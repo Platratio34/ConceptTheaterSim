@@ -1,0 +1,740 @@
+{
+	"folders": [
+		{
+			"name": "ConceptTheaterSim",
+			"path": "."
+		},
+		{
+			"name": "UE5",
+			"path": "D:\\Epic\\UE_5.6"
+		}
+	],
+	"settings": {
+		"typescript.tsc.autoDetect": "off",
+        "npm.autoDetect": "off",
+        "files.associations": {
+            ".fantomasignore": "ignore",
+            "*.meta": "xml",
+            "*.rtml": "xml",
+            "*.fsh": "glsl",
+            "*.vsh": "glsl",
+            "xlocale": "cpp",
+            "__locale": "cpp",
+            "algorithm": "cpp",
+            "chrono": "cpp",
+            "complex": "cpp",
+            "functional": "cpp",
+            "optional": "cpp",
+            "regex": "cpp",
+            "system_error": "cpp",
+            "type_traits": "cpp",
+            "xtr1common": "cpp",
+            "xutility": "cpp",
+            "__bit_reference": "cpp",
+            "__node_handle": "cpp",
+            "bitset": "cpp",
+            "deque": "cpp",
+            "__memory": "cpp",
+            "limits": "cpp",
+            "ratio": "cpp",
+            "tuple": "cpp",
+            "vector": "cpp",
+            "ctime": "cpp",
+            "*.rh": "cpp",
+            "xlocmon": "cpp",
+            "atomic": "cpp",
+            "locale": "cpp",
+            "*.mm": "cpp",
+            "array": "cpp",
+            "bit": "cpp",
+            "cctype": "cpp",
+            "cfenv": "cpp",
+            "charconv": "cpp",
+            "cinttypes": "cpp",
+            "clocale": "cpp",
+            "cmath": "cpp",
+            "codecvt": "cpp",
+            "compare": "cpp",
+            "concepts": "cpp",
+            "condition_variable": "cpp",
+            "coroutine": "cpp",
+            "csetjmp": "cpp",
+            "cstdarg": "cpp",
+            "cstddef": "cpp",
+            "cstdint": "cpp",
+            "cstdio": "cpp",
+            "cstdlib": "cpp",
+            "cstring": "cpp",
+            "cwchar": "cpp",
+            "cwctype": "cpp",
+            "exception": "cpp",
+            "filesystem": "cpp",
+            "format": "cpp",
+            "forward_list": "cpp",
+            "fstream": "cpp",
+            "future": "cpp",
+            "hash_map": "cpp",
+            "initializer_list": "cpp",
+            "iomanip": "cpp",
+            "ios": "cpp",
+            "iosfwd": "cpp",
+            "iostream": "cpp",
+            "istream": "cpp",
+            "iterator": "cpp",
+            "list": "cpp",
+            "map": "cpp",
+            "memory": "cpp",
+            "memory_resource": "cpp",
+            "mutex": "cpp",
+            "new": "cpp",
+            "numeric": "cpp",
+            "ostream": "cpp",
+            "queue": "cpp",
+            "random": "cpp",
+            "ranges": "cpp",
+            "set": "cpp",
+            "shared_mutex": "cpp",
+            "source_location": "cpp",
+            "span": "cpp",
+            "sstream": "cpp",
+            "stack": "cpp",
+            "stdexcept": "cpp",
+            "stop_token": "cpp",
+            "streambuf": "cpp",
+            "string": "cpp",
+            "strstream": "cpp",
+            "thread": "cpp",
+            "typeindex": "cpp",
+            "typeinfo": "cpp",
+            "unordered_map": "cpp",
+            "unordered_set": "cpp",
+            "utility": "cpp",
+            "valarray": "cpp",
+            "variant": "cpp",
+            "xfacet": "cpp",
+            "xhash": "cpp",
+            "xiosbase": "cpp",
+            "xlocbuf": "cpp",
+            "xlocinfo": "cpp",
+            "xlocmes": "cpp",
+            "xlocnum": "cpp",
+            "xloctime": "cpp",
+            "xmemory": "cpp",
+            "xstddef": "cpp",
+            "xstring": "cpp",
+            "xtree": "cpp",
+            "__bits": "cpp",
+            "__config": "cpp",
+            "__debug": "cpp",
+            "__errc": "cpp",
+            "__hash_table": "cpp",
+            "__mutex_base": "cpp",
+            "__split_buffer": "cpp",
+            "__threading_support": "cpp",
+            "__tree": "cpp",
+            "__tuple": "cpp",
+            "__verbose_abort": "cpp",
+            "string_view": "cpp",
+            "alignedvector3": "cpp",
+            "scoped_allocator": "cpp",
+            "hash_set": "cpp"
+        }
+	},
+	"extensions": {
+		"recommendations": [
+			"ms-vscode.cpptools",
+			"ms-dotnettools.csharp"
+		]
+	},
+	"tasks": {
+		"version": "2.0.0",
+		"tasks": [
+			{
+				"label": "ConceptTheaterSim Win64 Debug Build",
+				"group": "build",
+				"command": "Engine\\Build\\BatchFiles\\Build.bat",
+				"args": [
+					"ConceptTheaterSim",
+					"Win64",
+					"Debug",
+					"D:\\UnrealProjects\\ConceptTheaterSim\\ConceptTheaterSim.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "D:\\Epic\\UE_5.6"
+				}
+			},
+			{
+				"label": "ConceptTheaterSim Win64 Debug Rebuild",
+				"group": "build",
+				"command": "Engine\\Build\\BatchFiles\\Build.bat",
+				"args": [
+					"ConceptTheaterSim",
+					"Win64",
+					"Debug",
+					"D:\\UnrealProjects\\ConceptTheaterSim\\ConceptTheaterSim.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"dependsOn": [
+					"ConceptTheaterSim Win64 Debug Clean"
+				],
+				"type": "shell",
+				"options": {
+					"cwd": "D:\\Epic\\UE_5.6"
+				}
+			},
+			{
+				"label": "ConceptTheaterSim Win64 Debug Clean",
+				"group": "build",
+				"command": "Engine\\Build\\BatchFiles\\Clean.bat",
+				"args": [
+					"ConceptTheaterSim",
+					"Win64",
+					"Debug",
+					"D:\\UnrealProjects\\ConceptTheaterSim\\ConceptTheaterSim.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "D:\\Epic\\UE_5.6"
+				}
+			},
+			{
+				"label": "ConceptTheaterSim Win64 DebugGame Build",
+				"group": "build",
+				"command": "Engine\\Build\\BatchFiles\\Build.bat",
+				"args": [
+					"ConceptTheaterSim",
+					"Win64",
+					"DebugGame",
+					"D:\\UnrealProjects\\ConceptTheaterSim\\ConceptTheaterSim.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "D:\\Epic\\UE_5.6"
+				}
+			},
+			{
+				"label": "ConceptTheaterSim Win64 DebugGame Rebuild",
+				"group": "build",
+				"command": "Engine\\Build\\BatchFiles\\Build.bat",
+				"args": [
+					"ConceptTheaterSim",
+					"Win64",
+					"DebugGame",
+					"D:\\UnrealProjects\\ConceptTheaterSim\\ConceptTheaterSim.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"dependsOn": [
+					"ConceptTheaterSim Win64 DebugGame Clean"
+				],
+				"type": "shell",
+				"options": {
+					"cwd": "D:\\Epic\\UE_5.6"
+				}
+			},
+			{
+				"label": "ConceptTheaterSim Win64 DebugGame Clean",
+				"group": "build",
+				"command": "Engine\\Build\\BatchFiles\\Clean.bat",
+				"args": [
+					"ConceptTheaterSim",
+					"Win64",
+					"DebugGame",
+					"D:\\UnrealProjects\\ConceptTheaterSim\\ConceptTheaterSim.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "D:\\Epic\\UE_5.6"
+				}
+			},
+			{
+				"label": "ConceptTheaterSim Win64 Development Build",
+				"group": "build",
+				"command": "Engine\\Build\\BatchFiles\\Build.bat",
+				"args": [
+					"ConceptTheaterSim",
+					"Win64",
+					"Development",
+					"D:\\UnrealProjects\\ConceptTheaterSim\\ConceptTheaterSim.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "D:\\Epic\\UE_5.6"
+				}
+			},
+			{
+				"label": "ConceptTheaterSim Win64 Development Rebuild",
+				"group": "build",
+				"command": "Engine\\Build\\BatchFiles\\Build.bat",
+				"args": [
+					"ConceptTheaterSim",
+					"Win64",
+					"Development",
+					"D:\\UnrealProjects\\ConceptTheaterSim\\ConceptTheaterSim.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"dependsOn": [
+					"ConceptTheaterSim Win64 Development Clean"
+				],
+				"type": "shell",
+				"options": {
+					"cwd": "D:\\Epic\\UE_5.6"
+				}
+			},
+			{
+				"label": "ConceptTheaterSim Win64 Development Clean",
+				"group": "build",
+				"command": "Engine\\Build\\BatchFiles\\Clean.bat",
+				"args": [
+					"ConceptTheaterSim",
+					"Win64",
+					"Development",
+					"D:\\UnrealProjects\\ConceptTheaterSim\\ConceptTheaterSim.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "D:\\Epic\\UE_5.6"
+				}
+			},
+			{
+				"label": "ConceptTheaterSim Win64 Test Build",
+				"group": "build",
+				"command": "Engine\\Build\\BatchFiles\\Build.bat",
+				"args": [
+					"ConceptTheaterSim",
+					"Win64",
+					"Test",
+					"D:\\UnrealProjects\\ConceptTheaterSim\\ConceptTheaterSim.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "D:\\Epic\\UE_5.6"
+				}
+			},
+			{
+				"label": "ConceptTheaterSim Win64 Test Rebuild",
+				"group": "build",
+				"command": "Engine\\Build\\BatchFiles\\Build.bat",
+				"args": [
+					"ConceptTheaterSim",
+					"Win64",
+					"Test",
+					"D:\\UnrealProjects\\ConceptTheaterSim\\ConceptTheaterSim.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"dependsOn": [
+					"ConceptTheaterSim Win64 Test Clean"
+				],
+				"type": "shell",
+				"options": {
+					"cwd": "D:\\Epic\\UE_5.6"
+				}
+			},
+			{
+				"label": "ConceptTheaterSim Win64 Test Clean",
+				"group": "build",
+				"command": "Engine\\Build\\BatchFiles\\Clean.bat",
+				"args": [
+					"ConceptTheaterSim",
+					"Win64",
+					"Test",
+					"D:\\UnrealProjects\\ConceptTheaterSim\\ConceptTheaterSim.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "D:\\Epic\\UE_5.6"
+				}
+			},
+			{
+				"label": "ConceptTheaterSim Win64 Shipping Build",
+				"group": "build",
+				"command": "Engine\\Build\\BatchFiles\\Build.bat",
+				"args": [
+					"ConceptTheaterSim",
+					"Win64",
+					"Shipping",
+					"D:\\UnrealProjects\\ConceptTheaterSim\\ConceptTheaterSim.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "D:\\Epic\\UE_5.6"
+				}
+			},
+			{
+				"label": "ConceptTheaterSim Win64 Shipping Rebuild",
+				"group": "build",
+				"command": "Engine\\Build\\BatchFiles\\Build.bat",
+				"args": [
+					"ConceptTheaterSim",
+					"Win64",
+					"Shipping",
+					"D:\\UnrealProjects\\ConceptTheaterSim\\ConceptTheaterSim.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"dependsOn": [
+					"ConceptTheaterSim Win64 Shipping Clean"
+				],
+				"type": "shell",
+				"options": {
+					"cwd": "D:\\Epic\\UE_5.6"
+				}
+			},
+			{
+				"label": "ConceptTheaterSim Win64 Shipping Clean",
+				"group": "build",
+				"command": "Engine\\Build\\BatchFiles\\Clean.bat",
+				"args": [
+					"ConceptTheaterSim",
+					"Win64",
+					"Shipping",
+					"D:\\UnrealProjects\\ConceptTheaterSim\\ConceptTheaterSim.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "D:\\Epic\\UE_5.6"
+				}
+			},
+			{
+				"label": "ConceptTheaterSimEditor Win64 Debug Build",
+				"group": "build",
+				"command": "Engine\\Build\\BatchFiles\\Build.bat",
+				"args": [
+					"ConceptTheaterSimEditor",
+					"Win64",
+					"Debug",
+					"D:\\UnrealProjects\\ConceptTheaterSim\\ConceptTheaterSim.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "D:\\Epic\\UE_5.6"
+				}
+			},
+			{
+				"label": "ConceptTheaterSimEditor Win64 Debug Rebuild",
+				"group": "build",
+				"command": "Engine\\Build\\BatchFiles\\Build.bat",
+				"args": [
+					"ConceptTheaterSimEditor",
+					"Win64",
+					"Debug",
+					"D:\\UnrealProjects\\ConceptTheaterSim\\ConceptTheaterSim.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"dependsOn": [
+					"ConceptTheaterSimEditor Win64 Debug Clean"
+				],
+				"type": "shell",
+				"options": {
+					"cwd": "D:\\Epic\\UE_5.6"
+				}
+			},
+			{
+				"label": "ConceptTheaterSimEditor Win64 Debug Clean",
+				"group": "build",
+				"command": "Engine\\Build\\BatchFiles\\Clean.bat",
+				"args": [
+					"ConceptTheaterSimEditor",
+					"Win64",
+					"Debug",
+					"D:\\UnrealProjects\\ConceptTheaterSim\\ConceptTheaterSim.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "D:\\Epic\\UE_5.6"
+				}
+			},
+			{
+				"label": "ConceptTheaterSimEditor Win64 DebugGame Build",
+				"group": "build",
+				"command": "Engine\\Build\\BatchFiles\\Build.bat",
+				"args": [
+					"ConceptTheaterSimEditor",
+					"Win64",
+					"DebugGame",
+					"D:\\UnrealProjects\\ConceptTheaterSim\\ConceptTheaterSim.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "D:\\Epic\\UE_5.6"
+				}
+			},
+			{
+				"label": "ConceptTheaterSimEditor Win64 DebugGame Rebuild",
+				"group": "build",
+				"command": "Engine\\Build\\BatchFiles\\Build.bat",
+				"args": [
+					"ConceptTheaterSimEditor",
+					"Win64",
+					"DebugGame",
+					"D:\\UnrealProjects\\ConceptTheaterSim\\ConceptTheaterSim.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"dependsOn": [
+					"ConceptTheaterSimEditor Win64 DebugGame Clean"
+				],
+				"type": "shell",
+				"options": {
+					"cwd": "D:\\Epic\\UE_5.6"
+				}
+			},
+			{
+				"label": "ConceptTheaterSimEditor Win64 DebugGame Clean",
+				"group": "build",
+				"command": "Engine\\Build\\BatchFiles\\Clean.bat",
+				"args": [
+					"ConceptTheaterSimEditor",
+					"Win64",
+					"DebugGame",
+					"D:\\UnrealProjects\\ConceptTheaterSim\\ConceptTheaterSim.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "D:\\Epic\\UE_5.6"
+				}
+			},
+			{
+				"label": "ConceptTheaterSimEditor Win64 Development Build",
+				"group": "build",
+				"command": "Engine\\Build\\BatchFiles\\Build.bat",
+				"args": [
+					"ConceptTheaterSimEditor",
+					"Win64",
+					"Development",
+					"D:\\UnrealProjects\\ConceptTheaterSim\\ConceptTheaterSim.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "D:\\Epic\\UE_5.6"
+				}
+			},
+			{
+				"label": "ConceptTheaterSimEditor Win64 Development Rebuild",
+				"group": "build",
+				"command": "Engine\\Build\\BatchFiles\\Build.bat",
+				"args": [
+					"ConceptTheaterSimEditor",
+					"Win64",
+					"Development",
+					"D:\\UnrealProjects\\ConceptTheaterSim\\ConceptTheaterSim.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"dependsOn": [
+					"ConceptTheaterSimEditor Win64 Development Clean"
+				],
+				"type": "shell",
+				"options": {
+					"cwd": "D:\\Epic\\UE_5.6"
+				}
+			},
+			{
+				"label": "ConceptTheaterSimEditor Win64 Development Clean",
+				"group": "build",
+				"command": "Engine\\Build\\BatchFiles\\Clean.bat",
+				"args": [
+					"ConceptTheaterSimEditor",
+					"Win64",
+					"Development",
+					"D:\\UnrealProjects\\ConceptTheaterSim\\ConceptTheaterSim.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "D:\\Epic\\UE_5.6"
+				}
+			}
+		]
+	},
+	"launch": {
+		"version": "0.2.0",
+		"configurations": [
+			{
+				"name": "Launch ConceptTheaterSim (Debug)",
+				"request": "launch",
+				"program": "D:\\UnrealProjects\\ConceptTheaterSim\\Binaries\\Win64\\UnrealGame-Win64-Debug.exe",
+				"preLaunchTask": "ConceptTheaterSim Win64 Debug Build",
+				"args": [
+				],
+				"cwd": "D:\\Epic\\UE_5.6",
+				"stopAtEntry": false,
+				"console": "externalTerminal",
+				"type": "cppvsdbg",
+				"visualizerFile": "D:\\Epic\\UE_5.6\\Engine\\Extras\\VisualStudioDebugging\\Unreal.natvis",
+				"sourceFileMap": {
+					"D:\\build\\++UE5\\Sync": "D:\\Epic\\UE_5.6"
+				}
+			},
+			{
+				"name": "Launch ConceptTheaterSim (DebugGame)",
+				"request": "launch",
+				"program": "D:\\UnrealProjects\\ConceptTheaterSim\\Binaries\\Win64\\UnrealGame-Win64-DebugGame.exe",
+				"preLaunchTask": "ConceptTheaterSim Win64 DebugGame Build",
+				"args": [
+				],
+				"cwd": "D:\\Epic\\UE_5.6",
+				"stopAtEntry": false,
+				"console": "externalTerminal",
+				"type": "cppvsdbg",
+				"visualizerFile": "D:\\Epic\\UE_5.6\\Engine\\Extras\\VisualStudioDebugging\\Unreal.natvis",
+				"sourceFileMap": {
+					"D:\\build\\++UE5\\Sync": "D:\\Epic\\UE_5.6"
+				}
+			},
+			{
+				"name": "Launch ConceptTheaterSim (Development)",
+				"request": "launch",
+				"program": "D:\\UnrealProjects\\ConceptTheaterSim\\Binaries\\Win64\\UnrealGame.exe",
+				"preLaunchTask": "ConceptTheaterSim Win64 Development Build",
+				"args": [
+				],
+				"cwd": "D:\\Epic\\UE_5.6",
+				"stopAtEntry": false,
+				"console": "externalTerminal",
+				"type": "cppvsdbg",
+				"visualizerFile": "D:\\Epic\\UE_5.6\\Engine\\Extras\\VisualStudioDebugging\\Unreal.natvis",
+				"sourceFileMap": {
+					"D:\\build\\++UE5\\Sync": "D:\\Epic\\UE_5.6"
+				}
+			},
+			{
+				"name": "Launch ConceptTheaterSim (Test)",
+				"request": "launch",
+				"program": "D:\\UnrealProjects\\ConceptTheaterSim\\Binaries\\Win64\\UnrealGame-Win64-Test.exe",
+				"preLaunchTask": "ConceptTheaterSim Win64 Test Build",
+				"args": [
+				],
+				"cwd": "D:\\Epic\\UE_5.6",
+				"stopAtEntry": false,
+				"console": "externalTerminal",
+				"type": "cppvsdbg",
+				"visualizerFile": "D:\\Epic\\UE_5.6\\Engine\\Extras\\VisualStudioDebugging\\Unreal.natvis",
+				"sourceFileMap": {
+					"D:\\build\\++UE5\\Sync": "D:\\Epic\\UE_5.6"
+				}
+			},
+			{
+				"name": "Launch ConceptTheaterSim (Shipping)",
+				"request": "launch",
+				"program": "D:\\UnrealProjects\\ConceptTheaterSim\\Binaries\\Win64\\UnrealGame-Win64-Shipping.exe",
+				"preLaunchTask": "ConceptTheaterSim Win64 Shipping Build",
+				"args": [
+				],
+				"cwd": "D:\\Epic\\UE_5.6",
+				"stopAtEntry": false,
+				"console": "externalTerminal",
+				"type": "cppvsdbg",
+				"visualizerFile": "D:\\Epic\\UE_5.6\\Engine\\Extras\\VisualStudioDebugging\\Unreal.natvis",
+				"sourceFileMap": {
+					"D:\\build\\++UE5\\Sync": "D:\\Epic\\UE_5.6"
+				}
+			},
+			{
+				"name": "Launch ConceptTheaterSimEditor (Debug)",
+				"request": "launch",
+				"program": "D:\\Epic\\UE_5.6\\Engine\\Binaries\\Win64\\UnrealEditor-Win64-Debug.exe",
+				"preLaunchTask": "ConceptTheaterSimEditor Win64 Debug Build",
+				"args": [
+					"D:\\UnrealProjects\\ConceptTheaterSim\\ConceptTheaterSim.uproject"
+				],
+				"cwd": "D:\\Epic\\UE_5.6",
+				"stopAtEntry": false,
+				"console": "externalTerminal",
+				"type": "cppvsdbg",
+				"visualizerFile": "D:\\Epic\\UE_5.6\\Engine\\Extras\\VisualStudioDebugging\\Unreal.natvis",
+				"sourceFileMap": {
+					"D:\\build\\++UE5\\Sync": "D:\\Epic\\UE_5.6"
+				}
+			},
+			{
+				"name": "Launch ConceptTheaterSimEditor (DebugGame)",
+				"request": "launch",
+				"program": "D:\\Epic\\UE_5.6\\Engine\\Binaries\\Win64\\UnrealEditor-Win64-DebugGame.exe",
+				"preLaunchTask": "ConceptTheaterSimEditor Win64 DebugGame Build",
+				"args": [
+					"D:\\UnrealProjects\\ConceptTheaterSim\\ConceptTheaterSim.uproject"
+				],
+				"cwd": "D:\\Epic\\UE_5.6",
+				"stopAtEntry": false,
+				"console": "externalTerminal",
+				"type": "cppvsdbg",
+				"visualizerFile": "D:\\Epic\\UE_5.6\\Engine\\Extras\\VisualStudioDebugging\\Unreal.natvis",
+				"sourceFileMap": {
+					"D:\\build\\++UE5\\Sync": "D:\\Epic\\UE_5.6"
+				}
+			},
+			{
+				"name": "Launch ConceptTheaterSimEditor (Development)",
+				"request": "launch",
+				"program": "D:\\Epic\\UE_5.6\\Engine\\Binaries\\Win64\\UnrealEditor.exe",
+				"preLaunchTask": "ConceptTheaterSimEditor Win64 Development Build",
+				"args": [
+					"D:\\UnrealProjects\\ConceptTheaterSim\\ConceptTheaterSim.uproject"
+				],
+				"cwd": "D:\\Epic\\UE_5.6",
+				"stopAtEntry": false,
+				"console": "externalTerminal",
+				"type": "cppvsdbg",
+				"visualizerFile": "D:\\Epic\\UE_5.6\\Engine\\Extras\\VisualStudioDebugging\\Unreal.natvis",
+				"sourceFileMap": {
+					"D:\\build\\++UE5\\Sync": "D:\\Epic\\UE_5.6"
+				}
+			},
+			{
+				"name": "Generate Project Files",
+				"type": "coreclr",
+				"request": "launch",
+				"preLaunchTask": "UnrealBuildTool Win64 Development Build",
+				"program": "D:\\Epic\\UE_5.6\\Engine\\Build\\BatchFiles\\RunUBT.bat",
+				"args": [
+					"-projectfiles",
+					"-vscode",
+					"-project=D:\\UnrealProjects\\ConceptTheaterSim\\ConceptTheaterSim.uproject",
+					"-game",
+					"-engine",
+					"-dotnet"
+				],
+				"console": "externalTerminal",
+				"stopAtEntry": false,
+				"cwd": "D:\\Epic\\UE_5.6"
+			}
+		]
+	}
+}
