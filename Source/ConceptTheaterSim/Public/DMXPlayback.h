@@ -24,11 +24,12 @@ public:
     UFUNCTION(BlueprintCallable)
     int GetDMXFrame();
 
+    UFUNCTION(BlueprintCallable)
+    void LoadFile(FString filename);
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
-    void LoadFile();
 
 public:	
 	// Called every frame

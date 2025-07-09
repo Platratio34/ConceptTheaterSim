@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "UDMXNetSource.h"
+#include "DMXNetSource.h"
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
 #include "DMXCache.generated.h"
@@ -10,7 +10,7 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(BlueprintType)
 class CONCEPTTHEATERSIM_API UDMXCache : public UObject
 {
 	GENERATED_BODY()

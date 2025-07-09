@@ -16,7 +16,7 @@ bool UDMXCache::updateSource(FName name, int priority, int universe, TArray<int>
         return false;
     }
     cache.Remove(universe);
-    return true;
+    return true; // test
 }
 
 TArray<int> UDMXCache::getData(const int universe) {
@@ -43,5 +43,7 @@ TArray<int> UDMXCache::getData(const int universe) {
         out.Add(arr[i]);
     }
     cache.Add(universe, out);
+    delete[] prio;
+    delete[] arr;
     return out;
 }

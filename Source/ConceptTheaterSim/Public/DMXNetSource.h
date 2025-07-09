@@ -4,16 +4,20 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
-#include "UDMXNetSource.generated.h"
+#include "DMXNetSource.generated.h"
 
 UCLASS()
 class CONCEPTTHEATERSIM_API UDMXNetSource : public UObject
 {
-	GENERATED_BODY()
+	GENERATED_BODY()    
 
 public:
-    TMap<int, int> priority;
-    TMap<int, int*> universes;
+    int priority[16];
+    int * universes[16];
+    bool hasUniverse[16];
+
+    UDMXNetSource();
+    ~UDMXNetSource();
 
     bool set(int universe, int priority, TArray<int> data);
 

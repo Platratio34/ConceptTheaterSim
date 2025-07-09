@@ -15,7 +15,6 @@ ADMXPlayback::ADMXPlayback()
 void ADMXPlayback::BeginPlay()
 {
 	Super::BeginPlay();
-    LoadFile();
 }
 
 // Called every frame
@@ -25,14 +24,18 @@ void ADMXPlayback::Tick(float DeltaTime)
 
 }
 
-void ADMXPlayback::LoadFile() {
+void ADMXPlayback::LoadFile(FString filename) {
     loaded = false;
     TArray64<uint8> file;
     FString path = FPaths::ProjectContentDir();
-    path += "/dmx_recording.dmx";
+    path += "/" + filename;
     UE_LOG(LogTemp, Display, TEXT("Loading DMX recording: %s"), *path);
     FFileHelper::LoadFileToArray(file, *path, 0x00000000);
     uint8 *bytes = file.GetData();
+    if(bytes == nullptr || file.Num() == 0) {
+        UE_LOG(LogTemp, Error, TEXT("Invalid file; No data"));
+        return;
+    }
     if(bytes[0] != 0x44 || bytes[1] != 0x4d || bytes[2] != 0x58 || bytes[3] != 0x00) { // invalid file type
         UE_LOG(LogTemp, Error, TEXT("Invalid file type for DMX recording binary;"));
         return;
@@ -181,7 +184,7 @@ TArray<int> ADMXPlayback::GetUniverse(int universe) {
     }
     catch(const std::exception& e)
     {
-        UE_LOG(LogTemp, Error, TEXT("Error in GetUniverse(%i): %s"), universe, e.what());
+        UE_LOG(LogTemp, Error, TEXT("Error in GetUniverse(%i): %hs"), universe, e.what());
     }
     return outArr;
 }
