@@ -7,6 +7,22 @@
 #include "UObject/NoExportTypes.h"
 #include "DMXCache.generated.h"
 
+USTRUCT()
+struct FUniverse {
+    GENERATED_BODY()
+
+public:
+    FUniverse() {
+        data;
+    }
+    FUniverse(TArray<int> dmx) : data(dmx) {
+        
+    }
+
+    UPROPERTY()
+    TArray<int> data;
+};
+
 /**
  * 
  */
@@ -25,7 +41,9 @@ public:
 protected:
     // source cache?
     //
-    TMap<int, TArray<int>> cache;
+    UPROPERTY()
+    TMap<int, FUniverse> cache;
 
+    UPROPERTY()
     TMap<FName, UDMXNetSource*> sources;
 };

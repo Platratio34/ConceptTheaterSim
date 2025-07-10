@@ -6,15 +6,18 @@
 #include "UObject/NoExportTypes.h"
 #include "DMXNetSource.generated.h"
 
+#define DMX_NET_SOURCE_MAX_UNIVERSE 16
+
 UCLASS()
 class CONCEPTTHEATERSIM_API UDMXNetSource : public UObject
 {
 	GENERATED_BODY()    
 
 public:
-    int priority[16];
-    int * universes[16];
-    bool hasUniverse[16];
+    FName name;
+    int priority[DMX_NET_SOURCE_MAX_UNIVERSE];
+    uint8 * universes[DMX_NET_SOURCE_MAX_UNIVERSE];
+    bool hasUniverse[DMX_NET_SOURCE_MAX_UNIVERSE];
 
     UDMXNetSource();
     ~UDMXNetSource();
@@ -23,7 +26,7 @@ public:
 
     struct DMXNetSourceUniverse {
         int priority;
-        int *data;
+        uint8 *data;
         bool valid = false;
     };
 

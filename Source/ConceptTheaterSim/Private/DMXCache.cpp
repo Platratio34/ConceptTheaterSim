@@ -5,45 +5,49 @@
 
 
 bool UDMXCache::updateSource(FName name, int priority, int universe, TArray<int> data) {
-    UDMXNetSource *source;
+    // UE_LOG(LogTemp, Display, TEXT("Updating DMX Net Source: %s"), *(name.ToString()));
+    UDMXNetSource *source = nullptr;
     const FName &nPtn = name;
     if(sources.Contains(name)) {
         source = *sources.Find(name);
     } else {
+        source = NewObject<UDMXNetSource>();
         sources.Add(name, source);
+        source->name = name;
+        // UE_LOG(LogTemp, Display, TEXT("- Creating new source"));
     }
     if(!source->set(universe, priority, data)) {
         return false;
     }
     cache.Remove(universe);
-    return true; // test
+    return true;
 }
 
 TArray<int> UDMXCache::getData(const int universe) {
     if(cache.Contains(universe)) {
-        return cache[universe];
+        return cache[universe].data;
     }
-    int *arr = new int[512];
-    int *prio = new int[512];
+    // UE_LOG(LogTemp, Display, TEXT("Geting DMX data: U%d"), universe);
+    int prio[512] = {};
+    TArray<int> out;
+    out.Init(0, 512);
     for(auto& pair : sources) {
         UDMXNetSource *source = pair.Value;
         UDMXNetSource::DMXNetSourceUniverse u = source->getUniverse(universe);
+        if(!u.valid) // this source doesn't have this universe
+            continue;
+        // UE_LOG(LogTemp, Display, TEXT("- Source: %s"), *(source->name.ToString()));
         for (int i = 0; i < 512; i++) {
             if(u.priority < prio[i])
                 continue;
             
-            if(u.priority > prio[i] || u.data[i] > arr[i]) {
+            if(u.priority > prio[i] || u.data[i] > out[i]) {
                 prio[i] = u.priority;
-                arr[i] = u.data[i];
+                out[i] = u.data[i];
             }
         }
     }
-    TArray<int> out;
-    for (int i = 0; i < 512; i++) {
-        out.Add(arr[i]);
-    }
-    cache.Add(universe, out);
-    delete[] prio;
-    delete[] arr;
+    FUniverse uni(out);
+    cache.Add(universe, uni);
     return out;
 }
