@@ -29,25 +29,28 @@ TArray<int> UDMXCache::getData(const int universe) {
     }
     // UE_LOG(LogTemp, Display, TEXT("Geting DMX data: U%d"), universe);
     int prio[512] = {};
-    TArray<int> out;
-    out.Init(0, 512);
+    for(int i = 0; i < 512; i++) {
+        prio[i] = 0;
+    }
+    TArray<int> outData;
+    outData.Init(0, 512);
     for(auto& pair : sources) {
         UDMXNetSource *source = pair.Value;
-        UDMXNetSource::DMXNetSourceUniverse u = source->getUniverse(universe);
-        if(!u.valid) // this source doesn't have this universe
+        UDMXNetSource::DMXNetSourceUniverse sourceUniverse = source->getUniverse(universe);
+        if(!sourceUniverse.valid) // this source doesn't have this universe
             continue;
         // UE_LOG(LogTemp, Display, TEXT("- Source: %s"), *(source->name.ToString()));
         for (int i = 0; i < 512; i++) {
-            if(u.priority < prio[i])
+            if(sourceUniverse.priority < prio[i])
                 continue;
             
-            if(u.priority > prio[i] || u.data[i] > out[i]) {
-                prio[i] = u.priority;
-                out[i] = u.data[i];
+            if(sourceUniverse.priority > prio[i] || sourceUniverse.data[i] > outData[i]) {
+                prio[i] = sourceUniverse.priority;
+                outData[i] = sourceUniverse.data[i];
             }
         }
     }
-    FUniverse uni(out);
+    FUniverse uni(outData);
     cache.Add(universe, uni);
-    return out;
+    return outData;
 }

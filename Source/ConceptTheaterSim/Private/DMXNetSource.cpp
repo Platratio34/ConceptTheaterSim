@@ -28,7 +28,7 @@ bool UDMXNetSource::set(int universe, int prio, TArray<int> data) {
     bool changed = !hasUniverse[universe];
     hasUniverse[universe] = true;
     if(universes[universe] == nullptr) {
-        universes[universe] = new uint8[512];
+        universes[universe] = new uint8[512] {};
     }
     if(data.Num() != 512) {
         UE_LOG(LogTemp, Error, TEXT("DMX data incorrect size: Expected 512 elements, found %d"), data.Num());
