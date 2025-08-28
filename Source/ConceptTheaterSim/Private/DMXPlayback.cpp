@@ -72,39 +72,39 @@ void ADMXPlayback::LoadFile(FString filename) {
         frame.count = (bytes[pointer++] << 24) | (bytes[pointer++] << 16) | (bytes[pointer++] << 8) | (bytes[pointer++]);
         frame.frameNumber = frameNumber;
         frame.universes = new uint8*[numUniverses];
+        int skip = 0;
         for (int i = 0; i < numUniverses; i++)
         {
             frame.universes[i] = new uint8[512];
-            bool all255 = true;
-            // bool all0 = true;
+            int num255 = true;
             for (int a = 0; a < 512; a++)
             {
                 frame.universes[i][a] = bytes[pointer++];
-                all255 &= (frame.universes[i][a] == (uint8)0xff);
-                // all0 &= (frame.universes[i][a] == 0);
+                if(frame.universes[i][a] == (uint8)0xff)
+                    num255++;
             }
-            if(numActualFrames > 0 && (all255) && frame.count == 1) {
-                UE_LOG(LogTemp, Display, TEXT("Flash detected? (frame %i, universe U%i)"), frame.frameNumber, universes[i]);
-                delete[] frame.universes[i];
-                frame.universes[i] = lastFrame.universes[i];
+            if(numActualFrames > 0 && (num255 > 200)/* && frame.count <= 1*/) {
+                // UE_LOG(LogTemp, Display, TEXT("Flash detected? (frame %i, universe U%i, length %i, num255 %i)"), frame.frameNumber, universes[i], frame.count, num255);
+                skip++;
             }
         }
-        // if((all255 || all0) && frame.count == 1) {
-        //     skippedFrames++;
-        //     UE_LOG(LogTemp, Display, TEXT("Skipped frame %i: preview flash"), frame.frameNumber);
-        //     frameList[numActualFrames - 1].count++;
-        // } else {
-        frame.isValid = true;
-        frameList.Add(frame);
-        lastFrame = frame;
-        numActualFrames++;
-        // }
+        if(skip > 2) {
+            skippedFrames++;
+            UE_LOG(LogTemp, Display, TEXT("Skipped frame %i: preview flash"), frame.frameNumber);
+            frameList[numActualFrames - 1].count += 1 + frame.count;
+        } else {
+            frame.isValid = true;
+            frameList.Add(frame);
+            lastFrame = frame;
+            numActualFrames++;
+        }
 
         frameNumber = (bytes[pointer++] << 24) | (bytes[pointer++] << 16) | (bytes[pointer++] << 8) | (bytes[pointer++]);
     }
     if(numFrames != numActualFrames) {
         // something is wrong here, probably just a bad file
-        UE_LOG(LogTemp, Warning, TEXT("File specified %i frames, but %i were found, falling back to number of frames found"), numFrames, numActualFrames)
+        if(numFrames != (numActualFrames + skippedFrames)) // only warn if we didn't skip any those frames
+            UE_LOG(LogTemp, Warning, TEXT("File specified %i frames, but %i were found, falling back to number of frames found"), numFrames, numActualFrames)
         numFrames = numActualFrames; // But we'll update this just to avoid issues in playback
     }
     
@@ -156,6 +156,25 @@ bool ADMXPlayback::UpdateTime(int newFrames) {
 
     return updated;
 }
+
+void ADMXPlayback::NextFrame() {
+    if(frameIndex == numFrames - 1)
+        return; // No more frames defined
+    cFrame = frames[frameIndex + 1];
+    frameIndex++;
+}
+
+int ADMXPlayback::SetDMXFrame(int frame) {
+    if(frame < 0) {
+        frame = 0;
+    } else if (frame >= numFrames) {
+        frame = numFrames - 1;
+    }
+    frameIndex = frame;
+    cFrame = frames[frameIndex];
+    return frameIndex;
+}
+
 TArray<int> ADMXPlayback::GetUniverse(int universe) {
     TArray<int> outArr;
     outArr.Init(0, 512);

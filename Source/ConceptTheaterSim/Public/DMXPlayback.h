@@ -25,7 +25,13 @@ public:
     int GetDMXFrame();
 
     UFUNCTION(BlueprintCallable)
+    int SetDMXFrame(int frame);
+
+    UFUNCTION(BlueprintCallable)
     void LoadFile(FString filename);
+
+    UFUNCTION(BlueprintCallable)
+    void NextFrame();
 
 protected:
 	// Called when the game starts or when spawned
