@@ -14,4 +14,6 @@ class CONCEPTTHEATERSIM_API UVersionUtils : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 	
+    UFUNCTION(BlueprintCallable)
+    static FString GetProjectVersion();
 };
