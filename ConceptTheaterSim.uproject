@@ -42,5 +42,9 @@
 			"Name": "PreLoadScreenMoviePlayer",
 			"Enabled": true
 		}
+	],
+	"TargetPlatforms": [
+		"Linux",
+		"Windows"
 	]
 }
