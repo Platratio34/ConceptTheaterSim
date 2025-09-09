@@ -53,7 +53,8 @@ void ADMXPlayback::LoadFile(FString filename) {
         universesList.Add(nextUniverse);
         numUniverses++;
 
-        nextUniverse = (bytes[pointer++] << 8) | (bytes[pointer++]);
+        nextUniverse = (bytes[pointer] << 8) | (bytes[pointer+1]);
+        pointer += 2;
     }
     universes = new uint16[numUniverses];
     for (int32 i = 0; i != universesList.Num(); ++i)
@@ -61,15 +62,18 @@ void ADMXPlayback::LoadFile(FString filename) {
         universes[i] = universesList[i];
     }
 
-    numFrames = (bytes[pointer++] << 24) | (bytes[pointer++] << 16) | (bytes[pointer++] << 8) | (bytes[pointer++]);
+    numFrames = (bytes[pointer] << 24) | (bytes[pointer+1] << 16) | (bytes[pointer+2] << 8) | (bytes[pointer+3]);
+    pointer += 4;
     TArray<DMXFrame> frameList;
-    uint32 frameNumber = (bytes[pointer++] << 24) | (bytes[pointer++] << 16) | (bytes[pointer++] << 8) | (bytes[pointer++]);
+    uint32 frameNumber = (bytes[pointer] << 24) | (bytes[pointer+1] << 16) | (bytes[pointer+2] << 8) | (bytes[pointer+3]);
+    pointer += 4;
     int numActualFrames = 0;
     int skippedFrames = 0;
     DMXFrame lastFrame;
     while(frameNumber != 0xffffffff) {
         DMXFrame frame;
-        frame.count = (bytes[pointer++] << 24) | (bytes[pointer++] << 16) | (bytes[pointer++] << 8) | (bytes[pointer++]);
+        frame.count = (bytes[pointer] << 24) | (bytes[pointer+1] << 16) | (bytes[pointer+2] << 8) | (bytes[pointer+3]);
+        pointer += 4;
         frame.frameNumber = frameNumber;
         frame.universes = new uint8*[numUniverses];
         int skip = 0;
@@ -79,7 +83,8 @@ void ADMXPlayback::LoadFile(FString filename) {
             int num255 = true;
             for (int a = 0; a < 512; a++)
             {
-                frame.universes[i][a] = bytes[pointer++];
+                frame.universes[i][a] = bytes[pointer];
+                pointer += 1;
                 if(frame.universes[i][a] == (uint8)0xff)
                     num255++;
             }
@@ -99,7 +104,8 @@ void ADMXPlayback::LoadFile(FString filename) {
             numActualFrames++;
         }
 
-        frameNumber = (bytes[pointer++] << 24) | (bytes[pointer++] << 16) | (bytes[pointer++] << 8) | (bytes[pointer++]);
+        frameNumber = (bytes[pointer] << 24) | (bytes[pointer+1] << 16) | (bytes[pointer+2] << 8) | (bytes[pointer+3]);
+        pointer += 4;
     }
     if(numFrames != numActualFrames) {
         // something is wrong here, probably just a bad file
