@@ -13,7 +13,7 @@ struct FUniverse {
 
 public:
     FUniverse() {
-        data;
+        
     }
     FUniverse(TArray<int> dmx) : data(dmx) {
         

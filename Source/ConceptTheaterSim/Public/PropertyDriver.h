@@ -24,8 +24,14 @@ public:
     UFUNCTION(BlueprintCallable)
     bool IsDone();
 
+    UPROPERTY(EditAnywhere)
+    float maxAccl = -1;
+    UPROPERTY(EditAnywhere)
+    float decelTime = 0;
+
 protected:
     float value;
     float targetValue;
     float time;
+    float lastDelta = 0;
 };
