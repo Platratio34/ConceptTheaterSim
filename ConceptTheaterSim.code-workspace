@@ -138,7 +138,11 @@
             "alignedvector3": "cpp",
             "scoped_allocator": "cpp",
             "hash_set": "cpp"
-        }
+        },
+        "cSpell.words": [
+            "CONCEPTTHEATERSIM",
+            "UDELEGATE"
+        ]
 	},
 	"extensions": {
 		"recommendations": [
