@@ -4,28 +4,27 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
+#include "Networking/NetworkTypes.h"
 #include "CNetwork.generated.h"
 
-USTRUCT(BlueprintType)
-struct CONCEPTTHEATERSIM_API FNetworkPacket
-{
-    GENERATED_BODY()
+class CONCEPTTHEATERSIM_API MulticastTargetSet {
 
-    UPROPERTY(BlueprintReadWrite)
-    int dest = -1;
+public:
+    MulticastTargetSet(int address);
+    ~MulticastTargetSet();
 
-    UPROPERTY(BlueprintReadOnly)
-    int source = 0;
+    int address = 0xe0000000;
 
-    UPROPERTY(BlueprintReadWrite)
-    FName type;
+    UNetworkCard **subscribers = nullptr;
 
-    UPROPERTY(BlueprintReadWrite)
-    UObject *data = nullptr;
+    void addSubscriber(UNetworkCard *subscriber);
+    void removeSubscriber(UNetworkCard *subscriber);
+    void sendPacket(FNetworkPacket packet);
+
+protected:
+    int subSize = 4;
+    int subPntr = 0;
 };
-
-UDELEGATE(BlueprintCallable, BlueprintAuthorityOnly)
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnNetworkPacket, FNetworkPacket, packet);
 
 /**
  * 
@@ -36,6 +35,9 @@ class CONCEPTTHEATERSIM_API UCNetwork : public UObject
 	GENERATED_BODY()
 	
 public:
+    UCNetwork();
+    ~UCNetwork();
+
     FOnNetworkPacket onPacketOut;
 
     UFUNCTION(BlueprintCallable)
@@ -54,6 +56,9 @@ public:
     UFUNCTION(BlueprintCallable)
     void clearUpstream();
 
+    void multicastSubscribe(int address, UNetworkCard *subscriber);
+    void multicastUnSubscribe(int address, UNetworkCard *subscriber);
+
 protected:
     int subnet = 0x0A000000;
     int subnetMask = 0xFF000000;
@@ -64,4 +69,9 @@ protected:
     UCNetwork *upstream = nullptr;
 
     bool isAddressLocal(int addr);
+    void sendPacketInt(FNetworkPacket packet, bool fromUpstream);
+
+    MulticastTargetSet **multicastSets = nullptr;
+    int multicastSize = 1;
+    int multicastPntr;
 };

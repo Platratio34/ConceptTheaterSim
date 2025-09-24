@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
-#include "Networking/CNetwork.h"
+#include "Networking/NetworkTypes.h"
 #include "NetworkCard.generated.h"
 
 /**

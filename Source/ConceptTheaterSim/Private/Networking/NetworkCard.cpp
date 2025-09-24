@@ -2,6 +2,8 @@
 
 #include "Networking/NetworkCard.h"
 
+#include "Networking/CNetwork.h"
+
 UNetworkCard::UNetworkCard()
 {
     multicast = new int[multicastSize];
@@ -48,6 +50,9 @@ void UNetworkCard::multicastSubscribe(int multicastAddress)
         multicastSize += 8;
     }
     multicast[multicastPntr++] = multicastAddress;
+    if(network != nullptr) {
+        network->multicastSubscribe(multicastAddress, this);
+    }
 }
 void UNetworkCard::multicastUnSubscribe(int multicastAddress)
 {
@@ -65,6 +70,9 @@ void UNetworkCard::multicastUnSubscribe(int multicastAddress)
     }
     if (after)
         multicastPntr--;
+    if(network != nullptr) {
+        network->multicastUnSubscribe(multicastAddress, this);
+    }
 }
 
 void UNetworkCard::onPacket(FNetworkPacket packet)
@@ -75,16 +83,9 @@ void UNetworkCard::onPacket(FNetworkPacket packet)
     {
         valid = true;
     }
-    else
+    else if((packet.dest & 0xf0000000) == 0xe0000000)
     {
-        for (int i = 0; i < multicastPntr; i++)
-        {
-            if (packet.dest == multicast[i])
-            {
-                valid = true;
-                break;
-            }
-        }
+        valid = true;
     }
     if(!valid)
         return;
@@ -112,6 +113,8 @@ void UNetworkCard::connect(UCNetwork *newNetwork) {
     if(!staticIP)
         address = network->requestIP(hwAddress);
     network->onPacketOut.AddDynamic(this, &UNetworkCard::onPacket);
+    for (int i = 0; i < multicastPntr; i++)
+        network->multicastSubscribe(multicast[i], this);
 }
 
 void UNetworkCard::disconnect() {
@@ -120,6 +123,8 @@ void UNetworkCard::disconnect() {
     if(!staticIP)
         network->releaseIP(hwAddress);
     network->onPacketOut.RemoveDynamic(this, &UNetworkCard::onPacket);
+    for (int i = 0; i < multicastPntr; i++)
+        network->multicastUnSubscribe(multicast[i], this);
 }
 
 int UNetworkCard::getIP() {
