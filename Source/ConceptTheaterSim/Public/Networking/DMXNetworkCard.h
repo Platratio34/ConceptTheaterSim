@@ -4,24 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "Networking/NetworkCard.h"
+#include "Networking/NetworkPacketTypes.h"
 #include "DMXCache.h"
 #include "DMXNetworkCard.generated.h"
-
-USTRUCT(BlueprintType)
-struct CONCEPTTHEATERSIM_API FDMXNetworkPacket : public FNetworkPacket
-{
-    GENERATED_BODY()
-
-public:
-    UPROPERTY(BlueprintReadWrite)
-    FName sourceDevice;
-    UPROPERTY(BlueprintReadWrite)
-    int universe = 1;
-    UPROPERTY(BlueprintReadWrite)
-    int priority = 128;
-    UPROPERTY(BlueprintReadWrite)
-    TArray<int> dmxData;
-};
 
 /**
  * 
