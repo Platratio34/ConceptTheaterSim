@@ -25,6 +25,12 @@ public:
 
     UFUNCTION(BlueprintCallable)
     void sendData(FName source, int priority, int universe, TArray<int> data);
+    
+    UFUNCTION(BlueprintCallable)
+    bool hasChanged(int universe);
+
+    UFUNCTION(BlueprintCallable)
+    void clearChanged(int universe);
 
     UPROPERTY(VisibleAnywhere)
     TArray<int> activeUniverses;
@@ -33,4 +39,6 @@ protected:
     UDMXCache *cache = nullptr;
 
     bool onPacketInternal(FNetworkPacket packet);
+
+    TMap<int, bool> changedUniverses;
 };

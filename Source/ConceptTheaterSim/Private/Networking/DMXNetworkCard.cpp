@@ -32,6 +32,7 @@ bool UDMXNetworkCard::onPacketInternal(FNetworkPacket packet)
         return true;
     
     cache->updateSource(dmxPacket.sourceDevice, dmxPacket.priority, dmxPacket.universe, dmxPacket.dmxData);
+    changedUniverses.Add(dmxPacket.universe, true);
 
     return true;
 }
@@ -53,4 +54,18 @@ void UDMXNetworkCard::sendData(FName source, int priority, int universe, TArray<
     dmxPacket.dmxData = data;
     
     send(dmxPacket);
+}
+
+bool UDMXNetworkCard::hasChanged(int universe)
+{
+    if(bool* changed = changedUniverses.Find(universe))
+        return *changed;
+    return false;
+}
+
+void UDMXNetworkCard::clearChanged(int universe)
+{
+    if(universe <= 0)
+        changedUniverses.Empty();
+    changedUniverses.Remove(universe);
 }
