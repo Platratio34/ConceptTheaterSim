@@ -15,7 +15,7 @@ UDMXNetworkCard::~UDMXNetworkCard()
 
 bool UDMXNetworkCard::onPacketInternal(FNetworkPacket packet)
 {
-    if(packet.type != FName(TEXT("DMX"))) {
+    if(packet.type != DMX_NETWORK_PACKET) {
         return false;
     }
     FDMXNetworkPacket dmxPacket = (FDMXNetworkPacket)packet;
@@ -32,7 +32,7 @@ void UDMXNetworkCard::sendData(FName source, int priority, int universe, TArray<
     FDMXNetworkPacket dmxPacket;
 
     dmxPacket.dest = 0xe0000000 | universe;
-    dmxPacket.type = FName(TEXT("DMX"));
+    dmxPacket.type = DMX_NETWORK_PACKET;
 
     dmxPacket.sourceDevice = source;
     dmxPacket.priority = priority;

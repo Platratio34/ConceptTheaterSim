@@ -17,7 +17,8 @@ void ATimeCodeSourceC::TimerUpdate() {
     if(!running)
         return;
     frames++;
-    onTimeChangeEvent.Broadcast(frames, this->GetSeconds());
+    onTimeChangeEvent.Broadcast(frames, GetSeconds());
+    sendTimePacket();
 }
 
 void ATimeCodeSourceC::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -32,7 +33,8 @@ void ATimeCodeSourceC::Start(int startFrames) {
         return;
     frames = startFrames;
     running = true;
-    onTimeChangeEvent.Broadcast(frames, this->GetSeconds());
+    onTimeChangeEvent.Broadcast(frames, GetSeconds());
+    sendTimePacket();
 }
 
 void ATimeCodeSourceC::Stop() {
@@ -40,6 +42,7 @@ void ATimeCodeSourceC::Stop() {
         return;
     running = false;
     onTimeStopEvent.Broadcast();
+    sendTimePacket();
 }
 
 bool ATimeCodeSourceC::IsRunning() {
@@ -58,4 +61,22 @@ void ATimeCodeSourceC::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void ATimeCodeSourceC::sendTimePacket()
+{
+    if(networkCard == nullptr)
+        return;
+    
+    FTimecodeNetworkPacket packet;
+
+    packet.dest = -1;
+    packet.type = TIMECODE_NETWORK_PACKET;
+
+    packet.timeSource = timeSourceName;
+    packet.frames = frames;
+    packet.seconds = GetSeconds();
+    packet.running = running;
+
+    networkCard->send(packet);
 }

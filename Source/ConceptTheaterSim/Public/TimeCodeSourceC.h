@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Networking/NetworkCard.h"
+#include "Networking/NetworkPacketTypes.h"
 #include "TimeCodeSourceC.generated.h"
 
 /**
@@ -49,6 +51,12 @@ public:
     UPROPERTY(VisibleAnywhere)
     FOnStop onTimeStopEvent;
 
+    UPROPERTY(VisibleAnywhere)
+    UNetworkCard *networkCard;
+
+    UPROPERTY(VisibleAnywhere)
+    FName timeSourceName = FName(TEXT("TimeCodeSourceC"));
+
 protected:
     int frames = 0;
     int frameRate = 30;
@@ -58,4 +66,6 @@ protected:
     bool running = false;
 
     virtual void BeginPlay() override;
+
+    void sendTimePacket();
 };
