@@ -19,6 +19,18 @@ bool UDMXNetworkCard::onPacketInternal(FNetworkPacket packet)
         return false;
     }
     FDMXNetworkPacket dmxPacket = (FDMXNetworkPacket)packet;
+    bool has = false;
+    for(auto& universe : activeUniverses)
+    {
+        if(dmxPacket.universe == universe)
+        {
+            has = true;
+            break;
+        }
+    }
+    if(!has)
+        return true;
+    
     cache->updateSource(dmxPacket.sourceDevice, dmxPacket.priority, dmxPacket.universe, dmxPacket.dmxData);
 
     return true;

@@ -16,7 +16,7 @@ class CONCEPTTHEATERSIM_API UDMXNetworkCard : public UNetworkCard
 {
 	GENERATED_BODY()
 
-protected:
+public:
     UDMXNetworkCard();
     ~UDMXNetworkCard();
 
@@ -25,6 +25,9 @@ protected:
 
     UFUNCTION(BlueprintCallable)
     void sendData(FName source, int priority, int universe, TArray<int> data);
+
+    UPROPERTY(VisibleAnywhere)
+    TArray<int> activeUniverses;
 
 protected:
     UDMXCache *cache = nullptr;

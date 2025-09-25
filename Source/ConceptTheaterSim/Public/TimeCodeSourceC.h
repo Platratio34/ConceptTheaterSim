@@ -52,7 +52,7 @@ public:
     FOnStop onTimeStopEvent;
 
     UPROPERTY(VisibleAnywhere)
-    UNetworkCard *networkCard;
+    UNetworkCard *networkCard = nullptr;
 
     UPROPERTY(VisibleAnywhere)
     FName timeSourceName = FName(TEXT("TimeCodeSourceC"));

@@ -144,6 +144,7 @@ bool ADMXPlayback::UpdateTime(int newFrames) {
             }
         }
         cFrame = frames[frameIndex];
+        sendFramePackets();
         return true;
     }
 
@@ -158,6 +159,11 @@ bool ADMXPlayback::UpdateTime(int newFrames) {
         updated = true;
         
         nextFrame = frames[frameIndex + 1];
+    }
+
+    if(updated || lastSentFrame + (5*30) < cFrameNumber)
+    {
+        sendFramePackets();
     }
 
     return updated;
@@ -216,4 +222,21 @@ TArray<int> ADMXPlayback::GetUniverse(int universe) {
 
 int ADMXPlayback::GetDMXFrame() {
     return frameIndex;
+}
+
+void ADMXPlayback::sendFramePackets()
+{
+    lastSentFrame = cFrameNumber;
+    if(networkCard == nullptr)
+        return;
+    for (int i = 0; i < numUniverses; i++) {
+        int universe = universes[i];
+        TArray<int> outArr;
+        outArr.Init(0, 512);
+        uint8 *data = cFrame.universes[i];
+        for(int a = 0; a < 512; a++) {
+            outArr[a] = (int)data[a];
+        }
+        networkCard->sendData(dmxSourceName, dmxPriority, universe, outArr);
+    }
 }

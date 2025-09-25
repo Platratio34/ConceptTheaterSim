@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Networking/DMXNetworkCard.h"
 #include "DMXPlayback.generated.h"
 
 UCLASS()
@@ -48,6 +49,15 @@ public:
         bool isValid = false;
     };
 
+    UPROPERTY(VisibleAnywhere)
+    UDMXNetworkCard *networkCard = nullptr;
+
+    UPROPERTY(VisibleAnywhere)
+    FName dmxSourceName = FName(TEXT("DMXPlayback"));
+
+    UPROPERTY(VisibleAnywhere)
+    int dmxPriority = 127;
+
 private:
     int numFrames;
     DMXFrame *frames;
@@ -58,4 +68,8 @@ private:
     int frameIndex = -1;
     int cFrameNumber = -1;
     bool loaded = false;
+
+    int lastSentFrame = -1;
+
+    void sendFramePackets();
 };
