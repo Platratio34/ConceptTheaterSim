@@ -48,6 +48,9 @@ public:
     int requestIP(FString hwAddress);
     void releaseIP(FString hwAddress);
 
+    void connect(UNetworkCard *card);
+    void disconnect(UNetworkCard *card);
+
     int getSubnet();
     int getSubnetMask();
 
@@ -69,9 +72,13 @@ protected:
     UCNetwork *upstream = nullptr;
 
     bool isAddressLocal(int addr);
-    void sendPacketInt(FNetworkPacket packet, bool fromUpstream);
+    void sendPacketInt(FNetworkPacket packet, bool fromUpstream, UCNetwork* sourceNet);
 
     MulticastTargetSet **multicastSets = nullptr;
     int multicastSize = 1;
     int multicastPntr;
+
+    TArray<UNetworkCard*> cards;
+    TArray<UCNetwork*> childNetworks;
+    UCNetwork *parentNetwork;
 };

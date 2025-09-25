@@ -30,7 +30,6 @@ void UNetworkCard::send(FNetworkPacket packet)
     if(network != nullptr) {
         network->sendPacket(packet);
     }
-    // send it here
 }
 
 void UNetworkCard::multicastSubscribe(int multicastAddress)
@@ -42,12 +41,14 @@ void UNetworkCard::multicastSubscribe(int multicastAddress)
     }
     if (multicastPntr == multicastSize)
     {
-        int *nArr = new int[multicastSize + 8];
-        for (int i = 0; i < multicastSize; i++)
+        multicastSize += 8;
+        int *nArr = new int[multicastSize];
+        for (int i = 0; i < multicastPntr; i++)
         {
             nArr[i] = multicast[i];
         }
-        multicastSize += 8;
+        delete[] multicast;
+        multicast = nArr;
     }
     multicast[multicastPntr++] = multicastAddress;
     if(network != nullptr) {
@@ -77,19 +78,7 @@ void UNetworkCard::multicastUnSubscribe(int multicastAddress)
 
 void UNetworkCard::onPacket(FNetworkPacket packet)
 {
-    bool valid = false;
-    int localBroadcast = subnet | (~subnetMask);
-    if (packet.dest == address || packet.dest == -1 || packet.dest == localBroadcast)
-    {
-        valid = true;
-    }
-    else if((packet.dest & 0xf0000000) == 0xe0000000)
-    {
-        valid = true;
-    }
-    if(!valid)
-        return;
-    if(packet.type == FName(TEXT("Ping"))) {
+    if(packet.type == FName(TEXT("Ping"))) { // automatically respond to Ping messages and comsume them
         FNetworkPacket rsp;
         rsp.dest = packet.source;
         rsp.source = address;
@@ -97,7 +86,7 @@ void UNetworkCard::onPacket(FNetworkPacket packet)
         send(rsp);
         return;
     }
-    if(!onPacketInternal(packet)) // if the internal function did not consume it
+    if(!onPacketInternal(packet)) // if the internal function did not consume it send it to listeners
         onNetworkPacket.Broadcast(packet);
 }
 
@@ -112,7 +101,7 @@ void UNetworkCard::connect(UCNetwork *newNetwork) {
     subnetMask = network->getSubnetMask();
     if(!staticIP)
         address = network->requestIP(hwAddress);
-    network->onPacketOut.AddDynamic(this, &UNetworkCard::onPacket);
+    network->connect(this);
     for (int i = 0; i < multicastPntr; i++)
         network->multicastSubscribe(multicast[i], this);
 }
@@ -122,7 +111,7 @@ void UNetworkCard::disconnect() {
         return;
     if(!staticIP)
         network->releaseIP(hwAddress);
-    network->onPacketOut.RemoveDynamic(this, &UNetworkCard::onPacket);
+    network->disconnect(this);
     for (int i = 0; i < multicastPntr; i++)
         network->multicastUnSubscribe(multicast[i], this);
 }

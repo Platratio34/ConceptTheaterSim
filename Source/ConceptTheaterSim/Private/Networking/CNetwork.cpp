@@ -35,38 +35,47 @@ bool UCNetwork::isAddressLocal(int addr)
 
 void UCNetwork::sendPacket(FNetworkPacket packet)
 {
-    sendPacketInt(packet, false);
+    sendPacketInt(packet, false, nullptr);
 }
 
 void UCNetwork::onUpstreamPacket(FNetworkPacket packet)
 {
-    sendPacketInt(packet, true);
+    sendPacketInt(packet, true, nullptr);
 }
 
-void UCNetwork::sendPacketInt(FNetworkPacket packet, bool fromUpstream)
+void UCNetwork::sendPacketInt(FNetworkPacket packet, bool fromUpstream, UCNetwork* sourceNet)
 {
-    int addr = packet.dest;
-    int packetSubnet = addr & subnetMask;
-    bool isMulticast = (addr & 0xF0000000) == 0xE0000000;
+    int dest = packet.dest;
+    int packetSubnet = dest & subnetMask;
+    int localBroadcast = subnet | (~subnetMask);
     
-    if (packetSubnet == subnet || addr == -1)
-    { // in our network, or all network broadcast
+    if (packetSubnet == subnet || dest == -1) // in our network, or all network broadcast
+    {
         onPacketOut.Broadcast(packet);
+        bool broadcast = dest == -1 || dest == localBroadcast;
+        for(auto& card : cards)
+        {
+            if(broadcast || dest == card->getIP())
+            {
+                card->onPacket(packet);
+            }
+        }
     }
-    else if ((addr & 0xF0000000) == 0xE0000000)
-    { // multicast
+    else if ((dest & 0xF0000000) == 0xE0000000) // multicast
+    {
+        onPacketOut.Broadcast(packet);
         for (int i = 0; i < multicastPntr; i++)
         {
             MulticastTargetSet *set = multicastSets[i];
-            if (set->address == addr)
+            if (set->address == dest)
             {
                 set->sendPacket(packet);
                 break;
             }
         }
     }
-    else if (upstream != nullptr && !fromUpstream)
-    { // else send to upstream if present
+    else if (upstream != nullptr && !fromUpstream) // else send to upstream if present
+    {
         upstream->sendPacket(packet);
     }
 }
@@ -138,6 +147,8 @@ void UCNetwork::multicastSubscribe(int address, UNetworkCard *subscriber)
         {
             newArr[i] = multicastSets[i];
         }
+        delete[] multicastSets;
+        multicastSets = newArr;
     }
     MulticastTargetSet *set = new MulticastTargetSet(address);
     multicastSets[multicastPntr++] = set;
@@ -156,6 +167,14 @@ void UCNetwork::multicastUnSubscribe(int address, UNetworkCard *subscriber)
         }
     }
 }
+
+void UCNetwork::connect(UNetworkCard *card) {
+    cards.AddUnique(card);
+}
+void UCNetwork::disconnect(UNetworkCard *card) {
+    cards.Remove(card);
+}
+
 
 MulticastTargetSet::MulticastTargetSet(int address_)
 {
@@ -182,6 +201,8 @@ void MulticastTargetSet::addSubscriber(UNetworkCard *subscriber)
         {
             newArr[i] = subscribers[i];
         }
+        delete[] subscribers;
+        subscribers = newArr;
     }
     subscribers[subPntr++] = subscriber;
 }
