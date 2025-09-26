@@ -25,4 +25,43 @@ protected:
 
     UFUNCTION(BlueprintCallable)
     FLinearColor getCommandColor();
+    
+    static TMap<FName, FString> getNamesToDisplay()
+    {
+        static bool namesToDisplayInit = false;
+        static TMap<FName, FString> namesToDisplay;
+        if(namesToDisplayInit)
+            return namesToDisplay;
+        namesToDisplayInit = true;
+
+        namesToDisplay.Add(BUTTON_DOT, TEXT("."));
+        namesToDisplay.Add(BUTTON_SLASH, TEXT("/"));
+
+        namesToDisplay.Add(BUTTON_GO_TO_CUE, TEXT("Go To Cue"));
+
+        namesToDisplay.Add(BUTTON_ADDRESS, TEXT("Address"));
+
+        namesToDisplay.Add(BUTTON_BEAM_PALLET, TEXT("Beam Pallet"));
+        namesToDisplay.Add(BUTTON_INT_PALLET, TEXT("Intensity Pallet"));
+        namesToDisplay.Add(BUTTON_COLOR_PALLET, TEXT("Color Pallet"));
+        namesToDisplay.Add(BUTTON_FOCUS_PALLET, TEXT("Focus Pallet"));
+        
+        namesToDisplay.Add(BUTTON_SELECT_ACTIVE, TEXT("Select Active"));
+        namesToDisplay.Add(BUTTON_SELECT_LAST, TEXT("Select Last"));
+        namesToDisplay.Add(BUTTON_SELECT_MANUAL, TEXT("Select Manual"));
+        
+        namesToDisplay.Add(BUTTON_RECORD_ONLY, TEXT("Record Only"));
+
+        namesToDisplay.Add(BUTTON_RECALL_FROM, TEXT("Recall From"));
+        namesToDisplay.Add(BUTTON_COPY_TO, TEXT("Copy To"));
+
+        namesToDisplay.Add(BUTTON_HIGH, TEXT("Highlight"));
+        
+        namesToDisplay.Add(BUTTON_PLUS, TEXT("+"));
+        namesToDisplay.Add(BUTTON_MINUS, TEXT("-"));
+        
+        namesToDisplay.Add(BUTTON_LABEL, TEXT("Label"));
+
+        return namesToDisplay;
+    }
 };

@@ -5,6 +5,8 @@
 
 FString UEOSScreenBase::getCommandString()
 {
+    TMap<FName, FString> ntd = getNamesToDisplay();
+
     FString str = TEXT("");
     if(board != nullptr)
     {
@@ -36,8 +38,14 @@ FString UEOSScreenBase::getCommandString()
                 if(!(UEOSButton::isNumeric(n) && UEOSButton::isNumeric(command[i-1])))
                     str += TEXT(" ");
             }
-                
-            str += n.ToString();
+            if(FString* s2 = ntd.Find(n))
+            {
+                str += *s2;
+            }
+            else
+            {
+                str += n.ToString();
+            }
         }
         if(board->commandError.Len() > 0)
         {
@@ -46,6 +54,10 @@ FString UEOSScreenBase::getCommandString()
         if(board->confirmCmd)
         {
             str += TEXT(" Confirm");
+        }
+        if(board->clearCmd)
+        {
+            str += TEXT(" *");
         }
     } else 
     {

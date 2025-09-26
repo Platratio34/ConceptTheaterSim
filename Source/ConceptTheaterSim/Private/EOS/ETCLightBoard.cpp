@@ -2,6 +2,10 @@
 
 #include "EOS/ETCLightBoard.h"
 
+const FName CMD_UNPARK = FName(TEXT("Unpark"));
+const FName CMD_CHAN = FName(TEXT("Chan"));
+const FName CMD_FOLLOW = FName(TEXT("Follow"));
+
 // Sets default values
 AETCLightBoard::AETCLightBoard()
 {
@@ -33,6 +37,24 @@ void AETCLightBoard::BeginPlay()
             buttonsByMesh.Add(comp, buttonName);
             setButtonInteractionText(comp, buttonName);
         }
+        else if(compName.Contains(TEXT("Indicator-")))
+        {
+            FName buttonName = FName(compName.Mid(10, compName.Len() - 10));
+            indicatorsByName.Add(buttonName, comp);
+            UEOSButton* button = NewObject<UEOSButton>();
+            button->setup(buttonName, nullptr, FColor(255, 255, 255));
+            button->setIndicatorMesh(comp);
+            buttonByName.Add(buttonName, button);
+            if(FColor* color = buttonColors.Find(buttonName))
+            {
+                button->makeUnique(UMaterialInstanceDynamic::Create(buttonMaterial, this), UMaterialInstanceDynamic::Create(indicatorMaterial, this));
+                button->setActiveColor(*color);
+                UE_LOG(LogTemp, Display, TEXT("EOS Button: `%s` (UNIQUE)"), *buttonName.ToString());
+            }
+            button->updateRender();
+
+            UE_LOG(LogTemp, Display, TEXT("EOS Button Indicator: `%s`"), *buttonName.ToString());
+        }
     }
 
     TArray<UTextRenderComponent*> textRendererComponents;
@@ -45,26 +67,36 @@ void AETCLightBoard::BeginPlay()
             FName buttonName = FName(compName.Mid(5, compName.Len() - 5));
             textByName.Add(buttonName, comp);
             comp->SetTextMaterial(baseButtonMaterial);
-            UEOSButton* button = NewObject<UEOSButton>();
-            button->setup(buttonName, comp, FColor(255, 255, 255));
-            buttonByName.Add(buttonName, button);
-            if(FColor* color = buttonColors.Find(buttonName))
+            UEOSButton* button = nullptr;
+            if(UEOSButton** ptr = buttonByName.Find(buttonName))
             {
-                button->makeUnique(UMaterialInstanceDynamic::Create(buttonMaterial, this));
-                button->setActiveColor(*color);
-                // UE_LOG(LogTemp, Display, TEXT("EOS Button: `%s` (UNIQUE)"), *buttonName.ToString());
+                button = *ptr;
+                button->setTextRenderer(comp);
+            }
+            else
+            {
+                button = NewObject<UEOSButton>();
+                button->setup(buttonName, comp, FColor(255, 255, 255));
+                buttonByName.Add(buttonName, button);
+                if(FColor* color = buttonColors.Find(buttonName))
+                {
+                    button->makeUnique(UMaterialInstanceDynamic::Create(buttonMaterial, this), UMaterialInstanceDynamic::Create(indicatorMaterial, this));
+                    button->setActiveColor(*color);
+                    UE_LOG(LogTemp, Display, TEXT("EOS Button: `%s` (UNIQUE)"), *buttonName.ToString());
+                }
+                button->updateRender();
             }
             // UE_LOG(LogTemp, Display, TEXT("EOS Button: `%s`"), *buttonName.ToString());
         }
     }
 
-    setButtonColor(BUTTON_LIVE, FColor(255, 255, 255), FColor(255, 255, 0));
-    setButtonColor(BUTTON_BLIND, FColor(255, 255, 255), FColor(32, 32, 255));
-    setButtonColor(BUTTON_STAGE, FColor(255, 255, 255), FColor(32, 255, 32));
+    // setButtonColor(BUTTON_LIVE, FColor(255, 255, 255), FColor(255, 255, 0));
+    // setButtonColor(BUTTON_BLIND, FColor(255, 255, 255), FColor(32, 32, 255));
+    // setButtonColor(BUTTON_STAGE, FColor(255, 255, 255), FColor(32, 255, 32));
     
-    setButtonColor(BUTTON_HIGH, FColor(255, 255, 255), FColor(255, 255, 0));
+    // setButtonColor(BUTTON_HIGH, FColor(255, 255, 255), FColor(255, 255, 0));
     
-    setButtonColor(BUTTON_CLEAR, FColor(255, 255, 255), FColor(255, 32, 32));
+    // setButtonColor(BUTTON_CLEAR, FColor(255, 255, 255), FColor(255, 32, 32));
 }
 
 // Called every frame
@@ -81,6 +113,10 @@ void AETCLightBoard::Tick(float DeltaTime)
     setButtonActive(BUTTON_PARK, !parkedChannels.IsEmpty());
 
     setButtonActive(BUTTON_CLEAR, !command.IsEmpty());
+
+    setButtonActive(BUTTON_SHIFT, shift);
+
+    
 }
 
 void AETCLightBoard::setButtonColor(FName button, int r, int g, int b)
@@ -139,21 +175,38 @@ void AETCLightBoard::onInteract(UPrimitiveComponent* component)
             mode = STAGE;
             return;
         }
-        else if(button == BUTTON_ENTER)
+        else if(button == BUTTON_GO)
+        {
+            // TODO: update when Qs are added
+            return;
+        }
+        else if(button == BUTTON_BACK)
+        {
+            // TODO: update when Qs are added
+            return;
+        }
+        
+        if(clearCmd)
+        {
+            command.Empty();
+            clearCmd = false;
+        }
+        
+        if(button == BUTTON_ENTER)
         {
             executeCommand();
             return;
         }
         else if(button == BUTTON_CLEAR)
         {
-            commandError = TEXT("");
-            if(clearCmd)
-            {
-                command.Empty();
-                clearCmd = false;
+            if(commandError.Len() > 0)
+                commandError = TEXT("");
+            else if(command.Num() > 0) {
+                if(shift)
+                    command.Empty();
+                else
+                    command.RemoveAt(command.Num() - 1);
             }
-            else if(command.Num() > 0)
-                command.RemoveAt(command.Num() - 1);
             return;
         }
         else if(button == BUTTON_SHIFT)
@@ -161,11 +214,7 @@ void AETCLightBoard::onInteract(UPrimitiveComponent* component)
             shift = !shift;
             return;
         }
-        if(clearCmd)
-        {
-            command.Empty();
-            clearCmd = false;
-        }
+        
         if(commandError.Len() > 0)
         {
             commandError = TEXT("");
@@ -173,7 +222,14 @@ void AETCLightBoard::onInteract(UPrimitiveComponent* component)
 
         if(UEOSButton::isNumeric(button) && command.Num() == 0)
         {
-            command.Add(FName(TEXT("Chan")));
+            command.Add(CMD_CHAN);
+        }
+        else if(button == BUTTON_DELAY)
+        {
+            if(shift)
+            {
+                button = CMD_FOLLOW;
+            }
         }
 
         command.Add(button);
@@ -234,11 +290,11 @@ void AETCLightBoard::executeCommand()
             return;
         }
         command.Empty();
-        command.Add(FName(TEXT("Unpark")));
+        command.Add(CMD_UNPARK);
         confirmCmd = true;
         return;
     }
-    else if(command.Num() == 1 && command[0] == FName(TEXT("Unpark")) && confirmCmd)
+    else if(command.Num() == 1 && command[0] == CMD_UNPARK && confirmCmd)
     {
         confirmCmd = false;
         clearCmd = true;
@@ -247,7 +303,7 @@ void AETCLightBoard::executeCommand()
     }
     else if(command[command.Num()-1] == BUTTON_PARK)
     {
-        if(command[0] != FName(TEXT("Chan")))
+        if(command[0] != CMD_CHAN)
         {
             commandError = TEXT("Can only park channels");
             return;
@@ -256,7 +312,7 @@ void AETCLightBoard::executeCommand()
         if(parkedChannels.Contains(c))
         {
             command.RemoveAt(command.Num() - 1);
-            command.Add(FName(TEXT("Unpark")));
+            command.Add(CMD_UNPARK);
             confirmCmd = true;
             return;
         }
@@ -264,7 +320,7 @@ void AETCLightBoard::executeCommand()
         clearCmd = true;
         return;
     }
-    else if(command[command.Num()-1] == FName(TEXT("Unpark")))
+    else if(command[command.Num()-1] == CMD_UNPARK)
     {
         int c = getCmdNumber(1);
         parkedChannels.Remove(c);

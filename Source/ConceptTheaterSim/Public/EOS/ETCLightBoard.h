@@ -49,6 +49,9 @@ public:
     UPROPERTY(EditAnywhere)
     UMaterialInterface *buttonMaterial;
 
+    UPROPERTY(EditAnywhere)
+    UMaterialInterface *indicatorMaterial;
+
     TArray<FName> command;
     FString commandError = TEXT("");
     bool confirmCmd = false;
@@ -63,6 +66,7 @@ private:
 
     TMap<FName, UStaticMeshComponent*> buttonsByName;
     TMap<UStaticMeshComponent*, FName> buttonsByMesh;
+    TMap<FName, UStaticMeshComponent*> indicatorsByName;
 
     TMap<FName, UTextRenderComponent*> textByName;
 

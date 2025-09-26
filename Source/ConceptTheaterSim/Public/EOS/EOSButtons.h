@@ -237,10 +237,44 @@ public:
         return ID;
     }
 
-    UEOSButton* makeUnique(UMaterialInstanceDynamic* buttonMaterial_)
+    UEOSButton* makeUnique(UMaterialInstanceDynamic* buttonMaterial_, UMaterialInstanceDynamic* indicatorMaterial_)
     {
         buttonMaterial = buttonMaterial_;
-        textRenderer->SetTextMaterial(buttonMaterial);
+        indicatorMaterial = indicatorMaterial_;
+        if(textRenderer != nullptr)
+        {
+            textRenderer->SetTextMaterial(buttonMaterial);
+        }
+        if(mesh != nullptr)
+        {
+            mesh->SetMaterial(buttonMaterialIndex, indicatorMaterial);
+        }
+        updateRender(true);
+        return this;
+    }
+
+    UEOSButton* setIndicatorMesh(UStaticMeshComponent* mesh_)
+    {
+        return setIndicatorMesh(mesh_, 0);
+    }
+    UEOSButton* setIndicatorMesh(UStaticMeshComponent* mesh_, int index)
+    {
+        mesh = mesh_;
+        buttonMaterialIndex = index;
+        if(buttonMaterial != nullptr)
+        {
+            mesh->SetMaterial(buttonMaterialIndex, indicatorMaterial);
+        }
+        return this;
+    }
+    UEOSButton* setTextRenderer(UTextRenderComponent* textRenderer_)
+    {
+        textRenderer = textRenderer_;
+        if(buttonMaterial != nullptr)
+        {
+            textRenderer->SetTextMaterial(buttonMaterial);
+        }
+        updateRender(true);
         return this;
     }
 
@@ -263,6 +297,37 @@ public:
         return this;
     }
 
+    void updateRender()
+    {
+        updateRender(false);
+    }
+    void updateRender(bool force)
+    {   
+        if(lastActive == active && !force)
+        {
+            return;
+        }
+        lastActive = active;
+        FColor color = active ? activeColor : buttonColor;
+        float i2 = active ? 1.0f : intensity;
+
+        // if(textRenderer != nullptr && IsValid(textRenderer))
+        // {
+        //     textRenderer->TextRenderColor = FColor((int)(intensity * color.R), (int)(intensity * color.G), (int)(intensity * color.B));
+        // }
+        FLinearColor c2 = FLinearColor(((float)color.R) / 255.0, ((float)color.G) / 255.0, ((float)color.B) / 255.0, 1.0);
+        if(buttonMaterial != nullptr && IsValid(buttonMaterial))
+        {
+            buttonMaterial->SetScalarParameterValue("Intensity", i2);
+            buttonMaterial->SetVectorParameterValue("Color", c2);
+        }
+        if(indicatorMaterial != nullptr &&  && IsValid(indicatorMaterial))
+        {
+            indicatorMaterial->SetScalarParameterValue("Intensity", i2);
+            indicatorMaterial->SetVectorParameterValue("Color", c2);
+        }
+    }
+
     static TMap<const FName, FColor> getButtonColors()
     {
         TMap<const FName, FColor> map;
@@ -272,54 +337,44 @@ public:
         map.Add(BUTTON_STAGE, FColor(32, 255, 32));
         
         map.Add(BUTTON_CLEAR, FColor(255, 32, 32));
+        map.Add(BUTTON_SHIFT, FColor(32, 255, 32));
         
         map.Add(BUTTON_HIGH, FColor(255, 255, 32));
         map.Add(BUTTON_PARK, FColor(32, 255, 32));
 
-        map.Add(BUTTON_SK1, FColor(255, 255, 255));
-        map.Add(BUTTON_SK2, FColor(255, 255, 255));
-        map.Add(BUTTON_SK3, FColor(255, 255, 255));
-        map.Add(BUTTON_SK4, FColor(255, 255, 255));
-        map.Add(BUTTON_SK5, FColor(255, 255, 255));
-        map.Add(BUTTON_SK6, FColor(255, 255, 255));
+        map.Add(BUTTON_SK1, FColor(32, 255, 32));
+        map.Add(BUTTON_SK2, FColor(32, 255, 32));
+        map.Add(BUTTON_SK3, FColor(32, 255, 32));
+        map.Add(BUTTON_SK4, FColor(32, 255, 32));
+        map.Add(BUTTON_SK5, FColor(32, 255, 32));
+        map.Add(BUTTON_SK6, FColor(32, 255, 32));
         map.Add(BUTTON_MORE_SK, FColor(32, 255, 32));
+        
+        map.Add(BUTTON_GO, FColor(32, 255, 32));
+        map.Add(BUTTON_BACK, FColor(255, 32, 32));
 
         return map;
     }
 
     static bool isNumeric(FName button)
     {
-        return button == BUTTON_0 || button == BUTTON_1 || button == BUTTON_2 || button == BUTTON_3 || button == BUTTON_4 || button == BUTTON_5 || button == BUTTON_6 || button == BUTTON_7 || button == BUTTON_8 || button == BUTTON_9 || button == BUTTON_DOT;
+        return button == BUTTON_0 || button == BUTTON_1 || button == BUTTON_2 || button == BUTTON_3 || button == BUTTON_4 || button == BUTTON_5 || button == BUTTON_6 || button == BUTTON_7 || button == BUTTON_8 || button == BUTTON_9 || button == BUTTON_DOT || button == BUTTON_SLASH;
     }
 
 protected:
+    bool lastActive = false;
+
     FName ID;
 
     FColor buttonColor;
     FColor activeColor;
     float intensity = 0.5f;
-    bool active;
+    bool active = false;
 
-    UTextRenderComponent *textRenderer;
+    UTextRenderComponent *textRenderer = nullptr;
+    UStaticMeshComponent *mesh = nullptr;
+    int buttonMaterialIndex = 0;
 
     UMaterialInstanceDynamic* buttonMaterial = nullptr;
-
-    void updateRender()
-    {   
-        FColor color = active ? activeColor : buttonColor;
-        float i2 = active ? 1.0f : intensity;
-
-        if(textRenderer != nullptr)
-        {
-            int r = (int)(intensity * color.R);
-            int g = (int)(intensity * color.G);
-            int b = (int)(intensity * color.B);
-            textRenderer->TextRenderColor = FColor(r, g, b);
-        }
-        if(buttonMaterial != nullptr)
-        {
-            buttonMaterial->SetScalarParameterValue("Intensity", i2);
-            buttonMaterial->SetVectorParameterValue("Color", FLinearColor(((float)color.R) / 255.0, ((float)color.G) / 255.0, ((float)color.B) / 255.0, 1.0));
-        }
-    }
+    UMaterialInstanceDynamic* indicatorMaterial = nullptr;
 };

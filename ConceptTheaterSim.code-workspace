@@ -137,11 +137,15 @@
             "string_view": "cpp",
             "alignedvector3": "cpp",
             "scoped_allocator": "cpp",
-            "hash_set": "cpp"
+            "hash_set": "cpp",
+            "util": "cpp"
         },
         "cSpell.words": [
+            "AETC",
             "CONCEPTTHEATERSIM",
-            "UDELEGATE"
+            "UDELEGATE",
+            "UEOS",
+            "UNPARK"
         ]
 	},
 	"extensions": {
