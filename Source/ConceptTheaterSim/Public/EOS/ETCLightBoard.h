@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "Components/TextRenderComponent.h"
 #include "EOS/EOSButtons.h"
+#include "EOS/EOSShowfile.h"
+#include "EOS/EOSPatchTypes.h"
 #include "ETCLightBoard.generated.h"
 
 enum EOSMode
@@ -13,6 +15,26 @@ enum EOSMode
     LIVE,
     BLIND,
     STAGE
+};
+
+USTRUCT()
+struct FCmdSelection
+{
+	GENERATED_BODY()
+public:
+    UPROPERTY()
+    TArray<int> values;
+    UPROPERTY()
+    bool chan;
+    UPROPERTY()
+    bool cue;
+    UPROPERTY()
+    bool sub;
+    UPROPERTY()
+    bool group;
+
+    UPROPERTY()
+    FString error;
 };
 
 UCLASS()
@@ -52,31 +74,46 @@ public:
     UPROPERTY(EditAnywhere)
     UMaterialInterface *indicatorMaterial;
 
+    UPROPERTY(VisibleAnywhere)
     TArray<FName> command;
+    UPROPERTY(VisibleAnywhere)
     FString commandError = TEXT("");
     bool confirmCmd = false;
+    UPROPERTY(VisibleAnywhere)
     bool clearCmd = false;
+    UPROPERTY(VisibleAnywhere)
     bool highlightMode = false;
+    
     EOSMode mode = LIVE;
+
+    UPROPERTY(EditAnywhere)
+    UEOSShowfile* showfile = nullptr;
 
 private:
     bool shift = false;
 
     TSet<int> parkedChannels;
 
+    UPROPERTY()
     TMap<FName, UStaticMeshComponent*> buttonsByName;
+    UPROPERTY()
     TMap<UStaticMeshComponent*, FName> buttonsByMesh;
+    UPROPERTY()
     TMap<FName, UStaticMeshComponent*> indicatorsByName;
 
+    UPROPERTY()
     TMap<FName, UTextRenderComponent*> textByName;
 
+    UPROPERTY()
     TMap<FName, UEOSButton*> buttonByName;
 
     void setButtonColor(FName button, int r, int g, int b);
     void setButtonColor(FName button, FColor buttonColor, FColor activeColor);
     void setButtonActive(FName button, bool active);
 
+    UPROPERTY()
     UMaterialInstanceDynamic* baseButtonMaterial;
 
-    int getCmdNumber(int start);
+    int getCmdNumber(int start, int* len);
+    FCmdSelection getCmdSelection(int start, int *end);
 };

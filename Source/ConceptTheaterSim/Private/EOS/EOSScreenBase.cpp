@@ -85,3 +85,22 @@ FLinearColor UEOSScreenBase::getCommandColor()
     }
     return FLinearColor(1.0, 1.0, 0.25, 1.0);
 }
+
+TArray<int> UEOSScreenBase::getPatchedChannels()
+{
+    if(board == nullptr)
+    {
+        TArray<int> o;
+        return o;
+    }
+    return board->showfile->getPatchedChannels();
+}
+
+double UEOSScreenBase::getChannelParameter(int ch, FName parameter)
+{
+    if(board == nullptr)
+    {
+        return 0;
+    }
+    return board->showfile->getParameter(ch, parameter);
+}

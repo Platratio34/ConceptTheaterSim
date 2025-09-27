@@ -321,7 +321,7 @@ public:
             buttonMaterial->SetScalarParameterValue("Intensity", i2);
             buttonMaterial->SetVectorParameterValue("Color", c2);
         }
-        if(indicatorMaterial != nullptr &&  && IsValid(indicatorMaterial))
+        if(indicatorMaterial != nullptr && IsValid(indicatorMaterial))
         {
             indicatorMaterial->SetScalarParameterValue("Intensity", i2);
             indicatorMaterial->SetVectorParameterValue("Color", c2);
@@ -364,17 +364,27 @@ public:
 protected:
     bool lastActive = false;
 
+    UPROPERTY()
     FName ID;
 
+    UPROPERTY()
     FColor buttonColor;
+    UPROPERTY()
     FColor activeColor;
+    UPROPERTY()
     float intensity = 0.5f;
+    UPROPERTY()
     bool active = false;
 
+    UPROPERTY()
     UTextRenderComponent *textRenderer = nullptr;
+    UPROPERTY()
     UStaticMeshComponent *mesh = nullptr;
+    UPROPERTY()
     int buttonMaterialIndex = 0;
 
+    UPROPERTY()
     UMaterialInstanceDynamic* buttonMaterial = nullptr;
+    UPROPERTY()
     UMaterialInstanceDynamic* indicatorMaterial = nullptr;
 };

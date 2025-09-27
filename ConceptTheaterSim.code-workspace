@@ -138,7 +138,10 @@
             "alignedvector3": "cpp",
             "scoped_allocator": "cpp",
             "hash_set": "cpp",
-            "util": "cpp"
+            "util": "cpp",
+            "any": "cpp",
+            "expected": "cpp",
+            "pointers": "cpp"
         },
         "cSpell.words": [
             "AETC",

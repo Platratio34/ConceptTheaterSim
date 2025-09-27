@@ -18,6 +18,15 @@ void AETCLightBoard::BeginPlay()
 {
 	Super::BeginPlay();
 
+    if(showfile == nullptr)
+    {
+        showfile = UEOSShowfile::create(TEXT("Testing"));
+        for (int i = 1; i <= 100; i++)
+        {
+            showfile->patchLight(i, EOSPatchTypes::create(LIGHT_TYPE_ETC_S4_LUSTR_P_DIRECT));
+        }
+    }
+
     baseButtonMaterial = UMaterialInstanceDynamic::Create(buttonMaterial, this);
 
     baseButtonMaterial->SetScalarParameterValue("Intensity", 0.5);
@@ -112,7 +121,7 @@ void AETCLightBoard::Tick(float DeltaTime)
 
     setButtonActive(BUTTON_PARK, !parkedChannels.IsEmpty());
 
-    setButtonActive(BUTTON_CLEAR, !command.IsEmpty());
+    setButtonActive(BUTTON_CLEAR, !command.IsEmpty() && !clearCmd);
 
     setButtonActive(BUTTON_SHIFT, shift);
 
@@ -231,8 +240,18 @@ void AETCLightBoard::onInteract(UPrimitiveComponent* component)
                 button = CMD_FOLLOW;
             }
         }
+        else if(button == BUTTON_FULL && command.Num() > 0 && command[command.Num()-1] == BUTTON_FULL)
+        {
+            executeCommand();
+            return;
+        }
 
         command.Add(button);
+        if(button == BUTTON_OUT)
+        {
+            executeCommand();
+            return;
+        }
 
         // if(button == BUTTON_PARK)
         // {
@@ -308,7 +327,7 @@ void AETCLightBoard::executeCommand()
             commandError = TEXT("Can only park channels");
             return;
         }
-        int c = getCmdNumber(1);
+        int c = getCmdNumber(1, nullptr);
         if(parkedChannels.Contains(c))
         {
             command.RemoveAt(command.Num() - 1);
@@ -322,18 +341,72 @@ void AETCLightBoard::executeCommand()
     }
     else if(command[command.Num()-1] == CMD_UNPARK)
     {
-        int c = getCmdNumber(1);
+        int c = getCmdNumber(1, nullptr);
         parkedChannels.Remove(c);
         clearCmd = true;
         confirmCmd = false;
         return;
     }
+    else if(command[command.Num()-1] == BUTTON_FULL || command[command.Num()-1] == BUTTON_OUT)
+    {
+        int p;
+        FCmdSelection selection = getCmdSelection(0, &p);
+        if(p == 0 || selection.cue)
+        {
+            if(selection.cue)
+                commandError = TEXT("Invalid selection: Can not set intensity of cue");
+            else
+                commandError = TEXT("Invalid selection: ") + selection.error;
+            return;
+        }
+        double v = command[command.Num() - 1] == BUTTON_FULL ? 1.0 : 0.0;
+        for (int i = 0; i < selection.values.Num(); i++)
+        {
+            int c = selection.values[i];
+            if(parkedChannels.Contains(c))
+                continue;
+            if(FEOSPropertySet *set = showfile->channels.Find(c))
+            {
+                set->set(PROPERTY_INTENSITY, v);
+            }
+        }
+        clearCmd = true;
+        return;
+    }
+    else if(command.Num() > 1 && command[command.Num()-2] == BUTTON_AT)
+    {
+        int p;
+        FCmdSelection selection = getCmdSelection(0, &p);
+        if(p == 0 || selection.cue)
+        {
+            if(selection.cue)
+                commandError = TEXT("Invalid selection: Can not set intensity of cue");
+            else
+                commandError = TEXT("Invalid selection: ") + selection.error;
+            return;
+        }
+        int n = getCmdNumber(p, nullptr);
+        double v = (double)n / 100.0;
+        for (int i = 0; i < selection.values.Num(); i++)
+        {
+            int c = selection.values[i];
+            if(parkedChannels.Contains(c))
+                continue;
+            if(FEOSPropertySet *set = showfile->channels.Find(c))
+            {
+                set->set(PROPERTY_INTENSITY, v);
+            }
+        }
+        clearCmd = true;
+        return;
+    }
     commandError = TEXT("Unknown command");
 }
 
-int AETCLightBoard::getCmdNumber(int start)
+int AETCLightBoard::getCmdNumber(int start, int* len)
 {
     int c = 0;
+    int l = 0;
     for (int i = start; i < command.Num(); i++)
     {
         FName n = command[i];
@@ -381,6 +454,128 @@ int AETCLightBoard::getCmdNumber(int start)
         {
             break;
         }
+        l++;
     }
+    if(len != nullptr)
+        *len = l;
     return c;
+}
+
+FCmdSelection AETCLightBoard::getCmdSelection(int start, int *end)
+{
+    FCmdSelection selection;
+    int i = start;
+    int last = -1;
+    bool minus = false;
+    selection.chan = command[i] == CMD_CHAN;
+    selection.cue = command[i] == BUTTON_CUE;
+    selection.sub = command[i] == BUTTON_SUB;
+    selection.group = command[i] == BUTTON_GROUP;
+    if(!(selection.chan || selection.cue || selection.sub || selection.group))
+    {
+        if(end != nullptr)
+            *end = i-2;
+        selection.error = TEXT("No valid selector type");
+        return selection;
+    }
+    i++;
+    int itCount = 0;
+    int cmdLength = command.Num();
+    while (i < cmdLength)
+    {
+        itCount++;
+        if(itCount > cmdLength*2)
+        {
+            selection.error = TEXT("Iteration count {");
+            for (int j = 0; j < selection.values.Num(); j++)
+            {
+                if(j > 0)
+                    selection.error += TEXT(",");
+                selection.error += FString::FromInt(selection.values[j]);
+            }
+            selection.error += TEXT("}");
+            break;
+        }
+        FName val = command[i];
+        if(val == BUTTON_THRU)
+        {
+            if(last == -1)
+            {
+                selection.error = TEXT("Found tru first");
+                break;
+            }
+            i++;
+            int p;
+            int n = getCmdNumber(i, &p);
+            i += p;
+            if(n > last)
+            {
+                for (int j = last; j <= n; j++)
+                {
+                    if(minus)
+                        selection.values.Remove(j);
+                    else
+                        selection.values.AddUnique(j);
+                }
+            }
+            else
+            {
+                for (int j = last; j >= n; j--)
+                {
+                    if(minus)
+                        selection.values.Remove(j);
+                    else
+                        selection.values.AddUnique(j);
+                }
+            }
+            last = n;
+            minus = false;
+        }
+        else if(val == BUTTON_PLUS)
+        {
+            if(last == -1)
+            {
+                selection.error = TEXT("Found + first");
+                break;
+            }
+            i++;
+            int p;
+            int n = getCmdNumber(i, &p);
+            i += p;
+            last = n;
+            selection.values.AddUnique(n);
+            minus = false;
+        }
+        else if(val == BUTTON_MINUS)
+        {
+            if(last == -1)
+            {
+                selection.error = TEXT("Found + first");
+                break;
+            }
+            i++;
+            int p;
+            int n = getCmdNumber(i, &p);
+            i += p;
+            last = n;
+            selection.values.Remove(n);
+            minus = true;
+        }
+        else
+        {
+            int p;
+            int n = getCmdNumber(i, &p);
+            if(p == 0)
+            {
+                selection.error = TEXT("No values");
+                break;
+            }
+            i += p;
+            last = n;
+            selection.values.AddUnique(n);
+        }
+    }
+    if(end != nullptr)
+        *end = i-1;
+    return selection;
 }

@@ -25,7 +25,13 @@ protected:
 
     UFUNCTION(BlueprintCallable)
     FLinearColor getCommandColor();
-    
+
+    UFUNCTION(BlueprintCallable)
+    TArray<int> getPatchedChannels();
+
+    UFUNCTION(BlueprintCallable)
+    double getChannelParameter(int ch, FName parameter);
+
     static TMap<FName, FString> getNamesToDisplay()
     {
         static bool namesToDisplayInit = false;
