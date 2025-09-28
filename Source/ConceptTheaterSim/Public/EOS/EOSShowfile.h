@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
-#include "EOSSHowfile.generated.h"
+#include "EOSShowfile.generated.h"
 
 USTRUCT()
 struct CONCEPTTHEATERSIM_API FEOSPatch
@@ -108,7 +108,7 @@ public:
     static UEOSShowfile* create(FString fileName)
     {
         UEOSShowfile* file = NewObject<UEOSShowfile>();
-        file->fileName;
+        file->fileName = fileName;
         return file;
     }
 
