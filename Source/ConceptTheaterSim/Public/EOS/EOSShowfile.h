@@ -43,6 +43,9 @@ struct CONCEPTTHEATERSIM_API FEOSPatchSet
 
 public:
     UPROPERTY()
+    int channel;
+    
+    UPROPERTY()
     TArray<FEOSPatch> devices;
 
     bool canAdd(FEOSPatch device)

@@ -8,6 +8,7 @@
 #include "EOS/EOSButtons.h"
 #include "EOS/EOSShowfile.h"
 #include "EOS/EOSPatchTypes.h"
+#include "EOS/EOSShowPatch.h"
 #include "ETCLightBoard.generated.h"
 
 enum EOSMode
@@ -62,6 +63,9 @@ protected:
     UFUNCTION(BlueprintNativeEvent)
     void setButtonInteractionText(UPrimitiveComponent *component, FName button);
 
+    UFUNCTION(BlueprintCallable)
+    void updateUniverse(int universe, TArray<int> dmx);
+
     void executeCommand();
 
 public:	
@@ -88,6 +92,9 @@ public:
 
     UPROPERTY(EditAnywhere)
     UEOSShowfile* showfile = nullptr;
+
+    UPROPERTY(EditAnywhere)
+    UEOSShowPatch* showPatch = nullptr;
 
 private:
     bool shift = false;

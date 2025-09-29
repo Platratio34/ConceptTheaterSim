@@ -17,6 +17,7 @@ bool UEOSShowfile::patchLight(int ch, FEOSPatch light)
     if(!set)
     {
         FEOSPatchSet s;
+        s.channel = ch;
         set = &s;
         patch.Add(ch, s);
         FEOSPropertySet propSet;

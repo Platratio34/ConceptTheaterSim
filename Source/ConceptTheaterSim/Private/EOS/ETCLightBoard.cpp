@@ -1,6 +1,7 @@
 // Copyright Peter Crall 2025
 
 #include "EOS/ETCLightBoard.h"
+#include "EOS/EOSLightOutputTypes.h"
 
 const FName CMD_UNPARK = FName(TEXT("Unpark"));
 const FName CMD_CHAN = FName(TEXT("Chan"));
@@ -20,10 +21,28 @@ void AETCLightBoard::BeginPlay()
 
     if(showfile == nullptr)
     {
-        showfile = UEOSShowfile::create(TEXT("Testing"));
-        for (int i = 1; i <= 100; i++)
+        if(showPatch != nullptr)
         {
-            showfile->patchLight(i, EOSPatchTypes::create(LIGHT_TYPE_ETC_S4_LUSTR_P_DIRECT));
+            showfile = UEOSShowfile::create(showPatch->name);
+            TArray<int> chs;
+            showPatch->lights.GetKeys(chs);
+            for (int i = 0; i < chs.Num(); i++)
+            {
+                int ch = chs[i];
+                FEOSShowPatchLight light = showPatch->lights[ch];
+                FEOSPatch patch = EOSPatchTypes::create(light.type);
+                patch.universe = light.universe;
+                patch.address = light.address;
+                showfile->patchLight(ch, patch);
+            }
+        }
+        else
+        {
+            showfile = UEOSShowfile::create(TEXT("Testing"));
+            for (int i = 1; i <= 100; i++)
+            {
+                showfile->patchLight(i, EOSPatchTypes::create(LIGHT_TYPE_ETC_S4_LUSTR_P_DIRECT));
+            }
         }
     }
 
@@ -124,8 +143,32 @@ void AETCLightBoard::Tick(float DeltaTime)
     setButtonActive(BUTTON_CLEAR, !command.IsEmpty() && !clearCmd);
 
     setButtonActive(BUTTON_SHIFT, shift);
+}
 
-    
+void AETCLightBoard::updateUniverse(int universe, TArray<int> dmx)
+{
+    if(showfile == nullptr)
+        return;
+    for (auto &elem : showfile->patch)
+    {
+        FEOSPatchSet patchSet = elem.Value;
+        int ch = elem.Key;
+        for (int i = 0; i < patchSet.devices.Num(); i++)
+        {
+            FEOSPatch patch = patchSet.devices[i];
+            if(patch.universe == universe)
+            {
+                EOSLightOutputType* outputType = EOSLightOutputType::getType(patch.type);
+                TArray<int> d2;
+                d2.Init(0, patch.size);
+                for (int j = 0; j < patch.size; j++)
+                {
+                    d2[j] = dmx[j+patch.address];
+                }
+                outputType->input(d2, showfile->channels[ch].properties);
+            }
+        }
+    }
 }
 
 void AETCLightBoard::setButtonColor(FName button, int r, int g, int b)
