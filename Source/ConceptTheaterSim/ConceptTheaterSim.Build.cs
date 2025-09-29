@@ -8,9 +8,9 @@ public class ConceptTheaterSim : ModuleRules
     {
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore" });
+        PublicDependencyModuleNames.AddRange(["Core", "CoreUObject", "Engine", "InputCore"]);
 
-        PrivateDependencyModuleNames.AddRange(new string[] { });
+        PrivateDependencyModuleNames.AddRange([]);
 
         bEnableExceptions = true;
 

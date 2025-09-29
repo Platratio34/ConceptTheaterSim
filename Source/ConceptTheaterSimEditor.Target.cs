@@ -11,6 +11,6 @@ public class ConceptTheaterSimEditorTarget : TargetRules
 		DefaultBuildSettings = BuildSettingsVersion.V5;
         IncludeOrderVersion = EngineIncludeOrderVersion.Latest;
 
-		ExtraModuleNames.AddRange( new string[] { "ConceptTheaterSim" } );
+		ExtraModuleNames.AddRange(["ConceptTheaterSim"]);
 	}
 }

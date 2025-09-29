@@ -36,8 +36,11 @@ float UPropertyDriver::Update(float deltaTime)
         remTime *= 1 + invPrcRem;
     }
     float move = delta / remTime;
+    move *= deltaTime;
+    if(abs(move) > abs(delta))
+        move = delta;
     time -= deltaTime;
-    value += (move * deltaTime);
+    value += move;
     lastDelta = delta;
     return value;
 }
