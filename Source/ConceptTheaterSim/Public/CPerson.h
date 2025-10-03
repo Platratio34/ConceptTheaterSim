@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
+#include "Animation/CAnimationComponent.h"
 #include "CPerson.generated.h"
 
 UENUM(BlueprintType)
@@ -193,6 +194,9 @@ protected:
 
     UPROPERTY(VisibleAnywhere, Category="Components")
     TMap<int, bool> clothingMeshComponentsVisible;
+
+    UPROPERTY(VisibleAnywhere, Category="Components")
+    UCAnimationComponent* animationComponent;
 
     void setVisibility(bool newVisibility);
 

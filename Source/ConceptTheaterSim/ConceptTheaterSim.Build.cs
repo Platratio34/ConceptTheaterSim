@@ -10,7 +10,7 @@ public class ConceptTheaterSim : ModuleRules
 
         PublicDependencyModuleNames.AddRange(["Core", "CoreUObject", "Engine", "InputCore"]);
 
-        PrivateDependencyModuleNames.AddRange([]);
+        PrivateDependencyModuleNames.AddRange([ "Json", "JsonUtilities" ]);
 
         bEnableExceptions = true;
 

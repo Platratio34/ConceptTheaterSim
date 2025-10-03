@@ -29,6 +29,15 @@ public:
     UPROPERTY(EditAnywhere)
     float decelTime = 0;
 
+    float GetValue()
+    {
+        return value;
+    }
+    float GetTarget()
+    {
+        return targetValue;
+    }
+
 protected:
     float value;
     float targetValue;

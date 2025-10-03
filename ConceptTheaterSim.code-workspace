@@ -142,7 +142,8 @@
             "any": "cpp",
             "expected": "cpp",
             "pointers": "cpp",
-            "*.inc": "cpp"
+            "*.inc": "cpp",
+            "execution": "cpp"
         },
         "cSpell.words": [
             "AETC",

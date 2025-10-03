@@ -29,6 +29,8 @@ ACPerson::ACPerson()
     earMeshComponent->SetupAttachment(bodyRoot);
     hairMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Hair Mesh Component"));
     hairMeshComponent->SetupAttachment(bodyRoot);
+
+    animationComponent = CreateDefaultSubobject<UCAnimationComponent>(TEXT("Animation Component"));
 }
 
 void ACPerson::OnConstruction(const FTransform &Transform)
@@ -196,7 +198,9 @@ void ACPerson::BeginPlay()
 
     updateMeshes();
     updateHeight();
-	
+
+    animationComponent->registerWithMaster(name);
+    animationComponent->onVisibilityChange.AddDynamic(this, &ACPerson::setVisibility);
 }
 
 // Called every frame
