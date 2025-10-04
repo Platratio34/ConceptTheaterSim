@@ -32,6 +32,9 @@ public:
     UPROPERTY(VisibleAnywhere)
     FOnVisibilityChange onVisibilityChange;
 
+    UPROPERTY(EditAnywhere)
+    bool dummy = false;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -52,9 +55,7 @@ private:
     UPropertyDriver *zRotDriver;
 
     UPROPERTY()
-    bool parentInvalid = false;
-    UPROPERTY()
-    AActor *cParent = nullptr;
+    USceneComponent *cParent = nullptr;
 
     void updatePosRot();
 

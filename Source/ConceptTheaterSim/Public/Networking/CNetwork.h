@@ -38,20 +38,29 @@ public:
     UCNetwork();
     ~UCNetwork();
 
+    UPROPERTY()
     FOnNetworkPacket onPacketOut;
 
     UFUNCTION(BlueprintCallable)
     void setup(int subnet, int subnetMask, UCNetwork *upstream);
 
+    UFUNCTION(BlueprintCallable)
     void sendPacket(FNetworkPacket packet);
+    UFUNCTION()
     void onUpstreamPacket(FNetworkPacket packet);
+    UFUNCTION(BlueprintCallable)
     int requestIP(FString hwAddress);
+    UFUNCTION(BlueprintCallable)
     void releaseIP(FString hwAddress);
 
+    UFUNCTION(BlueprintCallable)
     void connect(UNetworkCard *card);
+    UFUNCTION(BlueprintCallable)
     void disconnect(UNetworkCard *card);
 
+    UFUNCTION(BlueprintCallable)
     int getSubnet();
+    UFUNCTION(BlueprintCallable)
     int getSubnetMask();
 
     UFUNCTION(BlueprintCallable)
@@ -59,26 +68,39 @@ public:
     UFUNCTION(BlueprintCallable)
     void clearUpstream();
 
+    UFUNCTION(BlueprintCallable)
     void multicastSubscribe(int address, UNetworkCard *subscriber);
+    UFUNCTION(BlueprintCallable)
     void multicastUnSubscribe(int address, UNetworkCard *subscriber);
 
 protected:
+    UPROPERTY()
     int subnet = 0x0A000000;
+    UPROPERTY()
     int subnetMask = 0xFF000000;
 
+    UPROPERTY()
     TMap<FString, int> assignedAddresses;
+    UPROPERTY()
     int nextAddress = 0x00000001;
 
     UCNetwork *upstream = nullptr;
 
+    UFUNCTION()
     bool isAddressLocal(int addr);
+    UFUNCTION()
     void sendPacketInt(FNetworkPacket packet, bool fromUpstream, UCNetwork* sourceNet);
 
     MulticastTargetSet **multicastSets = nullptr;
+    UPROPERTY()
     int multicastSize = 1;
+    UPROPERTY()
     int multicastPntr;
 
+    UPROPERTY()
     TArray<UNetworkCard*> cards;
+    UPROPERTY()
     TArray<UCNetwork*> childNetworks;
+    UPROPERTY()
     UCNetwork *parentNetwork;
 };

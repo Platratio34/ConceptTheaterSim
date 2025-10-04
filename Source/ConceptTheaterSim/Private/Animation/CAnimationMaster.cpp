@@ -4,6 +4,8 @@
 #include "Animation/CAnimationComponent.h"
 #include "Json.h"
 
+DEFINE_LOG_CATEGORY(AnimationLog);
+
 // Sets default values
 ACAnimationMaster::ACAnimationMaster()
 {
@@ -39,6 +41,19 @@ void ACAnimationMaster::Tick(float DeltaTime)
             if(UCAnimationComponent** component = animatedObjects.Find(key))
             {
                 (*component)->onEvent(track.events[0]);
+                UE_LOG(AnimationLog, Display, TEXT("Setting default position for animated object: %s"), *key.ToString());
+            }
+            else
+            {
+                UE_LOG(AnimationLog, Warning, TEXT("Missing animated object: %s"), *key.ToString());
+            }
+        }
+        animatedObjects.GetKeys(trackKeys);
+        for(const FName& key : trackKeys)
+        {
+            if(!animationFile.tracks.Find(key))
+            {
+                UE_LOG(AnimationLog, Warning, TEXT("Missing track for animated object: %s"), *key.ToString());
             }
         }
         first = false;
@@ -54,11 +69,11 @@ void ACAnimationMaster::reloadFile()
     }
     FString path = FPaths::ProjectContentDir();
     path += "/" + filePath;
-    UE_LOG(LogTemp, Display, TEXT("Loading Animation: %s"), *path);
+    UE_LOG(AnimationLog, Display, TEXT("Loading Animation: %s"), *path);
     FString jsonString;
     if(!FFileHelper::LoadFileToString(jsonString, *path))
     {
-        UE_LOG(LogTemp, Warning, TEXT("Error Loading Animation file: %s; Error loading file"), *path);
+        UE_LOG(AnimationLog, Warning, TEXT("Error Loading Animation file: %s; Error loading file"), *path);
         return;
     }
 
@@ -66,7 +81,7 @@ void ACAnimationMaster::reloadFile()
     TSharedRef<TJsonReader<>> reader = TJsonReaderFactory<>::Create(jsonString);
     if(!FJsonSerializer::Deserialize(reader, jsonObject) || !jsonObject.IsValid())
     {
-        UE_LOG(LogTemp, Warning, TEXT("Error Loading Animation file: %s; Error parsing JSON"), *path);
+        UE_LOG(AnimationLog, Warning, TEXT("Error Loading Animation file: %s; Error parsing JSON"), *path);
         return;
     }
 
@@ -80,10 +95,13 @@ void ACAnimationMaster::reloadFile()
         animFile.tracks.Add(FName(*key), track);
         nextEvent.Add(FName(*key), 0);
     }
+
+    // reset/setup
     animationFile = animFile;
     animationFileLoaded = true;
     lastSeconds = -1;
     first = true;
+    UE_LOG(AnimationLog, Display, TEXT("Animation loaded: %s"), *path);
 }
 
 void ACAnimationMaster::onTimeUpdate(int frames, float seconds)
@@ -93,7 +111,7 @@ void ACAnimationMaster::onTimeUpdate(int frames, float seconds)
     
     bool jump = abs(seconds - lastSeconds) > 0.5;
     if(jump)
-        UE_LOG(LogTemp, Display, TEXT("Jump"));
+        UE_LOG(AnimationLog, Display, TEXT("Timecode Jump"));
     lastSeconds = seconds;
     
     TArray<FName> trackKeys;
@@ -112,14 +130,15 @@ void ACAnimationMaster::onTimeUpdate(int frames, float seconds)
                 break;
             if(event.timeSeconds < seconds)
             {
+                double minDur = FMath::Min(event.duration, 0.5);
                 event.duration = event.duration - (seconds - event.timeSeconds);
-                if(event.duration < 0.5)
-                    event.duration = 0.5;
+                if(event.duration < minDur)
+                    event.duration = minDur;
             }
             nextEvent.Add(key, i+1);
             if(UCAnimationComponent** component = animatedObjects.Find(key))
             {
-                UE_LOG(LogTemp, Display, TEXT("Animation event (@ %f, %f)"), event.timeSeconds, seconds);
+                // UE_LOG(AnimationLog, Display, TEXT("Animation event (@ %f, %f)"), event.timeSeconds, seconds);
                 (*component)->onEvent(event);
             }
         }
@@ -134,10 +153,11 @@ void ACAnimationMaster::onTimeStop()
 void ACAnimationMaster::registerAnimatedObject(FName id, UCAnimationComponent* component)
 {
     animatedObjects.Add(id, component);
-    registerParentObject(id, component->GetOwner());
+    registerParentObject(id, component->GetOwner()->GetRootComponent());
+    first = true;
 }
 
-void ACAnimationMaster::registerParentObject(FName id, AActor* object)
+void ACAnimationMaster::registerParentObject(FName id, USceneComponent* parent)
 {
-    animationParents.Add(id, object);
+    animationParents.Add(id, parent);
 }

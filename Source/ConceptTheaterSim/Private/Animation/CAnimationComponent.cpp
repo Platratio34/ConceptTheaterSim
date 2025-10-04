@@ -50,9 +50,9 @@ void UCAnimationComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-    if(parentInvalid)
+    if(dummy)
     {
-
+        return;
     }
 
     AActor *ow = GetOwner();
@@ -84,13 +84,11 @@ void UCAnimationComponent::onEvent(FAnimationFileTrackEvent event)
         }
         else
         {
-            AActor *newParent = master->getParent(event.parent);
+            USceneComponent *newParent = master->getParent(event.parent);
             if(newParent != cParent)
             {
-                USceneComponent *targetComponent = newParent->GetRootComponent();
-                // TODO: change for animation parent component here?
                 FAttachmentTransformRules attachmentRules(EAttachmentRule::KeepWorld, EAttachmentRule::KeepWorld, EAttachmentRule::KeepWorld, true);
-                GetOwner()->GetRootComponent()->AttachToComponent(targetComponent, attachmentRules);
+                GetOwner()->GetRootComponent()->AttachToComponent(newParent, attachmentRules);
                 cParent = newParent;
                 updatePosRot();
             }

@@ -3,6 +3,12 @@
 
 #include "CPerson.h"
 
+static void setMeshVisible(UStaticMeshComponent* mesh, bool visible)
+{
+    mesh->SetVisibility(visible);
+    mesh->SetCollisionEnabled(visible ? ECollisionEnabled::QueryAndPhysics : ECollisionEnabled::NoCollision);
+}
+
 // Sets default values
 ACPerson::ACPerson()
 {
@@ -42,7 +48,19 @@ void ACPerson::OnConstruction(const FTransform &Transform)
 void ACPerson::updateHeight()
 {
     float hScale = height / defaultHeight;
-    rootComponent2->SetRelativeScale3D(FVector(hScale, hScale, hScale));
+    bodyRoot->SetRelativeScale3D(FVector(hScale, hScale, hScale));
+    EPersonLegType legType = getLegType();
+    float hOffset = 0;
+    if(legType == EPersonLegType::FEMALE_HEEL_1)
+    {
+        hOffset = 2.54;
+    }
+    else if(legType == EPersonLegType::FEMALE_HEEL_2)
+    {
+        hOffset = 2.54 * 3;
+    }
+    hOffset *= hScale;
+    bodyRoot->SetRelativeLocation(FVector(0, 0, hOffset));
 }
 void ACPerson::updateMeshes()
 {
@@ -62,16 +80,6 @@ void ACPerson::updateMeshes()
         legMeshComponent->SetStaticMesh(*mesh);
     if(UStaticMesh** mesh = bodyMeshes.Find(bodyType))
         chestMeshComponent->SetStaticMesh(*mesh);
-    float hOffset = 0;
-    if(legType == EPersonLegType::FEMALE_HEEL_1)
-    {
-        hOffset = 2.54;
-    }
-    else if(legType == EPersonLegType::FEMALE_HEEL_2)
-    {
-        hOffset = 2.54 * 3;
-    }
-    bodyRoot->SetRelativeLocation(FVector(0, 0, hOffset));
 
     if(armMesh != nullptr)
         armMeshComponent->SetStaticMesh(armMesh);
@@ -96,7 +104,7 @@ void ACPerson::updateMeshes()
     {
         if(hairMeshes.Num() > 0 && hairMeshes[hairType] != nullptr)
             hairMeshComponent->SetStaticMesh(hairMeshes[hairType]);
-        hairMeshComponent->SetVisibility(true);
+        setMeshVisible(hairMeshComponent, true);
         if(hairMaterialInstance == nullptr || !IsValid(hairMaterialInstance))
         {
             hairMaterialInstance = UMaterialInstanceDynamic::Create(hairMaterial, this);
@@ -105,7 +113,7 @@ void ACPerson::updateMeshes()
         hairMeshComponent->SetMaterial(0, hairMaterialInstance);
     }
     else
-        hairMeshComponent->SetVisibility(false);
+        setMeshVisible(hairMeshComponent, false);
 
     // clothing update
     // First make sure our arrays are the same size
@@ -158,7 +166,7 @@ void ACPerson::updateMeshes()
         }
         if(clothingAsset == nullptr)
         {
-            meshComponent->SetVisibility(false);
+            setMeshVisible(meshComponent, false);
             clothingMeshComponentsVisible[i] = false;
             continue;
         }
@@ -176,7 +184,7 @@ void ACPerson::updateMeshes()
         if(mesh != nullptr)
         {
             meshComponent->SetStaticMesh(mesh);
-            meshComponent->SetVisibility(true);
+            setMeshVisible(meshComponent, true);
             clothingMeshComponentsVisible[i] = true;
             for (int index = 0; index < clothingAsset->defaultMaterials.Num(); index++)
             {
@@ -185,7 +193,7 @@ void ACPerson::updateMeshes()
         }
         else
         {
-            meshComponent->SetVisibility(false);
+            setMeshVisible(meshComponent, false);
             clothingMeshComponentsVisible[i] = false;
         }
     }
@@ -199,6 +207,8 @@ void ACPerson::BeginPlay()
     updateMeshes();
     updateHeight();
 
+    animationComponent->dummy = dummy;
+    if(!dummy)
     animationComponent->registerWithMaster(name);
     animationComponent->onVisibilityChange.AddDynamic(this, &ACPerson::setVisibility);
 }
@@ -219,19 +229,29 @@ void ACPerson::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 void ACPerson::setVisibility(bool newVisibility)
 {
-    legMeshComponent->SetVisibility(newVisibility);
-    chestMeshComponent->SetVisibility(newVisibility);
-    armMeshComponent->SetVisibility(newVisibility);
-    headMeshComponent ->SetVisibility(newVisibility);
-    eyeMeshComponent->SetVisibility(newVisibility);
-    earMeshComponent->SetVisibility(newVisibility);
+    setMeshVisible(legMeshComponent, newVisibility);
+    setMeshVisible(chestMeshComponent, newVisibility);
+    setMeshVisible(armMeshComponent, newVisibility);
+    setMeshVisible(headMeshComponent, newVisibility);
+    setMeshVisible(eyeMeshComponent, newVisibility);
+    setMeshVisible(earMeshComponent, newVisibility);
     if(hairType >= 0)
-        hairMeshComponent->SetVisibility(newVisibility);
+        setMeshVisible(hairMeshComponent, newVisibility);
     for (int i = 0; i < clothingMeshComponents.Num(); i++)
     {
         if(clothingMeshComponentsVisible[i])
         {
-            clothingMeshComponents[i]->SetVisibility(newVisibility);
+            setMeshVisible(clothingMeshComponents[i], newVisibility);
+        }
+    }
+
+    TArray<AActor *> attachedActors;
+    GetAttachedActors(attachedActors);
+    for(AActor* actor : attachedActors)
+    {
+        if(actor && Cast<ACPerson>(actor))
+        {
+            (Cast<ACPerson>(actor))->setVisibility(newVisibility);
         }
     }
 }

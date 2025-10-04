@@ -8,6 +8,8 @@
 #include "JsonUtilities.h"
 #include "CAnimationMaster.generated.h"
 
+DECLARE_LOG_CATEGORY_EXTERN(AnimationLog, Log, All);
+
 USTRUCT()
 struct FAnimationFileTrackEvent
 {
@@ -173,23 +175,26 @@ public:
 
     static double parseLengthString(FString str)
     {
+        bool neg = false;
+        double feet = 0;
         double l = 0;
         double next = 0.1;
+        bool dec = false;
         for (int i = 0; i < str.Len(); i++)
         {
             TCHAR c = str[i];
-            bool dec = false;
             switch (c)
             {
             case '-':
-                l *= -1;
+                neg = true;
                 break;
             case '.':
                 dec = true;
                 next = 0.1;
                 break;
             case '\'':
-                l *= 12;
+                feet = l;
+                l  = 0;
                 dec = false;
                 break;
             case '0':
@@ -311,7 +316,7 @@ public:
                 break;
             }
         }
-        return l;
+        return (l + ( feet * 12 ) ) * (neg ? -1 : 1);
     }
 
     static FAnimationFileTrackEvent CreateFrom(TSharedPtr<FJsonObject> eventJson)
@@ -450,13 +455,13 @@ public:
     void registerAnimatedObject(FName id, UCAnimationComponent* component);
 
     UFUNCTION(BlueprintCallable)
-    void registerParentObject(FName id, AActor* object);
+    void registerParentObject(FName id, USceneComponent* parent);
 
-    AActor *getParent(FName id)
+    USceneComponent *getParent(FName id)
     {
-        if(AActor** actor = animationParents.Find(id))
+        if(USceneComponent** component = animationParents.Find(id))
         {
-            return *actor;
+            return *component;
         }
         return nullptr;
     }
@@ -483,7 +488,7 @@ protected:
     TMap<FName, UCAnimationComponent *> animatedObjects;
 
     UPROPERTY(VisibleAnywhere)
-    TMap<FName, AActor*> animationParents;
+    TMap<FName, USceneComponent*> animationParents;
 
 private:
     UPROPERTY()

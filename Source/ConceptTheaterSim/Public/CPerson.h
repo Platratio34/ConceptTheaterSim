@@ -198,6 +198,7 @@ protected:
     UPROPERTY(VisibleAnywhere, Category="Components")
     UCAnimationComponent* animationComponent;
 
+    UFUNCTION()
     void setVisibility(bool newVisibility);
 
 public:	
