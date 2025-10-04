@@ -11,7 +11,7 @@
 UDELEGATE(BlueprintCallable)
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnVisibilityChange, bool, newVisibility);
 
-UCLASS(BlueprintType)
+UCLASS(BlueprintType, meta=(BlueprintSpawnableComponent))
 class CONCEPTTHEATERSIM_API UCAnimationComponent : public UActorComponent
 {
     
@@ -29,7 +29,7 @@ public:
     UFUNCTION(BlueprintCallable)
     void registerWithMaster(FName ID);
 
-    UPROPERTY(VisibleAnywhere)
+    UPROPERTY(BlueprintAssignable)
     FOnVisibilityChange onVisibilityChange;
 
     UPROPERTY(EditAnywhere)

@@ -41,7 +41,31 @@
                 { "time":"00:26:18:00", "duration": 5, "x": 96, "y": 24},
                 { "time":"00:26:25:00", "duration": 1, "y": 55},
                 { "time":"00:27:50:00", "duration": 2, "x": 39, "y": -51, "z": 12, "zRot": -65, "parent": "Ship"},
-                { "time":"00:28:59:00", "duration": 3, "x": 28, "y": 0}
+                { "time":"00:28:59:00", "duration": 3, "x": 28, "y": 0},
+                { "time":"00:31:30:00", "duration": 2, "x": "4", "y": "6'3", "zRot": -40 },
+                { "time":"00:32:12:00", "duration": 10, "zRot": 35 },
+                { "time":"00:32:54:00", "duration": 8, "zRot": 0 },
+                { "time":"00:33:13:15", "duration": 8, "zRot": -40 },
+                { "time":"00:36:42:15", "duration": 8, "x": "2'", "y": "-11'", "zRot": -70 },
+                { "time":"00:37:14:15", "duration": 2, "x": "9'5", "y": "4'11", "z":"2'5", "xRot": 0, "yRot": 0, "zRot": 0, "parent": "" },
+                { "time":"00:37:18:15", "duration": 2, "z":"0" },
+                { "time":"00:37:21:15", "duration": 5, "x": "0" },
+                { "time":"00:38:44:00", "duration": 1, "x": "2'4", "y": "2'", "z": "1'", "xRot": 0, "yRot": 0, "zRot": -90, "parent": "Ship" },
+                { "time":"00:40:33:00", "duration": 5, "x": "0", "y": "7'7", "zRot": 0 },
+                { "time":"00:41:21:00", "duration": 5, "x": "2'", "y": "4'7", "zRot": -75 },
+                { "time":"00:45:47:15", "duration": 5, "x": "-19'", "y": "4'7", "z": "0", "xRot": 0, "yRot": 0, "zRot": -35, "parent": "" },
+                { "time":"00:50:49:25", "duration": 8, "x": "-9'10" },
+                { "time":"00:52:52:12", "duration": 5, "zRot": 5 },
+                { "time":"00:53:02:04", "duration": 8, "x": "-19'", "zRot": -35 },
+                { "time":"00:53:18:15", "duration": 5, "x": "-5'3", "y": "-1'", "zRot": 0 },
+                { "time":"00:56:05:25", "duration": 5, "x": "3'" },
+                { "time":"00:56:31:00", "duration": 3, "x": "8'2" },
+                { "time":"00:56:36:00", "duration": 1, "x": "5'" },
+                { "time":"00:56:44:15", "duration": 5, "x": "-3'11" },
+                { "time":"00:57:23:15", "duration": 5, "y": "3'11" },
+                { "time":"00:58:07:15", "duration": 5, "y": "-1'" },
+                { "time":"00:58:57:00", "duration": 2, "y": "-5'" },
+                { "time":"00:59:00:00", "visibility": false }
             ]
         },
         "Polites": {
@@ -87,7 +111,10 @@
                 { "time":"00:01:15:00", "duration": 0, "visibility": true },
                 { "time":"00:01:30:00", "duration": 1, "x": 28 },
                 { "time":"00:01:46:15", "duration": 3, "x": 144 },
-                { "time":"00:01:56:00", "duration": 0, "parent": "", "visibility": false }
+                { "time":"00:01:56:00", "visibility": false },
+                { "time":"00:39:30:00", "visibility": true },
+                { "time":"00:39:46:00", "duration": 2, "x": 30 },
+                { "time":"00:40:30:00", "parent": "", "visibility": false }
             ]
         },
         "Penelope": {
@@ -96,7 +123,11 @@
                 { "time":"00:01:15:00", "duration": 0, "visibility": true },
                 { "time":"00:01:23:00", "duration": 1, "x": 28 },
                 { "time":"00:01:46:15", "duration": 3, "x": 144 },
-                { "time":"00:01:56:00", "duration": 0, "parent": "", "visibility": false }
+                { "time":"00:01:56:00", "duration": 0, "parent": "", "visibility": false },
+                { "time":"00:39:30:00", "x": 24, "parent": "Balcony-SL" },
+                { "time":"00:39:31:00", "visibility": true },
+                { "time":"00:39:47:15", "duration": 0.5, "x": 12 },
+                { "time":"00:40:30:00", "parent": "", "visibility": false }
             ]
         },
         "Eurylochus": {
@@ -120,7 +151,23 @@
                 { "time":"00:23:58:00", "duration": 10, "x": -48 },
                 { "time":"00:25:45:00", "duration": 1, "x": 199, "y": 12 },
                 { "time":"00:26:18:00", "duration": 5, "x": 144 },
-                { "time":"00:27:48:15", "duration": 2, "x": -36, "y": -120, "z": 0, "xRot": 0, "yRot": 0, "zRot": -255, "parent": "Ship" }
+                { "time":"00:27:48:15", "duration": 2, "x": -36, "y": -120, "z": 0, "xRot": 0, "yRot": 0, "zRot": -255, "parent": "Ship" },
+                { "time":"00:31:25:00", "duration": 3, "x": "0", "y": "0", "z": "1'", "zRot": -50 },
+                { "time":"00:32:12:00", "duration": 10, "zRot": 30 },
+                { "time":"00:32:54:00", "duration": 8, "x": "-1'", "y": "3'7", "zRot": 0 },
+                { "time":"00:33:13:15", "duration": 8, "x": "8", "zRot": -30 },
+                { "time":"00:36:42:15", "duration": 8, "x": "2'", "y": "-8'6", "zRot": -120 },
+                { "time":"00:38:39:15", "duration": 3, "zRot": -65 },
+                { "time":"00:36:42:15", "duration": 8, "x": "0", "y": "0", "zRot": 0 },
+                { "time":"00:41:21:00", "duration": 8, "x": "3'", "y": "-8'", "zRot": -65 },
+                { "time":"00:45:48:15", "duration": 4, "x": "-15'", "y": "3'", "z": "0", "xRot": 0, "yRot": 0, "zRot": -15, "parent": "" },
+                { "time":"00:46:50:00", "duration": 2, "y": "-2'7" },
+                { "time":"00:46:50:00", "duration": 5, "x": "-26'6" },
+                { "time":"00:47:00:00", "duration": 5, "x": "-15'" },
+                { "time":"00:47:03:00", "duration": 2, "y": "3'" },
+                { "time":"00:50:06:00", "duration": 1, "y": "-2'7" },
+                { "time":"00:50:06:00", "duration": 2, "x": "-25'6" },
+                { "time":"00:50:15:00", "visibility": false }
             ]
         },
         "Athena": {
@@ -153,7 +200,19 @@
                 { "time":"00:02:03:00", "duration": 5, "x": -132, "y": -108, "zRot": -15 },
                 { "time":"00:04:07:00", "duration": 2, "x": -420, "y": -72, "zRot": 0 },
                 { "time":"00:05:59:15", "duration": 10, "x": -180, "y": -84, "zRot": -30 },
-                { "time":"00:06:56:00", "duration": 3, "x": -30, "y": -30, "z": -6, "xRot": 0, "yRot": 0, "zRot": 80, "parent": "Ship" }
+                { "time":"00:06:56:00", "duration": 3, "x": -30, "y": -30, "z": -6, "xRot": 0, "yRot": 0, "zRot": 80, "parent": "Ship" },
+                { "time":"00:16:30:00", "x": "-35'", "y": "-4'", "z": "0", "xRot": 0, "yRot": 0, "zRot": 0, "parent": "" },
+                { "time":"00:17:00:00", "duration": 3, "x": "-7'", "zRot": -10 },
+                { "time":"00:17:46:00", "duration": 0.5, "x": "2'", "y": "-6'", "zRot":-60 },
+                { "time":"00:17:50:00", "duration": 10, "zRot": 30 },
+                { "time":"00:19:00:00", "duration": 5, "x": "-5'", "y": "-3'", "zRot": -40 },
+                { "time":"00:20:34:15", "duration": 1, "x": "-6'", "y": "-1'", "zRot": -70 },
+                { "time":"00:20:48:00", "duration": 2, "x": "7'", "y": "2'" },
+                { "time":"00:21:38:00", "duration": 2, "x": "-6'", "y": "-1'" },
+                { "time":"00:23:06:05", "duration": 0.2, "z": "6", "xRot": -90, "zRot": -60 },
+                { "time":"00:23:58:00", "duration": 0, "visibility": false },
+                { "time":"00:24:00:00", "x": -30, "y": -30, "z": -6, "xRot": 0, "yRot": 0, "zRot": 80, "parent": "Ship" },
+                { "time":"00:24:02:00", "visibility": true }
             ]
         },
         "Crew2": {
@@ -164,7 +223,19 @@
                 { "time":"00:02:03:00", "duration": 5, "x": 132, "y": -108, "zRot": 15 },
                 { "time":"00:04:07:00", "duration": 2, "x": 420, "y": -72, "zRot": 0 },
                 { "time":"00:05:59:15", "duration": 10, "x": 180, "y": -84, "zRot": 30 },
-                { "time":"00:06:56:00", "duration": 3, "x": 30, "y": -30, "z": -6, "xRot": 0, "yRot": 0, "zRot": -80, "parent": "Ship" }
+                { "time":"00:06:56:00", "duration": 3, "x": 30, "y": -30, "z": -6, "xRot": 0, "yRot": 0, "zRot": -80, "parent": "Ship" },
+                { "time":"00:16:30:00", "x": "35'", "y": "-6'", "z": "0", "xRot": 0, "yRot": 0, "zRot": 0, "parent": "" },
+                { "time":"00:17:00:00", "duration": 3, "x": "5'", "zRot": 10 },
+                { "time":"00:17:46:00", "duration": 0.5, "x": "8'", "y": "-7'", "zRot": 50 },
+                { "time":"00:17:50:00", "duration": 10, "zRot": 40 },
+                { "time":"00:19:00:00", "duration": 5, "x": "5'", "y": "-3'" },
+                { "time":"00:20:34:15", "duration": 1, "x": "6'", "y": "-1'", "zRot": 70 },
+                { "time":"00:20:48:00", "duration": 2, "x": "15'11", "y": "0'6", "zRot": 10 },
+                { "time":"00:21:38:00", "duration": 3, "x": "6'", "y": "-1'", "zRot": 70 },
+                { "time":"00:23:18:15", "duration": 0.2, "z": "6", "xRot": -90, "zRot": 60 },
+                { "time":"00:23:58:00", "visibility": false },
+                { "time":"00:24:00:00", "x": 30, "y": -30, "z": -6, "xRot": 0, "yRot": 0, "zRot": -80, "parent": "Ship" },
+                { "time":"00:24:02:00", "visibility": true }
             ]
         },
         "Crew3": {
@@ -174,7 +245,28 @@
                 { "time":"00:02:03:00", "duration": 5, "x": -168, "y": -156, "zRot": 0 },
                 { "time":"00:02:08:00", "duration": 5, "x": -420 },
                 { "time":"00:06:04:15", "duration": 10, "x": -96, "y": -96, "zRot": -10 },
-                { "time":"00:06:50:00", "duration": 4, "x": -420, "zRot": 0 }
+                { "time":"00:06:50:00", "duration": 4, "x": -420, "zRot": 0 },
+                { "time":"00:16:30:00", "x": "-35'", "y": "-8'", "z": "0", "xRot": 0, "yRot": 0, "zRot": 0, "parent": "" },
+                { "time":"00:17:00:00", "duration": 3, "x": "-6'", "zRot": -10 },
+                { "time":"00:17:46:00", "duration": 0.5, "x": "2'", "y": "-12'", "zRot": 70 },
+                { "time":"00:17:50:00", "duration": 10, "x": "0", "y": "-10'", "zRot": 30 },
+                { "time":"00:19:00:00", "duration": 5, "x": "-4'", "y": "-6'", "zRot": -20 },
+                { "time":"00:20:48:00", "duration": 2, "x": "8'", "y": "-4'", "zRot": -30 },
+                { "time":"00:21:38:00", "duration": 3, "x": "-4'", "y": "-6'", "zRot": -20 },
+                { "time":"00:25:45:00", "duration": 1, "x": "16'6", "y": "-10'", "zRot": 5 },
+                { "time":"00:26:18:00", "duration": 5, "x": "10'", "y": "-6'", "zRot": 20 },
+                { "time":"00:27:45:15", "duration": 3, "x": "35'", "zRot": 0 },
+                { "time":"00:27:55:00", "visibility": false },
+                { "time":"00:45:40:00", "x": "-35'", "y": "-4'", "zRot": 5 },
+                { "time":"00:45:40:01", "visibility": true },
+                { "time":"00:45:55:00", "duration": 4, "x": "-16'" },
+                { "time":"00:45:57:00", "duration": 2, "y": "0'" },
+                { "time":"00:46:50:00", "duration": 2, "y": "-4'" },
+                { "time":"00:46:50:00", "duration": 4, "x": "-35'", "zRot": 0 },
+                { "time":"00:47:00:00", "duration": 3, "y": "-13'" },
+                { "time":"00:47:10:00", "duration": 15, "x": "1'", "y": "-7'" },
+                { "time":"00:48:00:15", "duration": 5, "x": "0'", "y": "2'0", "z": "-1'", "zRot": 180, "parent": "CirceTable" },
+                { "time":"00:49:05:00", "visibility": false }
             ]
         },
         "Crew4": {
@@ -184,22 +276,81 @@
                 { "time":"00:02:03:00", "duration": 5, "x": 168, "y": -156, "zRot": 0 },
                 { "time":"00:02:08:00", "duration": 5, "x": 420 },
                 { "time":"00:06:04:15", "duration": 10, "x": 96, "y": -96, "zRot": 10 },
-                { "time":"00:06:50:00", "duration": 4, "x": 420, "zRot": 0 }
+                { "time":"00:06:50:00", "duration": 4, "x": 420, "zRot": 0 },
+                { "time":"00:16:30:00", "x": "35'", "y": "-10'", "z": "0", "xRot": 0, "yRot": 0, "zRot": 0, "parent": "" },
+                { "time":"00:17:00:00", "duration": 3, "x": "6'", "zRot": 20 },
+                { "time":"00:17:46:00", "duration": 0.5, "x": "8'", "y": "-12'", "zRot": 50 },
+                { "time":"00:17:50:00", "duration": 10, "x": "6'", "y": "-11'", "zRot": 20 },
+                { "time":"00:19:00:00", "duration": 5, "x": "4'", "y": "-6'" },
+                { "time":"00:20:48:00", "duration": 2, "x": "15'", "y": "-3'" },
+                { "time":"00:21:38:00", "duration": 3, "x": "4'", "y": "-6'" },
+                { "time":"00:25:45:00", "duration": 1, "x": "15'", "y": "-12'", "zRot": 0 },
+                { "time":"00:26:18:00", "duration": 5, "x": "10'", "y": "-10'", "zRot": 15 },
+                { "time":"00:27:45:15", "duration": 3, "x": "35'", "zRot": 0 },
+                { "time":"00:27:55:00", "visibility": false },
+                { "time":"00:47:00:00", "x": "-35'", "y": "-13'" },
+                { "time":"00:47:00:01", "visibility": true },
+                { "time":"00:47:10:00", "duration": 15, "x": "-0'6", "y": "-10'" },
+                { "time":"00:48:00:15", "duration": 5, "x": "0'", "y": "-2'0", "z": "-1'", "parent": "CirceTable" },
+                { "time":"00:49:05:00", "visibility": false }
             ]
         },
         "Circe": {
             "events": [
-                { "time":"00:00:00:01", "duration": 0, "x": 0, "y": 0, "z": 0, "xRot": 0, "yRot": 0, "zRot": 0, "parent": "", "visibility": false }
+                { "time":"00:00:00:01", "x": 0, "y": 0, "z": 0, "xRot": 0, "yRot": 0, "zRot": 0, "parent": "", "visibility": false },
+                { "time":"00:47:30:00", "x": "26'0", "y": "-10'10", "z": "8'0", "zRot": 90, "visibility": true },
+                { "time":"00:47:37:20", "duration": 1, "x": "23'9" },
+                { "time":"00:47:38:20", "duration": 5, "x": "16'9", "z": "3'4" },
+                { "time":"00:47:43:25", "duration": 5, "x": "11'10", "z": "0" },
+                { "time":"00:47:48:25", "duration": 5, "x": "11'6", "y": "-7'7", "zRot": 0 },
+                { "time":"00:48:00:15", "duration": 3, "x": "7'10", "y": "-3'11" },
+                { "time":"00:48:53:05", "duration": 10, "x": "12'10", "y": "-7'3" },
+                { "time":"00:50:06:00", "duration": 2, "y": "-10'10" },
+                { "time":"00:50:06:00", "duration": 4, "x": "23'9", "z": "8'0" },
+                { "time":"00:50:07:00", "duration": 1, "zRot": -90 },
+                { "time":"00:50:10:00", "duration": 1, "x": "26'9" },
+                { "time":"00:50:12:00", "duration": 1, "zRot": 90 },
+                { "time":"00:53:06:00", "duration": 1, "x": "23'9" },
+                { "time":"00:53:07:00", "duration": 10, "x": "11'10", "z": "0" },
+                { "time":"00:53:16:00", "duration": 2, "zRot": 0 },
+                { "time":"00:53:18:15", "duration": 5, "x": "5'3", "y": "-4" },
+                { "time":"00:55:50:00", "duration": 5, "x": "-2'" },
+                { "time":"00:56:05:25", "duration": 5, "x": "-3'" },
+                { "time":"00:56:31:00", "duration": 3, "x": "10'2" },
+                { "time":"00:57:23:20", "duration": 5, "x": "3'3" },
+                { "time":"00:58:56:15", "duration": 4, "x": "30'" },
+                { "time":"00:58:56:15", "duration": 2, "y": "-4'" },
+                { "time":"00:59:01:00", "visibility": false }
             ]
         },
         "Aeolus": {
             "events": [
-                { "time":"00:00:00:01", "duration": 0, "x": 0, "y": 0, "z": 0, "xRot": 0, "yRot": 0, "zRot": 0, "parent": "", "visibility": false }
+                { "time":"00:00:00:01", "x": "-30'0", "y": "-2'7", "z": "2'", "xRot": 0, "yRot": 0, "zRot": -40, "parent": "", "visibility": false },
+                { "time":"00:37:12:15", "visibility": true },
+                { "time":"00:37:45:00", "duration": 3, "x": "-20'4", "z": "2'" },
+                { "time":"00:38:15:12", "duration": 8, "x": "-4'3", "y": "4'3", "z": "0'" },
+                { "time":"00:38:39:15", "duration": 5, "x": "-20'4", "y": "-2'7", "z": "2'" },
+                { "time":"00:40:49:00", "duration": 3, "x": "-30'0", "z": "0'" },
+                { "time":"00:40:55:00", "visibility": false }
             ]
         },
         "Hermes": {
             "events": [
-                { "time":"00:00:00:01", "duration": 0, "x": 0, "y": 0, "z": 0, "xRot": 0, "yRot": 0, "zRot": 0, "parent": "", "visibility": false }
+                { "time":"00:00:00:01", "x": 0, "y": 0, "z": 0, "xRot": 0, "yRot": 0, "zRot": 0, "parent": "", "visibility": false },
+                { "time":"00:50:21:00", "x": "23'11", "y": "4'11", "zRot": 35, "visibility": true },
+                { "time":"00:50:49:25", "duration": 8, "x": "8'6", "zRot": 20 },
+                { "time":"00:51:48:00", "duration": 2, "x": "3'7", "y": "-8" },
+                { "time":"00:51:50:00", "duration": 5, "x": "-8", "y": "5'3", "zRot": -0 },
+                { "time":"00:52:52:12", "duration": 5, "x": "-19'8", "y": "5'11", "zRot": -50 },
+                { "time":"00:53:02:04", "duration": 4, "x": "-26'11", "y": "10'6" },
+                { "time":"00:53:06:04", "visibility": false }
+            ]
+        },
+        "Poseidon": {
+            "events": [
+                { "time":"00:00:00:01", "duration": 0, "x": 0, "y": "-10'", "z": "-12'", "xRot": 0, "yRot": 0, "zRot": 0, "parent": "", "visibility": false },
+                { "time":"00:41:00:00", "x": 0, "y": 0, "z": 0, "xRot": 0, "yRot": 0, "zRot": 0, "parent": "DSLift", "visibility": true},
+                { "time":"00:45:35:00", "parent": "", "visibility": false}
             ]
         },
         "YoungOdysseus": {
@@ -245,6 +396,20 @@
                 { "time":"00:25:45:00", "duration": 1, "x": "-16'5", "y": "-2'" },
                 { "time":"00:26:15:00", "duration": 5, "x": "-33'10", "y": "-4'" },
                 { "time":"00:26:30:15", "visibility": false }
+            ]
+        },
+        "CirceStairs": {
+            "events": [
+                { "time": "00:00:00:01", "visibility": false },
+                { "time": "00:45:30:00", "visibility": true },
+                { "time": "00:59:00:00", "visibility": false }
+            ]
+        },
+        "CirceTable": {
+            "events": [
+                { "time": "00:00:00:01", "visibility": false },
+                { "time": "00:45:30:00", "visibility": true },
+                { "time": "00:59:00:00", "visibility": false }
             ]
         }
     }

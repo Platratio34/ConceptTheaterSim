@@ -71,6 +71,11 @@ void UCAnimationComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 
 void UCAnimationComponent::onEvent(FAnimationFileTrackEvent event)
 {   
+    if(event.visibleKey)
+    {
+        if(!event.visible)
+            onVisibilityChange.Broadcast(false);
+    }
     if(event.parentKey)
     {
         if(event.clearParent)
@@ -110,7 +115,10 @@ void UCAnimationComponent::onEvent(FAnimationFileTrackEvent event)
         zRotDriver->SetTarget(event.zRot, event.duration);
     
     if(event.visibleKey)
-        onVisibilityChange.Broadcast(event.visible);
+    {
+        if(event.visible)
+            onVisibilityChange.Broadcast(true);
+    }
 }
 
 void UCAnimationComponent::updatePosRot()
