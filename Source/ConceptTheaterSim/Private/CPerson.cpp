@@ -48,7 +48,8 @@ void ACPerson::OnConstruction(const FTransform &Transform)
 void ACPerson::updateHeight()
 {
     float hScale = height / defaultHeight;
-    bodyRoot->SetRelativeScale3D(FVector(hScale, hScale, hScale));
+    float wScale = (hScale - 1) * 0.75 + 1;
+    bodyRoot->SetRelativeScale3D(FVector(wScale, wScale, hScale));
     EPersonLegType legType = getLegType();
     float hOffset = 0;
     if(legType == EPersonLegType::FEMALE_HEEL_1)

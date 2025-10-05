@@ -5,12 +5,20 @@
 
 void UPropertyDriver::SetValue(float value_) {
     this->value = value_;
+    done = false;
 }
 
 void UPropertyDriver::SetTarget(float target, float time_)
 {
     this->targetValue = target;
     this->time = time_;
+    done = false;
+}
+
+void UPropertyDriver::UpdateTarget(float target)
+{
+    this->targetValue = target;
+    done = false;
 }
 
 float UPropertyDriver::Update(float deltaTime)
@@ -19,6 +27,7 @@ float UPropertyDriver::Update(float deltaTime)
     if(abs(delta) < 0.001) {
         value = targetValue;
         time = 0;
+        done = true;
         return targetValue;
     }
     if(time <= 0) {
@@ -42,12 +51,12 @@ float UPropertyDriver::Update(float deltaTime)
     time -= deltaTime;
     value += move;
     lastDelta = delta;
+    done = abs(targetValue - value) < 0.001;
     return value;
 }
 
 
 bool UPropertyDriver::IsDone()
 {
-    float delta = targetValue - value;
-    return abs(delta) < 0.001;
+    return done;
 }

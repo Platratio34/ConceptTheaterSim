@@ -62,7 +62,7 @@ void UCAnimationComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
     cPos.Y = yPosDriver->Update(DeltaTime) * IN_TO_CM;
     cPos.Z = zPosDriver->Update(DeltaTime) * IN_TO_CM;
     ow->SetActorRelativeLocation(cPos);
-    FRotator cRot/* = transform.Rotation*/;
+    FRotator cRot /* = transform.Rotation */;
     cRot.Roll = xRotDriver->Update(DeltaTime);
     cRot.Pitch = yRotDriver->Update(DeltaTime);
     cRot.Yaw = zRotDriver->Update(DeltaTime);
@@ -83,8 +83,7 @@ void UCAnimationComponent::onEvent(FAnimationFileTrackEvent event)
             if(cParent != nullptr)
             {
                 GetOwner()->DetachFromActor(FDetachmentTransformRules(EDetachmentRule::KeepWorld, true));
-                cParent = nullptr;
-                updatePosRot();
+                updatePosRot(nullptr);
             }
         }
         else
@@ -94,25 +93,59 @@ void UCAnimationComponent::onEvent(FAnimationFileTrackEvent event)
             {
                 FAttachmentTransformRules attachmentRules(EAttachmentRule::KeepWorld, EAttachmentRule::KeepWorld, EAttachmentRule::KeepWorld, true);
                 GetOwner()->GetRootComponent()->AttachToComponent(newParent, attachmentRules);
-                cParent = newParent;
-                updatePosRot();
+                updatePosRot(newParent);
             }
         }
     }
 
+    bool isInstant = event.duration < (1 / 30);
+
+    AActor *ow = GetOwner();
+    FTransform transform = ow->GetRootComponent()->GetRelativeTransform();
+    FVector cPos = transform.GetLocation();
     if(event.xKey)
+    {
+        if(isInstant)
+            cPos.X = event.x * IN_TO_CM;
+        xPosDriver->SetTarget(event.x, event.duration);
+    }
         xPosDriver->SetTarget(event.x, event.duration);
     if(event.yKey)
+    {
+        if(isInstant)
+            cPos.Y = event.y * IN_TO_CM;
         yPosDriver->SetTarget(event.y, event.duration);
+    }
     if(event.zKey)
+    {
+        if(isInstant)
+            cPos.Z = event.z * IN_TO_CM;
         zPosDriver->SetTarget(event.z, event.duration);
-        
+    }
+    if(isInstant)
+        ow->SetActorRelativeLocation(cPos);
+    
+    FRotator cRot = transform.GetRotation().Rotator();
     if(event.xRotKey)
+    {
+        if(isInstant)
+            cRot.Roll = event.xRot;
         xRotDriver->SetTarget(event.xRot, event.duration);
+    }
     if(event.yRotKey)
+    {
+        if(isInstant)
+            cRot.Pitch = event.yRot;
         yRotDriver->SetTarget(event.yRot, event.duration);
+    }
     if(event.zRotKey)
+    {
+        if(isInstant)
+            cRot.Yaw = event.zRot;
         zRotDriver->SetTarget(event.zRot, event.duration);
+    }
+    if(isInstant)
+        ow->SetActorRelativeRotation(cRot);
     
     if(event.visibleKey)
     {
@@ -121,7 +154,7 @@ void UCAnimationComponent::onEvent(FAnimationFileTrackEvent event)
     }
 }
 
-void UCAnimationComponent::updatePosRot()
+void UCAnimationComponent::updatePosRot(USceneComponent* newParent)
 {
     AActor *ow = GetOwner();
     FTransform transform = ow->GetRootComponent()->GetRelativeTransform();
@@ -135,4 +168,28 @@ void UCAnimationComponent::updatePosRot()
     xRotDriver->SetValue(rot.Roll);
     yRotDriver->SetValue(rot.Pitch);
     zRotDriver->SetValue(rot.Yaw);
+
+    FVector cTgtPos = FVector(xPosDriver->GetValue(), yPosDriver->GetValue(), zPosDriver->GetValue());
+    FQuat cTgtRot = FRotator(yRotDriver->GetValue(), zRotDriver->GetValue(), xRotDriver->GetValue()).Quaternion();
+    if(cParent != nullptr)
+    {
+        FTransform oldParentTransform = cParent->GetComponentTransform();
+        cTgtPos = oldParentTransform.TransformPosition(cTgtPos);
+        cTgtRot = oldParentTransform.TransformRotation(cTgtRot);
+    }
+    if(newParent != nullptr)
+    {
+        FTransform newParentTransform = newParent->GetComponentTransform();
+        cTgtPos = newParentTransform.InverseTransformPosition(cTgtPos);
+        cTgtRot = newParentTransform.InverseTransformRotation(cTgtRot);
+    }
+    FRotator cTgtRotator = cTgtRot.Rotator();
+    xPosDriver->UpdateTarget(cTgtPos.X / IN_TO_CM);
+    yPosDriver->UpdateTarget(cTgtPos.Y / IN_TO_CM);
+    zPosDriver->UpdateTarget(cTgtPos.Z / IN_TO_CM);
+    xRotDriver->UpdateTarget(cTgtRotator.Roll);
+    yRotDriver->UpdateTarget(cTgtRotator.Pitch);
+    zRotDriver->UpdateTarget(cTgtRotator.Yaw);
+
+    cParent = newParent;
 }

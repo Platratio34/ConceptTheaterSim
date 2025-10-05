@@ -20,6 +20,8 @@ public:
     UFUNCTION(BlueprintCallable)
     void SetTarget(float target, float time);
     UFUNCTION(BlueprintCallable)
+    void UpdateTarget(float target);
+    UFUNCTION(BlueprintCallable)
     float Update(float deltaTime);
     UFUNCTION(BlueprintCallable)
     bool IsDone();
@@ -43,4 +45,6 @@ protected:
     float targetValue;
     float time;
     float lastDelta = 0;
+
+    bool done;
 };

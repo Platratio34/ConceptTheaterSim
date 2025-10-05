@@ -40,7 +40,13 @@ void ACAnimationMaster::Tick(float DeltaTime)
             FAnimationFileTrack track = animationFile.tracks[key];
             if(UCAnimationComponent** component = animatedObjects.Find(key))
             {
-                (*component)->onEvent(track.events[0]);
+                for (int i = 0; i < track.events.Num(); i++)
+                {
+                    FAnimationFileTrackEvent event = track.events[i];
+                    if (event.timeSeconds > lastSeconds && i > 0)
+                        break;
+                    (*component)->onEvent(event);
+                }
                 UE_LOG(AnimationLog, Display, TEXT("Setting default position for animated object: %s"), *key.ToString());
             }
             else
@@ -99,7 +105,6 @@ void ACAnimationMaster::reloadFile()
     // reset/setup
     animationFile = animFile;
     animationFileLoaded = true;
-    lastSeconds = -1;
     first = true;
     UE_LOG(AnimationLog, Display, TEXT("Animation loaded: %s"), *path);
 }
@@ -130,10 +135,9 @@ void ACAnimationMaster::onTimeUpdate(int frames, float seconds)
                 break;
             if(event.timeSeconds < seconds)
             {
-                double minDur = FMath::Min(event.duration, 0.5);
                 event.duration = event.duration - (seconds - event.timeSeconds);
-                if(event.duration < minDur)
-                    event.duration = minDur;
+                if(event.duration < 0)
+                    event.duration = 0;
             }
             nextEvent.Add(key, i+1);
             if(UCAnimationComponent** component = animatedObjects.Find(key))

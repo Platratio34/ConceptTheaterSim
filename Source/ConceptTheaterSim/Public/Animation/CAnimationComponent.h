@@ -57,7 +57,7 @@ private:
     UPROPERTY()
     USceneComponent *cParent = nullptr;
 
-    void updatePosRot();
+    void updatePosRot(USceneComponent* newParent);
 
     UPROPERTY()
     ACAnimationMaster *master;

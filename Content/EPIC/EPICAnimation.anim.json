@@ -65,7 +65,11 @@
                 { "time":"00:57:23:15", "duration": 5, "y": "3'11" },
                 { "time":"00:58:07:15", "duration": 5, "y": "-1'" },
                 { "time":"00:58:57:00", "duration": 2, "y": "-5'" },
-                { "time":"00:59:00:00", "visibility": false }
+                { "time":"00:58:57:00", "duration": 1, "x": "1'8", "y": "-4", "z": "1'", "xRot": 0, "yRot": 0, "zRot": -75, "parent": "Ship" },
+                { "time":"01:03:25:00", "duration": 3, "x": "0'", "y": "4'0", "z": "0", "xRot": 0, "yRot": 0, "zRot": 0, "parent": "" },
+                { "time":"01:03:30:00", "duration": 5, "x": "-6'" },
+                { "time":"01:06:18:00", "duration": 5, "x": "0'" },
+                { "time":"01:09:55:15", "duration": 2, "y": "-5'" }
             ]
         },
         "Polites": {
@@ -93,7 +97,10 @@
                 { "time":"00:21:38:00", "duration": 3, "x": 120, "y": 36 },
                 { "time":"00:22:35:00", "duration": 5, "x": 0, "y": 60, "zRot": 180 },
                 { "time":"00:22:47:05", "duration": 0.5, "y": 48, "z": 4, "xRot": -90 },
-                { "time":"00:23:58:00", "duration": 0, "visibility": false }
+                { "time":"00:23:58:00", "visibility": false },
+                { "time":"01:01:00:00", "x": 0, "y": 0, "z": 0, "xRot": 0, "yRot": 0, "zRot": 0, "parent": "DSLift" },
+                { "time":"01:01:01:00", "visibility": true },
+                { "time":"01:01:55:00", "visibility": false, "parent": "" }
             ]
         },
         "Zeus": {
@@ -266,7 +273,11 @@
                 { "time":"00:47:00:00", "duration": 3, "y": "-13'" },
                 { "time":"00:47:10:00", "duration": 15, "x": "1'", "y": "-7'" },
                 { "time":"00:48:00:15", "duration": 5, "x": "0'", "y": "2'0", "z": "-1'", "zRot": 180, "parent": "CirceTable" },
-                { "time":"00:49:05:00", "visibility": false }
+                { "time":"00:49:05:00", "parent": "", "visibility": false },
+                { "time":"01:00:10:00", "x": "-35'", "y": "-4'", "z": 0, "zRot": 0, "visibility": true },
+                { "time":"01:00:20:00", "duration": 5, "x": "-14'", "y": "-1'", "zRot": -25 },
+                { "time":"01:00:46:00", "duration": 5, "x": "-12'", "y": "-6'" },
+                { "time":"01:03:25:00", "duration": 4, "x": "-35'", "y": "-4'", "zRot": 0 }
             ]
         },
         "Crew4": {
@@ -292,7 +303,11 @@
                 { "time":"00:47:00:01", "visibility": true },
                 { "time":"00:47:10:00", "duration": 15, "x": "-0'6", "y": "-10'" },
                 { "time":"00:48:00:15", "duration": 5, "x": "0'", "y": "-2'0", "z": "-1'", "parent": "CirceTable" },
-                { "time":"00:49:05:00", "visibility": false }
+                { "time":"00:49:05:00", "parent": "", "visibility": false },
+                { "time":"01:00:10:00", "x": "35'", "y": "-4'", "z": 0, "zRot": 0, "visibility": true },
+                { "time":"01:00:20:00", "duration": 5, "x": "14'", "y": "-1'", "zRot": 65 },
+                { "time":"01:00:46:00", "duration": 5, "x": "12'", "y": "-6'", "zRot": 25 },
+                { "time":"01:03:25:00", "duration": 4, "x": "35'", "y": "-4'", "zRot": 0 }
             ]
         },
         "Circe": {
@@ -372,7 +387,12 @@
                 { "time":"00:10:06:00", "duration": 5, "x": -300, "visibility": true },
                 { "time":"00:11:06:15", "duration": 1, "x": -98 },
                 { "time":"00:12:46:15", "duration": 5, "x": -420 },
-                { "time":"00:12:51:15", "duration": 5, "visibility": false }
+                { "time":"00:12:51:15", "visibility": false },
+                { "time":"00:59:30:00", "x": "-30'", "y": "-6'11", "visibility": true },
+                { "time":"00:59:41:15", "duration": 5, "x": "4'", "y": "-6'11" },
+                { "time":"01:00:46:00", "duration": 5, "y": "-9'0" },
+                { "time":"01:03:25:00", "duration": 4, "x": "-30'", "y": "-19'4" },
+                { "time":"01:03:30:00", "visibility": false }
             ]
         },
         "Polyphemus": {
@@ -398,6 +418,23 @@
                 { "time":"00:26:30:15", "visibility": false }
             ]
         },
+        "Mother": {
+            "events": [
+                { "time":"00:00:00:01", "x": "-25'", "y": "8'0", "z": 0, "xRot": 0, "yRot": 0, "zRot": 0, "parent": "", "visibility": false },
+                { "time":"01:01:42:00", "duration": 2, "x": "-19'", "y": "7'7", "visibility": true },
+                { "time":"01:02:50:00", "duration": 2, "x": "-25'", "y": "8'0"},
+                { "time":"01:02:52:00", "visibility": false }
+            ]
+        },
+        "Prophet": {
+            "events": [
+                { "time":"00:00:00:01", "x": "0'", "y": "-5'", "z": "-12'", "xRot": 0, "yRot": 0, "zRot": 0, "parent": "", "visibility": false },
+                { "time":"01:03:20:00", "x": "0", "y": "0", "z": "0", "parent": "DSLift", "visibility": true },
+                { "time":"01:04:09:00", "duration": 5, "x": "0", "y": "3'", "z": "0", "parent": "" },
+                { "time":"01:06:02:00", "duration": 3, "x": "0", "y": "0'", "z": "0", "parent": "DSLift" },
+                { "time":"01:06:25:10", "parent": "", "visibility": false }
+            ]
+        },
         "CirceStairs": {
             "events": [
                 { "time": "00:00:00:01", "visibility": false },
@@ -410,6 +447,37 @@
                 { "time": "00:00:00:01", "visibility": false },
                 { "time": "00:45:30:00", "visibility": true },
                 { "time": "00:59:00:00", "visibility": false }
+            ]
+        },
+        "Horse-SL": {
+            "events": [
+                { "time": "00:00:00:01", "visibility": true },
+                { "time": "00:01:52:00", "visibility": false }
+            ]
+        },
+        "Horse-SR": {
+            "events": [
+                { "time": "00:00:00:01", "visibility": true },
+                { "time": "00:01:52:00", "visibility": false }
+            ]
+        },
+        "Balcony-SL": {
+            "events": [
+                { "time": "00:00:00:01", "visibility": true },
+                { "time": "00:04:15:00", "visibility": false },
+                { "time": "00:39:30:00", "visibility": true },
+                { "time": "00:40:30:00", "visibility": false }
+            ]
+        },
+        "Balcony-SR": {
+            "events": [
+                { "time": "00:00:00:01", "visibility": true },
+                { "time": "00:04:15:00", "visibility": false }
+            ]
+        },
+        "Ship": {
+            "events": [
+                { "time": "00:00:00:01", "visibility": true }
             ]
         }
     }

@@ -448,6 +448,13 @@ public:
     UFUNCTION(BlueprintCallable, CallInEditor)
     void reloadFile();
 
+    UFUNCTION(BlueprintCallable)
+    void loadFile(FString path)
+    {
+        filePath = path;
+        reloadFile();
+    }
+
     UPROPERTY(EditAnywhere)
     ATimeCodeSourceC* timecodeSource = nullptr;
 
