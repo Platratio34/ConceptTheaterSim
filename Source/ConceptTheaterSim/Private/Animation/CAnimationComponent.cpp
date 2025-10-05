@@ -74,7 +74,7 @@ void UCAnimationComponent::onEvent(FAnimationFileTrackEvent event)
     if(event.visibleKey)
     {
         if(!event.visible)
-            onVisibilityChange.Broadcast(false);
+            updateVisibility(false);
     }
     if(event.parentKey)
     {
@@ -150,7 +150,17 @@ void UCAnimationComponent::onEvent(FAnimationFileTrackEvent event)
     if(event.visibleKey)
     {
         if(event.visible)
-            onVisibilityChange.Broadcast(true);
+            updateVisibility(true);
+    }
+}
+
+void UCAnimationComponent::updateVisibility(bool newVisibility)
+{
+    onVisibilityChange.Broadcast(newVisibility);
+    for(UStaticMeshComponent* mesh : meshes)
+    {
+        mesh->SetVisibility(newVisibility);
+        mesh->SetCollisionEnabled(newVisibility ? ECollisionEnabled::QueryAndPhysics : ECollisionEnabled::NoCollision);
     }
 }
 

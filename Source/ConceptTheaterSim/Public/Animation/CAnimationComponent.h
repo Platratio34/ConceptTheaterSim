@@ -24,6 +24,7 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+    UFUNCTION()
     void onEvent(FAnimationFileTrackEvent event);
 
     UFUNCTION(BlueprintCallable)
@@ -38,6 +39,18 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+    UFUNCTION(BlueprintCallable)
+    void addMesh(UStaticMeshComponent* mesh)
+    {
+        meshes.AddUnique(mesh);
+    }
+
+    UFUNCTION(BlueprintCallable)
+    void removeMesh(UStaticMeshComponent* mesh)
+    {
+        meshes.Remove(mesh);
+    }
 
 private:
     UPROPERTY()
@@ -57,8 +70,15 @@ private:
     UPROPERTY()
     USceneComponent *cParent = nullptr;
 
+    UFUNCTION()
     void updatePosRot(USceneComponent* newParent);
 
     UPROPERTY()
     ACAnimationMaster *master;
+
+    UFUNCTION()
+    void updateVisibility(bool newVisibility);
+
+    UPROPERTY(EditInstanceOnly)
+    TArray<UStaticMeshComponent *> meshes;
 };

@@ -399,7 +399,8 @@
             "events": [
                 { "time":"00:00:00:01", "duration": 0, "x": "-26'11", "y": "-19'4", "z": 0, "xRot": 0, "yRot": 0, "zRot": 0, "parent": "", "visibility": false },
                 { "time":"00:17:00:00", "duration": 0, "visibility": true },
-                { "time":"00:17:46:00", "duration": 0.5, "x": "-10'", "y": "-14'" },
+                { "time":"00:17:45:20", "duration": 0.5, "x": "-10'" },
+                { "time":"00:17:46:00", "duration": 0.5, "y": "-14'" },
                 { "time":"00:17:50:00", "duration": 10, "y": "-4'" },
                 { "time":"00:19:00:00", "duration": 5, "x": "0'", "y": "0'" },
                 { "time":"00:23:43:15", "duration": 2, "z": 8, "xRot": -90 },
@@ -478,6 +479,74 @@
         "Ship": {
             "events": [
                 { "time": "00:00:00:01", "visibility": true }
+            ]
+        },
+        "Rocks-SL1": {
+            "events": [
+                { "time": "00:00:00:01", "x": 0, "y": 0, "z": 0, "xRot": 0, "yRot": 0, "zRot": 0, "parent": "SL1", "visibility": false },
+                { "time": "00:16:50:00", "visibility": true },
+                { "time": "00:27:50:00", "visibility": false },
+                { "time": "00:59:00:00", "visibility": true }
+            ]
+        },
+        "Rocks-SL2": {
+            "events": [
+                { "time": "00:00:00:01", "x": 0, "y": 0, "z": 0, "xRot": 0, "yRot": 0, "zRot": 0, "parent": "SL2", "visibility": false },
+                { "time": "00:16:50:00", "visibility": true },
+                { "time": "00:27:50:00", "visibility": false },
+                { "time": "00:59:00:00", "visibility": true }
+            ]
+        },
+        "Rocks-SR1": {
+            "events": [
+                { "time": "00:00:00:01", "x": 0, "y": 0, "z": 0, "xRot": 0, "yRot": 0, "zRot": 0, "parent": "SR1", "visibility": false },
+                { "time": "00:16:50:00", "visibility": true },
+                { "time": "00:27:50:00", "visibility": false },
+                { "time": "00:59:00:00", "visibility": true }
+            ]
+        },
+        "Rocks-SR2": {
+            "events": [
+                { "time": "00:00:00:01", "x": 0, "y": 0, "z": 0, "xRot": 0, "yRot": 0, "zRot": 0, "parent": "SR2", "visibility": false },
+                { "time": "00:16:50:00", "visibility": true },
+                { "time": "00:27:50:00", "visibility": false },
+                { "time": "00:59:00:00", "visibility": true }
+            ]
+        },
+        "Cave-SL1": {
+            "events": [
+                { "time": "00:00:00:01", "x": 10, "y": 2, "z": 0, "xRot": 0, "yRot": 0, "zRot": 0, "parent": "SL1", "visibility": false },
+                { "time": "00:58:30:00", "visibility": true }
+            ]
+        },
+        "Cave-SR1": {
+            "events": [
+                { "time": "00:00:00:01", "x": -10, "y": 2, "z": 0, "xRot": 0, "yRot": 0, "zRot": 0, "parent": "SR1", "visibility": false },
+                { "time": "00:58:30:00", "visibility": true }
+            ]
+        },
+        "Cave-SL2": {
+            "events": [
+                { "time": "00:00:00:01", "x": 5, "y": 0, "z": 0, "xRot": 0, "yRot": 0, "zRot": 0, "parent": "SL2", "visibility": false },
+                { "time": "00:58:30:00", "visibility": true }
+            ]
+        },
+        "Cave-SR2": {
+            "events": [
+                { "time": "00:00:00:01", "x": -5, "y": 0, "z": 0, "xRot": 0, "yRot": 0, "zRot": 0, "parent": "SR2", "visibility": false },
+                { "time": "00:58:30:00", "visibility": true }
+            ]
+        },
+        "Cave-SL3": {
+            "events": [
+                { "time": "00:00:00:01", "x": 0, "y": 10, "z": 0, "xRot": 0, "yRot": 0, "zRot": 0, "parent": "SL3", "visibility": false },
+                { "time": "00:58:30:00", "visibility": true }
+            ]
+        },
+        "Cave-SR3": {
+            "events": [
+                { "time": "00:00:00:01", "x": 0, "y": 10, "z": 0, "xRot": 0, "yRot": 0, "zRot": 0, "parent": "SR3", "visibility": false },
+                { "time": "00:58:30:00", "visibility": true }
             ]
         }
     }

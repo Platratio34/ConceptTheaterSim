@@ -17,7 +17,7 @@ ACTheatricalLight::ACTheatricalLight()
     body = CreateDefaultSubobject<USceneComponent>(TEXT("Body"));
     body->SetupAttachment(yoke);
 
-    light = CreateDefaultSubobject<USpotLightComponent>(TEXT("Body"));
+    light = CreateDefaultSubobject<USpotLightComponent>(TEXT("Light"));
     light->SetupAttachment(body);
 }
 
