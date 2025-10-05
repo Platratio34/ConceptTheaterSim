@@ -105,6 +105,12 @@ public:
 
     UPROPERTY(EditInstanceOnly)
     TSoftObjectPtr<AActor> parentActor = nullptr;
+    
+    UPROPERTY(EditAnywhere, Category="Image")
+    UTexture2D* gobo = nullptr;
+
+    UPROPERTY(EditAnywhere, Category="Image")
+    double goboRotation = 0;
 
     UPROPERTY(EditInstanceOnly)
     bool focusMode = false;
@@ -126,6 +132,12 @@ public:
     
     UFUNCTION(BlueprintCallable)
     void setZoom(double newZoom);
+    
+    UFUNCTION(BlueprintCallable)
+    void setGobo(UTexture2D* newGobo);
+
+    UFUNCTION(BlueprintCallable)
+    void setGoboRotation(double newGoboRotation);
 
 
 protected:
@@ -143,6 +155,12 @@ protected:
 
     UFUNCTION(BlueprintNativeEvent)
     double getIntensityScale();
+
+    UFUNCTION(BlueprintCallable)
+    void setup(UStaticMeshComponent* lenseMesh_);
+
+    UFUNCTION(BlueprintCallable)
+    void addShutterHandle(int index, UStaticMeshComponent* handle);
 
 private:
     virtual double getIntensityScale_Implementation() { return 1; }
