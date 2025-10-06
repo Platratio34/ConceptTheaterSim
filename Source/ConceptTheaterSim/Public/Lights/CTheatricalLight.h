@@ -31,7 +31,7 @@ public:
         p.angleOffset = tan(angle * DEG_TO_RAD);
         return p;
     }
-    static FShutterPosition CreateRot(double positionA, double positionB)
+    static FShutterPosition CreateAB(double positionA, double positionB)
     {
         FShutterPosition p;
         p.position = (positionA + positionB) * 0.5;
