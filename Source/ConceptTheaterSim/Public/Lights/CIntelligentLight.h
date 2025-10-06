@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Lights/CDMXProfile.h"
 #include "Lights/CTheatricalLight.h"
+#include "Cables/CDMXCableConnector.h"
 #include "CIntelligentLight.generated.h"
 
 class CONCEPTTHEATERSIM_API UCDMXParameter;
@@ -26,6 +27,12 @@ public:
     
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="DMX")
     UCDMXProfile *profile;
+    
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components")
+    UCDMXCableConnector *dmxInput;
+
+    UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category="DMX")
+    UCDMXCableConnector *cSource;
 
 protected:
 	// Called when the game starts or when spawned
@@ -65,4 +72,6 @@ public:
     {
         params.AddUnique(p);
     }
+
+    void onSourceUpdate(UCDMXCableConnector *source);
 };

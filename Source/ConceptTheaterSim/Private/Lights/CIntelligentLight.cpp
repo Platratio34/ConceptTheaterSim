@@ -6,7 +6,7 @@
 // Sets default values
 ACIntelligentLight::ACIntelligentLight()
 {
-    
+    dmxInput = CreateDefaultSubobject<UCDMXCableConnector>(TEXT("DMX Input"));
 }
 
 void ACIntelligentLight::OnConstruction(const FTransform &Transform)
@@ -19,7 +19,7 @@ void ACIntelligentLight::OnConstruction(const FTransform &Transform)
 void ACIntelligentLight::BeginPlay()
 {
 	Super::BeginPlay();
-    
+    dmxInput->onSourceUpdate.AddDynamic(this, &ACIntelligentLight::onSourceUpdate);
 }
 
 // Called every frame
@@ -73,4 +73,18 @@ FName ACIntelligentLight::getParameterIndexed(FName id)
     if(profile == nullptr)
         return FName("");
     return profile->getRange(id, *p);
+}
+
+void ACIntelligentLight::onSourceUpdate(UCDMXCableConnector *source)
+{
+    if(source == nullptr)
+    {
+        if(cSource != nullptr)
+            cSource->onDMXData.RemoveDynamic(this, &ACIntelligentLight::updateDmx);
+    }
+    else
+    {
+        source->onDMXData.AddDynamic(this, &ACIntelligentLight::updateDmx);
+    }
+    cSource = source;
 }
