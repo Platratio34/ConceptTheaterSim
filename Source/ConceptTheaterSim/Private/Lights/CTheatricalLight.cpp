@@ -135,7 +135,7 @@ void ACTheatricalLight::setPan(double newPan)
 void ACTheatricalLight::setTilt(double newTilt)
 {
     tilt = newTilt;
-    body->SetRelativeRotation(FRotator(tilt, 0, 0));
+    body->SetRelativeRotation(FRotator(0, 0, tilt));
 }
 
 void ACTheatricalLight::setEdge(double newEdge)

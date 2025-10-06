@@ -23,6 +23,8 @@ ACCable::ACCable()
     
     spline = CreateDefaultSubobject<USplineMeshComponent>("Spline");
     spline->SetupAttachment(root);
+    
+    arrow = CreateDefaultSubobject<UArrowComponent>("Arrow");
 }
 
 UCCableConnector* ACCable::getConnector(AActor* actor, bool start)
@@ -45,7 +47,7 @@ void ACCable::OnConstruction(const FTransform &Transform)
 {
     Super::OnConstruction(Transform);
 
-    if(!drawDebug || !softStartActor.IsValid() || !softEndActor.IsValid())
+    if(!softStartActor.IsValid() || !softEndActor.IsValid())
         return;
 
     AActor *startActor = softStartActor.Get();
@@ -54,31 +56,55 @@ void ACCable::OnConstruction(const FTransform &Transform)
         return;
         
     UCCableConnector *startPort = getConnector(startActor, true);
-    UCCableConnector *endPort = getConnector(startActor, false);
+    UCCableConnector *endPort = getConnector(endActor, false);
     
+    #if WITH_EDITOR
+        FString actorLabel = GetActorLabel();
+    #else
+        FString actorLabel = GetName();
+    #endif
     if(startPort == nullptr || endPort == nullptr)
+    {
+        #if WITH_EDITOR
+            FString targetActorLabel = (startPort == nullptr) ? startActor->GetActorLabel() : endActor->GetActorLabel();
+        #else
+            FString targetActorLabel = (startPort == nullptr) ? startActor->GetName() : endActor->GetName();
+        #endif
+        UE_LOG(LogTemp, Warning, TEXT("Unable to connect cable %s, could not find connector on %s"), *actorLabel, *targetActorLabel);
         return;
+    }
         
     if(startPort->connector == nullptr || endPort->connector == nullptr)
+    {
+        #if WITH_EDITOR
+            FString targetActorLabel = (startPort->connector == nullptr) ? startActor->GetActorLabel() : endActor->GetActorLabel();
+        #else
+            FString targetActorLabel = (startPort->connector == nullptr) ? startActor->GetName() : endActor->GetName();
+        #endif
+        UE_LOG(LogTemp, Warning, TEXT("Unable to connect cable %s, connector on %s was missing component"), *actorLabel, *targetActorLabel);
         return;
+    }
 
     FVector sPos = startPort->connector->GetComponentLocation();
     FVector ePos = endPort->connector->GetComponentLocation();
     
     SetActorLocation((sPos + ePos) * 0.5);
 
-    FTransform transform = GetActorTransform();
-    sPos = transform.InverseTransformPosition(sPos);
-    ePos = transform.InverseTransformPosition(ePos);
+    if(drawDebug)
+    {
+        FTransform transform = GetActorTransform();
+        sPos = transform.InverseTransformPosition(sPos);
+        ePos = transform.InverseTransformPosition(ePos);
 
-    UArrowComponent *arrow = NewObject<UArrowComponent>(this);
-    arrow->RegisterComponent();
-    arrow->AttachToComponent(root, FAttachmentTransformRules::KeepWorldTransform);
-    arrow->SetWorldLocation(sPos);
-    arrow->SetRelativeRotation(UKismetMathLibrary::FindLookAtRotation(sPos, ePos));
-    arrow->ArrowSize = 0.5;
-    arrow->ArrowLength = (sPos - ePos).Size() * 2.0;
-    arrow->SetArrowColor(debugColor);
+        arrow->RegisterComponent();
+        arrow->AttachToComponent(root, FAttachmentTransformRules::KeepWorldTransform);
+        arrow->SetWorldLocation(sPos);
+        arrow->SetWorldRotation(UKismetMathLibrary::FindLookAtRotation(sPos, ePos));
+        arrow->ArrowSize = 0.5;
+        arrow->ArrowLength = (sPos - ePos).Size() * 2.0;
+        arrow->SetArrowColor(debugColor);
+    }
+    arrow->SetVisibility(drawDebug);
 }
 
 // Called when the game starts or when spawned

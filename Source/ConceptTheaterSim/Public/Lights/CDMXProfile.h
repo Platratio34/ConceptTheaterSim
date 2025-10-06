@@ -44,9 +44,6 @@ public:
     FName id;
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly)
-    int address = 0;
-
-    UPROPERTY(EditAnywhere, BlueprintReadOnly)
     ECDMXProfileParameterType type = ECDMXProfileParameterType::STRAIGHT;
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly)
@@ -69,8 +66,9 @@ public:
     void updateParameters(TMap<FName, int> outParameters, TArray<int> dmx, int start)
     {
         TMap<FName, int> p;
-        for(FCDMXProfileParameter parameter: parameters)
+        for (int address = 0; address < parameters.Num(); address++)
         {
+            FCDMXProfileParameter parameter = parameters[address];
             FName id = parameter.id;
             if(!p.Find(id))
             {
@@ -79,15 +77,15 @@ public:
 
             if(parameter.type == ECDMXProfileParameterType::COARSE)
             {
-                p[id] = p[id] + (dmx[start + parameter.address] * 256);
+                p[id] = p[id] + (dmx[start + address] * 256);
             }
             else if(parameter.type == ECDMXProfileParameterType::FINE)
             {
-                p[id] = p[id] + dmx[start + parameter.address];
+                p[id] = p[id] + dmx[start + address];
             }
             else
             {
-                p[id] = dmx[start + parameter.address];
+                p[id] = dmx[start + address];
             }
         }
         TArray<FName> keys;

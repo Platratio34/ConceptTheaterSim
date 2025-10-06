@@ -112,6 +112,9 @@ protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Components")
     USplineMeshComponent *spline;
 
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Components")
+    UArrowComponent *arrow;
+
     UFUNCTION()
     UCCableConnector *getConnector(AActor *actor, bool start);
 
