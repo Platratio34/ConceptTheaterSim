@@ -96,6 +96,9 @@ public:
 
     UPROPERTY(EditAnywhere, Category="Shutters")
     TArray<FShutterPosition> shutterPositions;
+    
+    UPROPERTY(EditAnywhere, Category="Zoom & Focus")
+    double shutterFrame = 0;
 
     UPROPERTY(EditDefaultsOnly, Category="Shutters")
     TMap<int, USceneComponent*> shutterHandles;
@@ -138,6 +141,12 @@ public:
 
     UFUNCTION(BlueprintCallable)
     void setGoboRotation(double newGoboRotation);
+
+    UFUNCTION(BlueprintCallable)
+    void setShutter(int index, FShutterPosition position);
+
+    UFUNCTION(BlueprintCallable)
+    void setShutterFrame(double position);
 
 
 protected:

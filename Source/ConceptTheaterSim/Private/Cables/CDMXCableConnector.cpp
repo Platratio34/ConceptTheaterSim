@@ -37,10 +37,12 @@ void UCDMXCableConnector::onDisconnect(ACCable* cable_)
         other->onSourceUpdate.RemoveDynamic(this, &UCDMXCableConnector::updateSource);
     updateSource(nullptr);
 }
+
 void UCDMXCableConnector::sendDMX(TArray<int> dmx)
 {
     onDMXData.Broadcast(dmx);
 }
+
 void UCDMXCableConnector::updateSource(UCDMXCableConnector* src)
 {
     source = src;

@@ -65,6 +65,9 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Debug")
     bool drawDebug = true;
 
+    UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category="Debug")
+    bool debugConnected = false;
+
     UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category="Cable", AdvancedDisplay)
     UCCableConnector *startConnector = nullptr;
 

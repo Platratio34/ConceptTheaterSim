@@ -32,8 +32,11 @@ void ACIntelligentLight::Tick(float DeltaTime)
 void ACIntelligentLight::updateDmx(TArray<int> universe)
 {
     if(profile == nullptr)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("Missing profile"));
         return;
-    profile->updateParameters(parameterValues, universe, startAddress - 1);
+    }
+    profile->updateParameters(&parameterValues, universe, startAddress - 1);
     for(UCDMXParameter* p : params)
     {
         p->onDmxUpdate();

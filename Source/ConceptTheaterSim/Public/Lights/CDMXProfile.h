@@ -63,7 +63,7 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadOnly)
     TArray<FCDMXProfileParameter> parameters;
 
-    void updateParameters(TMap<FName, int> outParameters, TArray<int> dmx, int start)
+    void updateParameters(TMap<FName, int> *outParameters, TArray<int> dmx, int start)
     {
         TMap<FName, int> p;
         for (int address = 0; address < parameters.Num(); address++)
@@ -77,11 +77,11 @@ public:
 
             if(parameter.type == ECDMXProfileParameterType::COARSE)
             {
-                p[id] = p[id] + (dmx[start + address] * 256);
+                p[id] += dmx[start + address] * 256;
             }
             else if(parameter.type == ECDMXProfileParameterType::FINE)
             {
-                p[id] = p[id] + dmx[start + address];
+                p[id] += dmx[start + address];
             }
             else
             {
@@ -92,7 +92,7 @@ public:
         p.GetKeys(keys);
         for(FName key : keys)
         {
-            outParameters.Add(key, p[key]);
+            outParameters->Add(key, p[key]);
         }
     }
 

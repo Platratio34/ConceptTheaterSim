@@ -8,6 +8,7 @@
 // Sets default values
 ACCable::ACCable()
 {
+	PrimaryActorTick.bCanEverTick = true;
     
     root = CreateDefaultSubobject<USceneComponent>("Root");
     SetRootComponent(root);
@@ -51,7 +52,7 @@ void ACCable::OnConstruction(const FTransform &Transform)
         return;
 
     AActor *startActor = softStartActor.Get();
-    AActor *endActor = softStartActor.Get();
+    AActor *endActor = softEndActor.Get();
     if(!startActor || !endActor)
         return;
         
@@ -93,11 +94,11 @@ void ACCable::OnConstruction(const FTransform &Transform)
     if(drawDebug)
     {
         FTransform transform = GetActorTransform();
-        sPos = transform.InverseTransformPosition(sPos);
-        ePos = transform.InverseTransformPosition(ePos);
+        // sPos = transform.InverseTransformPosition(sPos);
+        // ePos = transform.InverseTransformPosition(ePos);
 
-        arrow->RegisterComponent();
-        arrow->AttachToComponent(root, FAttachmentTransformRules::KeepWorldTransform);
+        // arrow->RegisterComponent(); 
+        // arrow->AttachToComponent(root, FAttachmentTransformRules::KeepWorldTransform);
         arrow->SetWorldLocation(sPos);
         arrow->SetWorldRotation(UKismetMathLibrary::FindLookAtRotation(sPos, ePos));
         arrow->ArrowSize = 0.5;
@@ -122,18 +123,28 @@ void ACCable::Tick(float DeltaTime)
     if(!isFullyConnected() && softStartActor.IsValid() && softEndActor.IsValid())
     {
         AActor *startActor = softStartActor.Get();
-        AActor *endActor = softStartActor.Get();
+        AActor *endActor = softEndActor.Get();
         if(startActor && endActor)
         {
             UCCableConnector *startPort = getConnector(startActor, true);
-            UCCableConnector *endPort = getConnector(startActor, false);
+            UCCableConnector *endPort = getConnector(endActor, false);
             if(startPort != nullptr && endPort != nullptr)
             {
                 tryConnect(startPort);
                 tryConnect(endPort);
+                UE_LOG(LogTemp, Display, TEXT("Cable connected"));
+            }
+            else
+            {
+                UE_LOG(LogTemp, Warning, TEXT("Cable end actors missing connectors"));
             }
         }
+        else
+        {
+            UE_LOG(LogTemp, Warning, TEXT("Cable end actors not loaded"));
+        }
     }
+    debugConnected = isFullyConnected();
 
     updateCable();
 }
@@ -154,11 +165,12 @@ bool ACCable::tryConnect(UCCableConnector *connector)
         return false;
     if(directional)
     {
-        if(((connector->input) ? endConnector : startConnector) != nullptr)
+        bool start = !connector->input;
+        if((start ? startConnector : endConnector) != nullptr)
             return false;
-        if(!canConnectTo(connector, !connector->input))
+        if(!canConnectTo(connector, start))
             return false;
-        onConnect(connector, !connector->input);
+        onConnect(connector, start);
         return true;
     }
     else
@@ -181,14 +193,17 @@ bool ACCable::tryConnect(UCCableConnector *connector)
 
 void ACCable::onConnect(UCCableConnector *connector, bool start)
 {
-    connector->onConnect(this);
     if(start)
     {
         startConnector = connector;
+        if(endConnector != nullptr)
+            connector->onConnect(this);
     }
     else
     {
         endConnector = connector;
+        if(startConnector != nullptr)
+            connector->onConnect(this);
     }
 }
 
@@ -196,16 +211,16 @@ void ACCable::onDisconnect(bool start)
 {
     if(start)
     {
-        if(startConnector != nullptr)
-            startConnector->onDisconnect(this);
         startConnector = nullptr;
     }
     else
     {
-        if(endConnector != nullptr)
-            endConnector->onDisconnect(this);
         endConnector = nullptr;
     }
+    if(endConnector != nullptr)
+        endConnector->onDisconnect(this);
+    if(startConnector != nullptr)
+        startConnector->onDisconnect(this);
 }
 
 bool ACCable::isFullyConnected()
@@ -287,18 +302,12 @@ bool ACCable::isValidConnection(UCCableConnector *connector, bool start)
 {
     if(connector == nullptr)
         return false;
-    if(directional)
-    {
-        if(((connector->input) ? endConnector : startConnector) != nullptr)
-            return false;
-        if(!canConnectTo(connector, !connector->input))
-            return false;
-        return true;
-    }
-    else
-    {
-        if(!canConnectTo(connector, start))
-            return false;
-        return true;
-    }
+    if(directional && (!start) != connector->input)
+        return false;
+
+    if((start ? startConnector : endConnector) != nullptr)
+        return false;
+    if(!canConnectTo(connector, start))
+        return false;
+    return true;
 }

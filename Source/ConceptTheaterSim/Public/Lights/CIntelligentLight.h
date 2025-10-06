@@ -73,5 +73,6 @@ public:
         params.AddUnique(p);
     }
 
+    UFUNCTION()
     void onSourceUpdate(UCDMXCableConnector *source);
 };

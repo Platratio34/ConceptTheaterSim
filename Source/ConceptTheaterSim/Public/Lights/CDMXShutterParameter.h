@@ -25,14 +25,14 @@ public:
         {
             double posA = light->getParameterNormalized(posAParameter);
             double posB = light->getParameterNormalized(posBParameter);
-            light->shutterPositions[shutterIndex] = FShutterPosition::CreateAB(posA, posB);
+            light->setShutter(shutterIndex, FShutterPosition::CreateAB(posA, posB));
         }
         else
         {
             double pos = light->getParameterNormalized(posParameter);
             double rot = light->getParameterNormalized(rotParameter);
             rot = (rot - 0.5) * (rotRange * 2);
-            light->shutterPositions[shutterIndex] = FShutterPosition::Create(pos, rot);
+            light->setShutter(shutterIndex, FShutterPosition::Create(pos, rot));
         }
     }
 

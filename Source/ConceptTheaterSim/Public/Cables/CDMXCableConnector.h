@@ -28,21 +28,22 @@ protected:
 public:
 
     virtual void onConnect(ACCable* cable) override;
+
     virtual void onDisconnect(ACCable* cable) override;
 
-    UPROPERTY(BlueprintReadWrite)
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
     UCDMXCableConnector *through = nullptr;
     
-    UPROPERTY(BlueprintReadOnly)
+    UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, AdvancedDisplay)
     UCDMXCableConnector *source = nullptr;
 
-    UPROPERTY(BlueprintReadOnly)
+    UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, AdvancedDisplay)
     UCDMXCableConnector *other = nullptr;
 
-    UPROPERTY(BlueprintReadOnly)
+    UPROPERTY(EditAnywhere, BlueprintReadOnly)
     bool isSource = false;
 
-    UPROPERTY(BlueprintReadOnly)
+    UPROPERTY(EditAnywhere, BlueprintReadOnly)
     bool isReceiver = true;
 
     UFUNCTION(BlueprintCallable)
@@ -55,7 +56,8 @@ public:
     FOnDMXData onDMXData;
 
 protected:
-    void updateSource(UCDMXCableConnector* source);
+    UFUNCTION()
+    void updateSource(UCDMXCableConnector* source_);
 
 private:
     

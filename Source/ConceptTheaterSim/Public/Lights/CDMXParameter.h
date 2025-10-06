@@ -33,7 +33,7 @@ protected:
     static double range(double v, double min, double max)
     {
         v *= (max - min);
-        return v - min;
+        return v + min;
     }
 
 private:

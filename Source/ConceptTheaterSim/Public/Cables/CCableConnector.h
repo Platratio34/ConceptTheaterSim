@@ -47,8 +47,11 @@ public:
         return cable != nullptr;
     }
 
-    virtual void onConnect(ACCable* cable);
-    virtual void onDisconnect(ACCable* cable);
+    UFUNCTION()
+    virtual void onConnect(ACCable* cable_);
+
+    UFUNCTION()
+    virtual void onDisconnect(ACCable* cable_);
 
 private:
     

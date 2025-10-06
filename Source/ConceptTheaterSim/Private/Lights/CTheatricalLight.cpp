@@ -170,6 +170,24 @@ void ACTheatricalLight::updateBeam()
     light->SetInnerConeAngle(inner);
 }
 
+
+void ACTheatricalLight::setShutter(int index, FShutterPosition position)
+{
+    shutterPositions[index] = position;
+
+    FName posNames[4] = {FName("Shutter A In"), FName("Shutter B In"), FName("Shutter C In"), FName("Shutter D In")};
+    FName angleOffNames[4] = {FName("Shutter A AngleOff"), FName("Shutter B AngleOff"), FName("Shutter C AngleOff"), FName("Shutter D AngleOff")};
+    
+    lightFunctionInstance->SetScalarParameterValue(posNames[index], position.position);
+    lightFunctionInstance->SetScalarParameterValue(angleOffNames[index], position.angleOffset);
+    if(USceneComponent** p = shutterHandles.Find(index))
+    {
+        USceneComponent *handle = *p;
+        handle->SetRelativeLocation(FVector(0, position.position*shutterHandleTravel*2.54, 0));
+        handle->SetRelativeRotation(FRotator(0, atan(position.angleOffset) / DEG_TO_RAD, 0));
+    }
+}
+
 void ACTheatricalLight::updateShutters()
 {
     if(lightFunctionInstance == nullptr)
@@ -188,6 +206,14 @@ void ACTheatricalLight::updateShutters()
             handle->SetRelativeRotation(FRotator(0, atan(shutterPositions[i].angleOffset) / DEG_TO_RAD, 0));
         }
     }
+}
+
+void ACTheatricalLight::setShutterFrame(double position)
+{
+    shutterFrame = position;
+    if(lightFunctionInstance == nullptr)
+        return;
+    lightFunctionInstance->SetScalarParameterValue(FName("Frame Rotate"), position);
 }
 
 void ACTheatricalLight::addShutterHandle(int index, UStaticMeshComponent* handle)
