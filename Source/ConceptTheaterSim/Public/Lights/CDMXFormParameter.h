@@ -23,7 +23,7 @@ public:
         if(zoomEnabled && light->hasParameter(zoomParameter))
             light->setZoom(range(light->getParameterNormalized(zoomParameter), zoomMin, zoomMax));
         if(edgeEnabled&& light->hasParameter(edgeParameter))
-            light->setEdge(light->getParameterNormalized(edgeParameter));
+            light->setEdge(range(light->getParameterNormalized(edgeParameter), edgeMin, edgeMax)*2.54);
     }
 
     UPROPERTY(BlueprintReadWrite, EditAnywhere)
@@ -43,6 +43,12 @@ public:
 
     UPROPERTY(BlueprintReadWrite, EditAnywhere)
     bool edgeEnabled = true;
+    
+    UPROPERTY(BlueprintReadWrite, EditAnywhere)
+    double edgeMin = 60;
+    
+    UPROPERTY(BlueprintReadWrite, EditAnywhere)
+    double edgeMax = 600;
     
 
 private:

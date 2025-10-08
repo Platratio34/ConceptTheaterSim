@@ -31,15 +31,15 @@ void ACTheatricalLight::OnConstruction(const FTransform &Transform)
     if (lenseMaterial != nullptr && (lenseMaterialInstance == nullptr || !IsValid(lenseMaterialInstance)))
     {
         lenseMaterialInstance = UMaterialInstanceDynamic::Create(lenseMaterial, this);
-        if (lenseMesh != nullptr)
-            lenseMesh->SetMaterial(lenseMaterialIndex, lenseMaterialInstance);
     }
+    if (lenseMesh != nullptr)
+        lenseMesh->SetMaterial(lenseMaterialIndex, lenseMaterialInstance);
     if(lightFunction != nullptr && (lightFunctionInstance == nullptr || !IsValid(lightFunctionInstance)))
     {
         lightFunctionInstance = UMaterialInstanceDynamic::Create(lightFunction, this);
-        if(light != nullptr)
-            light->SetLightFunctionMaterial(lightFunctionInstance);
     }
+    if(light != nullptr)
+        light->SetLightFunctionMaterial(lightFunctionInstance);
 
     if(focusMode)
     {
@@ -68,6 +68,9 @@ void ACTheatricalLight::OnConstruction(const FTransform &Transform)
 
     setGobo(gobo);
     setGoboRotation(goboRotation);
+    
+    if(lightFunctionInstance != nullptr)
+        lightFunctionInstance->SetVectorParameterValue(FName("LightPosition"), GetActorLocation());
 }
 
 // Called when the game starts or when spawned
@@ -82,6 +85,8 @@ void ACTheatricalLight::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
     
+    if(lightFunctionInstance != nullptr)
+        lightFunctionInstance->SetVectorParameterValue(FName("LightPosition"), GetActorLocation());
 }
 
 void ACTheatricalLight::setup(UStaticMeshComponent* lenseMesh_)
@@ -142,8 +147,8 @@ void ACTheatricalLight::setEdge(double newEdge)
 {
     if(newEdge < 0)
         newEdge = 0;
-    if(newEdge > 1)
-        newEdge = 1;
+    // if(newEdge > 1)
+    //     newEdge = 1;
     edge = newEdge;
     updateBeam();
 }
@@ -162,12 +167,10 @@ void ACTheatricalLight::setZoom(double newZoom)
 
 void ACTheatricalLight::updateBeam()
 {
-    if(light == nullptr)
-        return;
-    
-    double inner = (edge * 0.6) + 0.4;
-    inner *= zoom * 0.5;
-    light->SetInnerConeAngle(inner);
+    if(light != nullptr)
+        light->SetInnerConeAngle(zoom * 0.5 * 0.95);
+    if(lightFunctionInstance != nullptr)
+        lightFunctionInstance->SetScalarParameterValue(FName("Focus"), edge);
 }
 
 
