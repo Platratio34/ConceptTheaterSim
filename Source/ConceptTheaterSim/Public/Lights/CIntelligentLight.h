@@ -28,10 +28,10 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="DMX")
     UCDMXProfile *profile;
     
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components")
+    UPROPERTY(BlueprintReadOnly, Category="Components")
     UCDMXCableConnector *dmxInput;
 
-    UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category="DMX")
+    UPROPERTY(BlueprintReadOnly, Category="DMX")
     UCDMXCableConnector *cSource;
 
 protected:

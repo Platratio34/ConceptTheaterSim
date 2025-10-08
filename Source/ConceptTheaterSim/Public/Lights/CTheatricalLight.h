@@ -35,7 +35,7 @@ public:
     {
         FShutterPosition p;
         p.position = (positionA + positionB) * 0.5;
-        p.angleOffset = positionA - positionB;
+        p.angleOffset = (positionA - positionB) * 0.5;
         return p;
     }
 };
@@ -153,13 +153,13 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-    UPROPERTY(VisibleAnywhere)
+    UPROPERTY(BlueprintReadOnly, Category="Components")
     USceneComponent* root;
     
-    UPROPERTY(VisibleAnywhere)
+    UPROPERTY(BlueprintReadOnly, Category="Components")
     USceneComponent* yoke;
 
-    UPROPERTY(VisibleAnywhere)
+    UPROPERTY(BlueprintReadOnly, Category="Components")
     USceneComponent* body;
 
     UFUNCTION(BlueprintNativeEvent)

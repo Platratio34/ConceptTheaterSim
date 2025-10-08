@@ -11,7 +11,7 @@ enum class FGoboRotateAction : uint8
 {
     INDEX,
     ROTATE,
-    ROTATE_REVERSE
+    STOP
 };
 
 USTRUCT(BlueprintType)
@@ -25,22 +25,19 @@ public:
     FGoboRotateAction action;
 
     UPROPERTY(BlueprintReadWrite, EditAnywhere)
-    bool rotate;
+    int minAddress = 0;
 
     UPROPERTY(BlueprintReadWrite, EditAnywhere)
-    int min = 0;
-
-    UPROPERTY(BlueprintReadWrite, EditAnywhere)
-    int max = 1;
+    int maxAddress = 1;
 
     UPROPERTY(BlueprintReadWrite, EditAnywhere)
     double dir = 1;
 
     UPROPERTY(BlueprintReadWrite, EditAnywhere)
-    double minSpeed = 0;
+    double minValue = 0;
 
     UPROPERTY(BlueprintReadWrite, EditAnywhere)
-    double maxSpeed = 1;
+    double maxValue = 1;
 
     UPROPERTY(BlueprintReadWrite, EditAnywhere)
     bool fine = false;
@@ -81,7 +78,7 @@ public:
         // if(edgeEnabled&& light->hasParameter(edgeParameter))
         //     light->setEdge(light->getParameterNormalized(edgeParameter));
 
-        FName goboId = light->getParameterIndexed(rotateParameter);
+        FName goboId = light->getParameterIndexed(selectParameter);
         if(UTexture2D** p = gobos.Find(goboId))
         {
             UTexture2D *gobo = *p;
@@ -94,12 +91,13 @@ public:
 
         if(rotateEnabled)
         {
-            if(FGoboRotateMode *p = rotateModes.Find(light->getParameterIndexed(rotateParameter)))
+            rotateModeName = light->getParameterIndexed(rotateParameter);
+            if(FGoboRotateMode *p = rotateModes.Find(rotateModeName))
             {
-                FGoboRotateMode rotateMode = *p;
+                rotateMode = *p;
 
-                double v = light->getParameter(rotateParameter) - rotateMode.min;
-                double max = (rotateMode.max - rotateMode.min);
+                double v = light->getParameter(rotateParameter) - rotateMode.minAddress;
+                double max = (rotateMode.maxAddress - rotateMode.minAddress);
                 if(rotateMode.fine)
                 {
                     v *= 256;
@@ -107,19 +105,26 @@ public:
                     max = (max * 256) + 255;
                 }
                 v /= max;
-                
+                cValue = v;
+
                 if(rotateMode.action == FGoboRotateAction::INDEX)
                 {
-                    cIndex = v;
+                    cIndex = (v * (rotateMode.maxValue - rotateMode.minValue) + rotateMode.minValue);
                     rotSpeed = 0;
                     light->setGoboRotation(cIndex);
                 }
-                else if(rotateMode.action == FGoboRotateAction::ROTATE || rotateMode.action == FGoboRotateAction::ROTATE_REVERSE)
+                if(rotateMode.action == FGoboRotateAction::STOP)
                 {
-                    double dir = (rotateMode.action == FGoboRotateAction::ROTATE) ? 1 : -1;
-                    dir *= rotateMode.dir;
-                    rotSpeed = dir * (v * (rotateMode.maxSpeed - rotateMode.minSpeed) + rotateMode.minSpeed);
+                    rotSpeed = 0;
                 }
+                else if(rotateMode.action == FGoboRotateAction::ROTATE)
+                {
+                    rotSpeed = rotateMode.dir * (v * (rotateMode.maxValue - rotateMode.minValue) + rotateMode.minValue);
+                }
+            }
+            else
+            {
+                rotSpeed = 0;
             }
         }
     }
@@ -137,22 +142,25 @@ public:
     bool rotateEnabled = true;
 
     UPROPERTY(BlueprintReadWrite, EditAnywhere)
-    FName rotateFineParameter = FName("Gobo Rotate Fine");
-
-    UPROPERTY(BlueprintReadWrite, EditAnywhere)
-    bool rotateFineEnabled = false;
-
-    UPROPERTY(BlueprintReadWrite, EditAnywhere)
     TMap<FName, FGoboRotateMode> rotateModes;
     
-    UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly);
+    UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly)
     double cIndex = 0;
 
-    UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly);
+    UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly)
     double rotSpeed = 0;
 
-    UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly);
+    UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly)
+    double cValue = 0;
+
+    UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly)
     UTexture2D *lastGobo = nullptr;
+
+    UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly)
+    FName rotateModeName;
+
+    UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly)
+    FGoboRotateMode rotateMode;
 
 private:
 };

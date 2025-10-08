@@ -23,7 +23,7 @@ public:
         if(panEnabled && light->hasParameter(panParameter))
             light->setPan(range(light->getParameterNormalized(panParameter), panMin, panMax));
         if(tiltEnabled&& light->hasParameter(tiltParameter))
-            light->setPan(range(light->getParameterNormalized(tiltParameter), tiltMin, tiltMax));
+            light->setTilt(range(light->getParameterNormalized(tiltParameter), tiltMin, tiltMax));
     }
 
     UPROPERTY(BlueprintReadWrite, EditAnywhere)

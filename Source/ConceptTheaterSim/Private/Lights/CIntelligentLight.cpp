@@ -39,7 +39,8 @@ void ACIntelligentLight::updateDmx(TArray<int> universe)
     profile->updateParameters(&parameterValues, universe, startAddress - 1);
     for(UCDMXParameter* p : params)
     {
-        p->onDmxUpdate();
+        if(p != nullptr)
+            p->onDmxUpdate();
     }
 }
 

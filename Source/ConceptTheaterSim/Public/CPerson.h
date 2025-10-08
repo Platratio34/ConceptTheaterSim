@@ -163,39 +163,39 @@ protected:
     TArray<UStaticMesh*> hairMeshes;
 
     // components
-    UPROPERTY(VisibleAnywhere, Category="Components")
+    UPROPERTY(BlueprintReadOnly, Category="Components")
     USceneComponent* rootComponent2;
-    UPROPERTY(VisibleAnywhere, Category="Components")
+    UPROPERTY(BlueprintReadOnly, Category="Components")
     USceneComponent* bodyRoot;
 
-    UPROPERTY(VisibleAnywhere, Category="Components")
+    UPROPERTY(BlueprintReadOnly, Category="Components")
     UStaticMeshComponent* legMeshComponent;
 
-    UPROPERTY(VisibleAnywhere, Category="Components")
+    UPROPERTY(BlueprintReadOnly, Category="Components")
     UStaticMeshComponent* armMeshComponent;
 
-    UPROPERTY(VisibleAnywhere, Category="Components")
+    UPROPERTY(BlueprintReadOnly, Category="Components")
     UStaticMeshComponent* headMeshComponent;
 
-    UPROPERTY(VisibleAnywhere, Category="Components")
+    UPROPERTY(BlueprintReadOnly, Category="Components")
     UStaticMeshComponent* eyeMeshComponent;
 
-    UPROPERTY(VisibleAnywhere, Category="Components")
+    UPROPERTY(BlueprintReadOnly, Category="Components")
     UStaticMeshComponent* earMeshComponent;
 
-    UPROPERTY(VisibleAnywhere, Category="Components")
+    UPROPERTY(BlueprintReadOnly, Category="Components")
     UStaticMeshComponent* hairMeshComponent;
 
-    UPROPERTY(VisibleAnywhere, Category="Components")
+    UPROPERTY(BlueprintReadOnly, Category="Components")
     UStaticMeshComponent* chestMeshComponent;
 
-    UPROPERTY(VisibleAnywhere, Category="Components")
+    UPROPERTY(BlueprintReadOnly, Category="Components")
     TArray<UStaticMeshComponent*> clothingMeshComponents;
 
-    UPROPERTY(VisibleAnywhere, Category="Components")
+    UPROPERTY(BlueprintReadOnly, Category="Components")
     TMap<int, bool> clothingMeshComponentsVisible;
 
-    UPROPERTY(VisibleAnywhere, Category="Components")
+    UPROPERTY(BlueprintReadOnly, Category="Components")
     UCAnimationComponent* animationComponent;
 
     UFUNCTION()

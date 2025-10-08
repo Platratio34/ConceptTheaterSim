@@ -37,6 +37,14 @@ public:
         if(light == nullptr)
             return;
         FLinearColor c = subtractive ? FLinearColor(1.0, 1.0, 1.0, 1.0) : FLinearColor(0.0, 0.0, 0.0, 1.0);
+        if(colorWheelActive)
+        {
+            FName color = light->getParameterIndexed(colorWheelParameter);
+            if(FLinearColor* cp = colorWheel.Find(color))
+            {
+                c = *cp;
+            }
+        }
         for(FColorParameter p : parameters)
         {
             double v = light->getParameterNormalized(p.parameterId);
@@ -65,6 +73,15 @@ public:
 
     UPROPERTY(BlueprintReadWrite, EditAnywhere)
     bool subtractive = false;
+
+    UPROPERTY(BlueprintReadWrite, EditAnywhere)
+    FName colorWheelParameter;
+
+    UPROPERTY(BlueprintReadWrite, EditAnywhere)
+    bool colorWheelActive = true;
+
+    UPROPERTY(BlueprintReadWrite, EditAnywhere)
+    TMap<FName, FLinearColor> colorWheel;
 
 private:
 
