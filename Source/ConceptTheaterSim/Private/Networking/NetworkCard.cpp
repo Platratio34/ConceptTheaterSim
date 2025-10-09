@@ -90,7 +90,7 @@ void UNetworkCard::onPacket(FNetworkPacket packet)
         onNetworkPacket.Broadcast(packet);
 }
 
-void UNetworkCard::connect(UCNetwork *newNetwork) {
+void UNetworkCard::connect(ACNetwork *newNetwork) {
     if(network == newNetwork)
         return;
     if(network != nullptr) {

@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "UObject/NoExportTypes.h"
+#include "Components/ActorComponent.h"
 #include "Networking/NetworkTypes.h"
 #include "NetworkCard.generated.h"
 
@@ -11,7 +11,7 @@
  *
  */
 UCLASS(BlueprintType)
-class CONCEPTTHEATERSIM_API UNetworkCard : public UObject
+class CONCEPTTHEATERSIM_API UNetworkCard : public UActorComponent
 {
     GENERATED_BODY()
 
@@ -35,7 +35,7 @@ public:
     void multicastUnSubscribe(int address);
 
     UFUNCTION(BlueprintCallable)
-    void connect(UCNetwork *network);
+    void connect(ACNetwork *network);
     UFUNCTION(BlueprintCallable)
     void disconnect();
 
@@ -56,7 +56,7 @@ protected:
     int multicastPntr = 0;
     int multicastSize = 8;
 
-    UCNetwork *network = nullptr;
+    ACNetwork *network = nullptr;
 
     bool virtual onPacketInternal(FNetworkPacket packet) { return false; }
 };

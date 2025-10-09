@@ -28,6 +28,6 @@ UDELEGATE(BlueprintCallable, BlueprintAuthorityOnly)
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnNetworkPacket, FNetworkPacket, packet);
 
 
-class CONCEPTTHEATERSIM_API UCNetwork;
+class CONCEPTTHEATERSIM_API ACNetwork;
 
 class CONCEPTTHEATERSIM_API UNetworkCard;

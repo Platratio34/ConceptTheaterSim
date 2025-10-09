@@ -4,12 +4,12 @@
 
 #include "Networking/NetworkCard.h"
 
-UCNetwork::UCNetwork()
+ACNetwork::ACNetwork()
 {
     multicastSets = new MulticastTargetSet *[multicastSize];
 }
 
-UCNetwork::~UCNetwork()
+ACNetwork::~ACNetwork()
 {
     for (int i = 0; i < multicastPntr; i++)
     {
@@ -18,7 +18,7 @@ UCNetwork::~UCNetwork()
     delete[] multicastSets;
 }
 
-void UCNetwork::setup(int _subnet, int _subnetMask, UCNetwork *_upstream)
+void ACNetwork::setup(int _subnet, int _subnetMask, ACNetwork *_upstream)
 {
     subnet = _subnet;
     subnetMask = _subnetMask;
@@ -26,24 +26,24 @@ void UCNetwork::setup(int _subnet, int _subnetMask, UCNetwork *_upstream)
         setUpstream(_upstream);
 }
 
-bool UCNetwork::isAddressLocal(int addr)
+bool ACNetwork::isAddressLocal(int addr)
 {
     int packetSubnet = addr & subnetMask;
     bool isMulticast = (addr & 0xF0000000) == 0xE0000000;
     return packetSubnet == subnet || addr == -1 || isMulticast;
 }
 
-void UCNetwork::sendPacket(FNetworkPacket packet)
+void ACNetwork::sendPacket(FNetworkPacket packet)
 {
     sendPacketInt(packet, false, nullptr);
 }
 
-void UCNetwork::onUpstreamPacket(FNetworkPacket packet)
+void ACNetwork::onUpstreamPacket(FNetworkPacket packet)
 {
     sendPacketInt(packet, true, nullptr);
 }
 
-void UCNetwork::sendPacketInt(FNetworkPacket packet, bool fromUpstream, UCNetwork* sourceNet)
+void ACNetwork::sendPacketInt(FNetworkPacket packet, bool fromUpstream, ACNetwork* sourceNet)
 {
     int dest = packet.dest;
     int packetSubnet = dest & subnetMask;
@@ -80,7 +80,7 @@ void UCNetwork::sendPacketInt(FNetworkPacket packet, bool fromUpstream, UCNetwor
     }
 }
 
-int UCNetwork::requestIP(FString hwAddress)
+int ACNetwork::requestIP(FString hwAddress)
 {
     if (int *addrPntr = assignedAddresses.Find(hwAddress))
     {
@@ -95,21 +95,21 @@ int UCNetwork::requestIP(FString hwAddress)
     return addr;
 }
 
-void UCNetwork::releaseIP(FString hwAddress)
+void ACNetwork::releaseIP(FString hwAddress)
 {
     assignedAddresses.Remove(hwAddress);
 }
 
-int UCNetwork::getSubnet()
+int ACNetwork::getSubnet()
 {
     return subnet;
 }
-int UCNetwork::getSubnetMask()
+int ACNetwork::getSubnetMask()
 {
     return subnetMask;
 }
 
-void UCNetwork::setUpstream(UCNetwork *newUpstream)
+void ACNetwork::setUpstream(ACNetwork *newUpstream)
 {
     if (upstream == newUpstream)
         return;
@@ -118,17 +118,17 @@ void UCNetwork::setUpstream(UCNetwork *newUpstream)
         clearUpstream();
     }
     upstream = newUpstream;
-    upstream->onPacketOut.AddDynamic(this, &UCNetwork::onUpstreamPacket);
+    upstream->onPacketOut.AddDynamic(this, &ACNetwork::onUpstreamPacket);
 }
-void UCNetwork::clearUpstream()
+void ACNetwork::clearUpstream()
 {
     if (upstream == nullptr)
         return;
-    upstream->onPacketOut.RemoveDynamic(this, &UCNetwork::onUpstreamPacket);
+    upstream->onPacketOut.RemoveDynamic(this, &ACNetwork::onUpstreamPacket);
     upstream = nullptr;
 }
 
-void UCNetwork::multicastSubscribe(int address, UNetworkCard *subscriber)
+void ACNetwork::multicastSubscribe(int address, UNetworkCard *subscriber)
 {
     for (int i = 0; i < multicastPntr; i++)
     {
@@ -155,7 +155,7 @@ void UCNetwork::multicastSubscribe(int address, UNetworkCard *subscriber)
     set->addSubscriber(subscriber);
 }
 
-void UCNetwork::multicastUnSubscribe(int address, UNetworkCard *subscriber)
+void ACNetwork::multicastUnSubscribe(int address, UNetworkCard *subscriber)
 {
     for (int i = 0; i < multicastPntr; i++)
     {
@@ -168,10 +168,10 @@ void UCNetwork::multicastUnSubscribe(int address, UNetworkCard *subscriber)
     }
 }
 
-void UCNetwork::connect(UNetworkCard *card) {
+void ACNetwork::connect(UNetworkCard *card) {
     cards.AddUnique(card);
 }
-void UCNetwork::disconnect(UNetworkCard *card) {
+void ACNetwork::disconnect(UNetworkCard *card) {
     cards.Remove(card);
 }
 

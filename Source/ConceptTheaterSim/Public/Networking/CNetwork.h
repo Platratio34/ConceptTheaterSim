@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "UObject/NoExportTypes.h"
+#include "GameFramework/Actor.h"
 #include "Networking/NetworkTypes.h"
 #include "CNetwork.generated.h"
 
@@ -30,19 +30,19 @@ protected:
  * 
  */
 UCLASS(BlueprintType)
-class CONCEPTTHEATERSIM_API UCNetwork : public UObject
+class CONCEPTTHEATERSIM_API ACNetwork : public AActor
 {
 	GENERATED_BODY()
 	
 public:
-    UCNetwork();
-    ~UCNetwork();
+    ACNetwork();
+    ~ACNetwork();
 
     UPROPERTY()
     FOnNetworkPacket onPacketOut;
 
     UFUNCTION(BlueprintCallable)
-    void setup(int subnet, int subnetMask, UCNetwork *upstream);
+    void setup(int subnet, int subnetMask, ACNetwork *upstream);
 
     UFUNCTION(BlueprintCallable)
     void sendPacket(FNetworkPacket packet);
@@ -64,7 +64,7 @@ public:
     int getSubnetMask();
 
     UFUNCTION(BlueprintCallable)
-    void setUpstream(UCNetwork *upstream);
+    void setUpstream(ACNetwork *upstream);
     UFUNCTION(BlueprintCallable)
     void clearUpstream();
 
@@ -84,12 +84,12 @@ protected:
     UPROPERTY()
     int nextAddress = 0x00000001;
 
-    UCNetwork *upstream = nullptr;
+    ACNetwork *upstream = nullptr;
 
     UFUNCTION()
     bool isAddressLocal(int addr);
     UFUNCTION()
-    void sendPacketInt(FNetworkPacket packet, bool fromUpstream, UCNetwork* sourceNet);
+    void sendPacketInt(FNetworkPacket packet, bool fromUpstream, ACNetwork* sourceNet);
 
     MulticastTargetSet **multicastSets = nullptr;
     UPROPERTY()
@@ -100,7 +100,7 @@ protected:
     UPROPERTY()
     TArray<UNetworkCard*> cards;
     UPROPERTY()
-    TArray<UCNetwork*> childNetworks;
+    TArray<ACNetwork*> childNetworks;
     UPROPERTY()
-    UCNetwork *parentNetwork;
+    ACNetwork *parentNetwork;
 };
