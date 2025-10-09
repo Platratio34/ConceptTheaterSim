@@ -23,6 +23,7 @@ ACCable::ACCable()
     coil->SetupAttachment(root);
     
     spline = CreateDefaultSubobject<USplineMeshComponent>("Spline");
+    spline->Mobility = EComponentMobility::Movable;
     spline->SetupAttachment(root);
     
     arrow = CreateDefaultSubobject<UArrowComponent>("Arrow");
@@ -54,7 +55,11 @@ void ACCable::OnConstruction(const FTransform &Transform)
     AActor *startActor = softStartActor.Get();
     AActor *endActor = softEndActor.Get();
     if(!startActor || !endActor)
+    {
+        coil->SetVisibility(true);
         return;
+    }
+    coil->SetVisibility(false);
         
     UCCableConnector *startPort = getConnector(startActor, true);
     UCCableConnector *endPort = getConnector(endActor, false);
@@ -105,7 +110,32 @@ void ACCable::OnConstruction(const FTransform &Transform)
         arrow->ArrowLength = (sPos - ePos).Size() * 2.0;
         arrow->SetArrowColor(debugColor);
     }
+    else
+    {
+        FTransform startTransform = startPort->connector->GetComponentTransform();
+        startMesh->SetVisibility(true);
+        startMesh->SetWorldLocationAndRotation(startTransform.GetLocation(), startTransform.GetRotation().Rotator());
+        FVector splineStart = startMesh->GetComponentTransform().TransformPosition(startOffset);
+        
+        FTransform endTransform = endPort->connector->GetComponentTransform();
+        endMesh->SetVisibility(true);
+        endMesh->SetWorldLocationAndRotation(endTransform.GetLocation(), endTransform.GetRotation().Rotator());
+        FVector splineEnd = endMesh->GetComponentTransform().TransformPosition(endOffset);
+
+        FTransform splineTransform = spline->GetComponentTransform();
+
+        splineStart = splineTransform.InverseTransformPosition(splineStart);
+        splineEnd = splineTransform.InverseTransformPosition(splineEnd);
+        FVector startTangent = splineEnd - splineStart;
+        FVector endTangent = splineStart - splineEnd;
+
+        spline->SetStartAndEnd(splineStart, startTangent, splineEnd, endTangent);
+    }
     arrow->SetVisibility(drawDebug);
+
+    spline->SetVisibility(!drawDebug);
+    startMesh->SetVisibility(!drawDebug);
+    endMesh->SetVisibility(!drawDebug);
 }
 
 // Called when the game starts or when spawned

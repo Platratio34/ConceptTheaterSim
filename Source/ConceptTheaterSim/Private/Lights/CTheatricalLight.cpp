@@ -78,6 +78,10 @@ void ACTheatricalLight::BeginPlay()
 {
 	Super::BeginPlay();
     
+    if(parentActor != nullptr)
+    {
+        root->AttachToComponent(parentActor->GetRootComponent(), FAttachmentTransformRules::KeepWorldTransform);
+    }
 }
 
 // Called every frame
@@ -168,7 +172,7 @@ void ACTheatricalLight::setZoom(double newZoom)
 void ACTheatricalLight::updateBeam()
 {
     if(light != nullptr)
-        light->SetInnerConeAngle(zoom * 0.5 * 0.95);
+        light->SetInnerConeAngle(zoom * 0.5);
     if(lightFunctionInstance != nullptr)
         lightFunctionInstance->SetScalarParameterValue(FName("Focus"), edge);
 }

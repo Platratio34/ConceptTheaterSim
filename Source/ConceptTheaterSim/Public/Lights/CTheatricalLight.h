@@ -153,13 +153,13 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-    UPROPERTY(BlueprintReadOnly, Category="Components")
+    UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category="Components")
     USceneComponent* root;
     
-    UPROPERTY(BlueprintReadOnly, Category="Components")
+    UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category="Components")
     USceneComponent* yoke;
 
-    UPROPERTY(BlueprintReadOnly, Category="Components")
+    UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category="Components")
     USceneComponent* body;
 
     UFUNCTION(BlueprintNativeEvent)

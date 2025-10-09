@@ -143,6 +143,8 @@ bool ADMXPlayback::UpdateTime(int newFrames) {
                 break;
             }
         }
+        if(frameIndex >= numFrames)
+            frameIndex = numFrames - 1;
         cFrame = frames[frameIndex];
         sendFramePackets();
         return true;
