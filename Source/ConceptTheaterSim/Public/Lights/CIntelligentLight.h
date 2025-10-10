@@ -38,8 +38,10 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-    UPROPERTY(VisibleInstanceOnly);
+    UPROPERTY(VisibleInstanceOnly, Category="DMX");
     TArray<UCDMXParameter *> params;
+
+    virtual double getPower() override;
 
 public:	
 	// Called every frame

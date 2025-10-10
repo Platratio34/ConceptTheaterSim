@@ -23,6 +23,13 @@ public:
     
 
 protected:
+
+    UFUNCTION(BlueprintCallable)
+    void setup(UPrimitiveComponent *connectorObject, UCDMXCableConnector *throughConnector)
+    {
+        connector = connectorObject;
+        through = throughConnector;
+    }
     
 
 public:
@@ -31,34 +38,36 @@ public:
 
     virtual void onDisconnect(ACCable* cable) override;
 
-    UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default")
     UCDMXCableConnector *through = nullptr;
     
-    UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, AdvancedDisplay)
+    UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, AdvancedDisplay, Category="Default")
     UCDMXCableConnector *source = nullptr;
 
-    UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, AdvancedDisplay)
+    UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, AdvancedDisplay, Category="Default")
     UCDMXCableConnector *other = nullptr;
 
-    UPROPERTY(EditAnywhere, BlueprintReadOnly)
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="DMX")
     bool isSource = false;
 
-    UPROPERTY(EditAnywhere, BlueprintReadOnly)
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="DMX")
     bool isReceiver = true;
 
     UFUNCTION(BlueprintCallable)
     void sendDMX(TArray<int> dmx);
 
-    UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+    UPROPERTY(BlueprintAssignable, VisibleAnywhere, Category="Default")
     FOnDMXSourceUpdate onSourceUpdate;
 
-    UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+    UPROPERTY(BlueprintAssignable, VisibleAnywhere, Category="DMX")
     FOnDMXData onDMXData;
 
 protected:
     UFUNCTION()
     void updateSource(UCDMXCableConnector* source_);
 
+    UFUNCTION()
+    void onData(TArray<int> dmx);
+
 private:
-    
 };

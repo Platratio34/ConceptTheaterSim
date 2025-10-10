@@ -21,25 +21,24 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-    
 
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default")
     bool input;
     
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default")
     FText name;
     
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default")
     FName id;
 
-    UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly)
+    UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category="Default")
     ACCable *cable = nullptr;
     
-    UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Components")
     UPrimitiveComponent *connector = nullptr;
 
     bool isConnected()

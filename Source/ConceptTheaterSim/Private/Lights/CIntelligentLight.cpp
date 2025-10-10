@@ -92,3 +92,8 @@ void ACIntelligentLight::onSourceUpdate(UCDMXCableConnector *source)
     }
     cSource = source;
 }
+
+double ACIntelligentLight::getPower()
+{
+    return powerInput->getWatts() >= requiredPower ? 1 : 0;
+}

@@ -45,12 +45,25 @@ void UCDMXCableConnector::sendDMX(TArray<int> dmx)
 
 void UCDMXCableConnector::updateSource(UCDMXCableConnector* src)
 {
+    if(isReceiver)
+    {
+        if(source != nullptr)
+        {
+            source->onDMXData.RemoveDynamic(this, &UCDMXCableConnector::onData);
+        }
+        src->onDMXData.AddDynamic(this, &UCDMXCableConnector::onData);
+    }
     source = src;
     if(through != nullptr)
     {
         through->updateSource(src);
     }
     onSourceUpdate.Broadcast(src);
+}
+
+void UCDMXCableConnector::onData(TArray<int> dmx)
+{
+    onDMXData.Broadcast(dmx);
 }
 
             

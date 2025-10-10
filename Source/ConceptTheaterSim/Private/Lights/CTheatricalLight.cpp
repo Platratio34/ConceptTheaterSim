@@ -19,24 +19,36 @@ ACTheatricalLight::ACTheatricalLight()
 
     light = CreateDefaultSubobject<USpotLightComponent>(TEXT("Light"));
     light->SetupAttachment(body);
+
+    powerInput = CreateDefaultSubobject<UCPowerCableConnector>(TEXT("Power Input"));
+    powerInput->input = true;
 }
 
 void ACTheatricalLight::OnConstruction(const FTransform &Transform)
 {
+    powerInput->input = true;
     for (int i = shutterPositions.Num(); i < 4; i++)
     {
         shutterPositions.Add(FShutterPosition::Create(0, 0));
     }
 
-    if (lenseMaterial != nullptr && (lenseMaterialInstance == nullptr || !IsValid(lenseMaterialInstance)))
+    if (lenseMaterial != nullptr)
     {
         lenseMaterialInstance = UMaterialInstanceDynamic::Create(lenseMaterial, this);
     }
+    else
+    {
+        lenseMaterialInstance = nullptr;
+    }
     if (lenseMesh != nullptr)
         lenseMesh->SetMaterial(lenseMaterialIndex, lenseMaterialInstance);
-    if(lightFunction != nullptr && (lightFunctionInstance == nullptr || !IsValid(lightFunctionInstance)))
+    if(lightFunction != nullptr)
     {
         lightFunctionInstance = UMaterialInstanceDynamic::Create(lightFunction, this);
+    }
+    else
+    {
+        lightFunctionInstance = nullptr;
     }
     if(light != nullptr)
         light->SetLightFunctionMaterial(lightFunctionInstance);
@@ -52,6 +64,7 @@ void ACTheatricalLight::OnConstruction(const FTransform &Transform)
             if(lenseMaterialInstance != nullptr)
                 lenseMaterialInstance->SetVectorParameterValue(FName("Color"), FLinearColor(1.0, 1.0, 1.0, 1.0));
         }
+        actualIntensity = 1;
     }
     else
     {
@@ -71,6 +84,7 @@ void ACTheatricalLight::OnConstruction(const FTransform &Transform)
     
     if(lightFunctionInstance != nullptr)
         lightFunctionInstance->SetVectorParameterValue(FName("LightPosition"), GetActorLocation());
+    onLightUpdate();
 }
 
 // Called when the game starts or when spawned
@@ -82,6 +96,8 @@ void ACTheatricalLight::BeginPlay()
     {
         root->AttachToComponent(parentActor->GetRootComponent(), FAttachmentTransformRules::KeepWorldTransform);
     }
+    if(dummy && light != nullptr)
+        light->SetIntensity(0);
 }
 
 // Called every frame
@@ -117,18 +133,20 @@ void ACTheatricalLight::setIntensity(double newIntensity)
     if(newIntensity > 1)
         newIntensity = 1;
     intensity = newIntensity;
-    double actualIntensity = intensity * getIntensityScale();
+    actualIntensity = intensity * getIntensityScale() * getPower();
     if(intensityCurve != nullptr)
         actualIntensity = intensityCurve->GetFloatValue(actualIntensity);
-    if(light != nullptr)
+    if(light != nullptr && !dummy)
         light->SetIntensity(actualIntensity * maxIntensity);
     if(lenseMaterialInstance != nullptr)
         lenseMaterialInstance->SetScalarParameterValue(FName("Intensity"), actualIntensity * 10);
+    onLightUpdate();
 }
 
 void ACTheatricalLight::setColor(FLinearColor newColor)
 {
     color = newColor;
+    onLightUpdate();
     if(light != nullptr)
         light->SetLightColor(color);
     if(lenseMaterialInstance != nullptr)
@@ -171,10 +189,19 @@ void ACTheatricalLight::setZoom(double newZoom)
 
 void ACTheatricalLight::updateBeam()
 {
-    if(light != nullptr)
-        light->SetInnerConeAngle(zoom * 0.5);
-    if(lightFunctionInstance != nullptr)
-        lightFunctionInstance->SetScalarParameterValue(FName("Focus"), edge);
+    if(simpleEdge)
+    {
+        if(light != nullptr)
+            light->SetInnerConeAngle(zoom * 0.5 * edge);
+    }
+    else
+    {
+        if(light != nullptr)
+            light->SetInnerConeAngle(zoom * 0.5);
+        if(lightFunctionInstance != nullptr)
+            lightFunctionInstance->SetScalarParameterValue(FName("Focus"), edge);
+    }
+    onLightUpdate();
 }
 
 
@@ -254,4 +281,9 @@ void ACTheatricalLight::setGoboRotation(double newGoboRotation)
         return;
 
     lightFunctionInstance->SetScalarParameterValue(FName("Gobo Rotation"), goboRotation);
+}
+
+double ACTheatricalLight::getPower()
+{
+    return powerInput->getWatts() / requiredPower;
 }
