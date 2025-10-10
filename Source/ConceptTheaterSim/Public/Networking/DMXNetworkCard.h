@@ -32,13 +32,21 @@ public:
     UFUNCTION(BlueprintCallable)
     void clearChanged(int universe);
 
-    UPROPERTY(VisibleAnywhere)
+    UPROPERTY(VisibleInstanceOnly, Category="DMX")
     TArray<int> activeUniverses;
 
+    UFUNCTION(BlueprintCallable)
+    void addUniverse(int universe);
+    
+    UFUNCTION(BlueprintCallable)
+    void removeUniverse(int universe);
+
 protected:
+    UPROPERTY(VisibleInstanceOnly, Category="DMX")
     UDMXCache *cache = nullptr;
 
-    bool onPacketInternal(FNetworkPacket packet);
+    virtual bool onPacketInternal(FNetworkPacket packet) override;
 
+    UPROPERTY(VisibleInstanceOnly, Category="DMX")
     TMap<int, bool> changedUniverses;
 };

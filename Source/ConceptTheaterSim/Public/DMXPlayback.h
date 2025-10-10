@@ -38,6 +38,9 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Components")
+    UDMXNetworkCard *networkCard;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -49,27 +52,32 @@ public:
         bool isValid = false;
     };
 
-    UPROPERTY(VisibleAnywhere)
-    UDMXNetworkCard *networkCard = nullptr;
-
-    UPROPERTY(VisibleAnywhere)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="DMX")
     FName dmxSourceName = FName(TEXT("DMXPlayback"));
 
-    UPROPERTY(VisibleAnywhere)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="DMX")
     int dmxPriority = 127;
 
-private:
+protected:
+    UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category="DMX", AdvancedDisplay)
     int numFrames;
     DMXFrame *frames;
+    UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category="DMX", AdvancedDisplay)
     int numUniverses = 0;
     uint16 *universes;
 
     DMXFrame cFrame;
+    UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category="DMX")
     int frameIndex = -1;
+    UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category="DMX")
     int cFrameNumber = -1;
+    UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category="DMX", AdvancedDisplay)
     bool loaded = false;
 
+    UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category="DMX", AdvancedDisplay)
     int lastSentFrame = -1;
 
+private:
+    UFUNCTION()
     void sendFramePackets();
 };

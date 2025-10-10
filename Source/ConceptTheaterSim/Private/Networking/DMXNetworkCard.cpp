@@ -69,3 +69,19 @@ void UDMXNetworkCard::clearChanged(int universe)
         changedUniverses.Empty();
     changedUniverses.Remove(universe);
 }
+
+void UDMXNetworkCard::addUniverse(int universe)
+{
+    if(activeUniverses.Contains(universe))
+        return;
+    activeUniverses.Add(universe);
+    multicastSubscribe(0xF0000000 + universe);
+}
+
+void UDMXNetworkCard::removeUniverse(int universe)
+{
+    if(!activeUniverses.Contains(universe))
+        return;
+    activeUniverses.Remove(universe);
+    multicastUnSubscribe(0xF0000000 + universe);
+}

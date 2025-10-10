@@ -9,6 +9,8 @@ ADMXPlayback::ADMXPlayback()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+    networkCard = CreateDefaultSubobject<UDMXNetworkCard>(TEXT("Network Card"));
+
 }
 
 // Called when the game starts or when spawned
@@ -163,7 +165,7 @@ bool ADMXPlayback::UpdateTime(int newFrames) {
         nextFrame = frames[frameIndex + 1];
     }
 
-    if(updated || lastSentFrame + (5*30) < cFrameNumber)
+    if(updated || lastSentFrame + (3*30) < cFrameNumber) // if we changed OR if it has been 3 seconds since the last packet
     {
         sendFramePackets();
     }
@@ -229,8 +231,6 @@ int ADMXPlayback::GetDMXFrame() {
 void ADMXPlayback::sendFramePackets()
 {
     lastSentFrame = cFrameNumber;
-    if(networkCard == nullptr)
-        return;
     for (int i = 0; i < numUniverses; i++) {
         int universe = universes[i];
         TArray<int> outArr;

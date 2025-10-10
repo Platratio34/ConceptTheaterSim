@@ -9,9 +9,11 @@
 #include "EOS/EOSShowfile.h"
 #include "EOS/EOSPatchTypes.h"
 #include "EOS/EOSShowPatch.h"
+#include "Networking/DMXNetworkCard.h"
 #include "ETCLightBoard.generated.h"
 
-enum EOSMode
+UENUM(BlueprintType)
+enum class EEOSMode : uint8
 {
     LIVE,
     BLIND,
@@ -66,42 +68,49 @@ protected:
     UFUNCTION(BlueprintCallable)
     void updateUniverse(int universe, TArray<int> dmx);
 
+    UFUNCTION()
     void executeCommand();
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Components")
+    UDMXNetworkCard *networkCard;
 
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-    UPROPERTY(EditAnywhere)
+    UPROPERTY(EditAnywhere, Category="Buttons")
     UMaterialInterface *buttonMaterial;
 
-    UPROPERTY(EditAnywhere)
+    UPROPERTY(EditAnywhere, Category="Buttons")
     UMaterialInterface *indicatorMaterial;
 
-    UPROPERTY(VisibleAnywhere)
-    TArray<FName> command;
-    UPROPERTY(VisibleAnywhere)
-    FString commandError = TEXT("");
-    bool confirmCmd = false;
-    UPROPERTY(VisibleAnywhere)
-    bool clearCmd = false;
-    UPROPERTY(VisibleAnywhere)
-    bool highlightMode = false;
-    
-    EOSMode mode = LIVE;
-
-    UPROPERTY(EditAnywhere)
+    UPROPERTY(EditAnywhere, Category="EOS")
     UEOSShowfile* showfile = nullptr;
 
-    UPROPERTY(EditAnywhere)
+    UPROPERTY(EditAnywhere, Category="EOS")
     UEOSShowPatch* showPatch = nullptr;
 
+    UPROPERTY(VisibleInstanceOnly, Category="EOS")
+    TArray<FName> command;
+    UPROPERTY(VisibleInstanceOnly, Category="EOS")
+    FString commandError = TEXT("");
+    bool confirmCmd = false;
+    UPROPERTY(VisibleInstanceOnly, Category="EOS", AdvancedDisplay)
+    bool clearCmd = false;
+    UPROPERTY(VisibleInstanceOnly, Category="EOS", AdvancedDisplay)
+    bool highlightMode = false;
+    
+    UPROPERTY(VisibleInstanceOnly, Category="EOS")
+    EEOSMode mode = EEOSMode::LIVE;
+
 private:
+    UPROPERTY(VisibleInstanceOnly, Category="EOS", AdvancedDisplay)
     bool shift = false;
 
+    UPROPERTY(VisibleInstanceOnly, Category="EOS", AdvancedDisplay)
     TSet<int> parkedChannels;
 
-    UPROPERTY()
+    UPROPERTY(VisibleInstanceOnly, Category="Buttons", AdvancedDisplay)
     TMap<FName, UStaticMeshComponent*> buttonsByName;
     UPROPERTY()
     TMap<UStaticMeshComponent*, FName> buttonsByMesh;
@@ -118,9 +127,11 @@ private:
     void setButtonColor(FName button, FColor buttonColor, FColor activeColor);
     void setButtonActive(FName button, bool active);
 
-    UPROPERTY()
+    UPROPERTY(VisibleInstanceOnly, Category="Buttons", AdvancedDisplay)
     UMaterialInstanceDynamic* baseButtonMaterial;
 
     int getCmdNumber(int start, int* len);
     FCmdSelection getCmdSelection(int start, int *end);
+
+    void onNetworkPacket(FNetworkPacket packet);
 };

@@ -38,11 +38,11 @@ public:
     ACNetwork();
     ~ACNetwork();
 
-    UPROPERTY()
+    UPROPERTY(VisibleInstanceOnly, BlueprintAssignable, Category="Network")
     FOnNetworkPacket onPacketOut;
 
     UFUNCTION(BlueprintCallable)
-    void setup(int subnet, int subnetMask, ACNetwork *upstream);
+    void setup(int subnet, int subnetMask, ACNetwork *upstream, bool sameNet);
 
     UFUNCTION(BlueprintCallable)
     void sendPacket(FNetworkPacket packet);
@@ -64,7 +64,7 @@ public:
     int getSubnetMask();
 
     UFUNCTION(BlueprintCallable)
-    void setUpstream(ACNetwork *upstream);
+    void setUpstream(ACNetwork *upstream, bool sameNet);
     UFUNCTION(BlueprintCallable)
     void clearUpstream();
 
@@ -74,22 +74,26 @@ public:
     void multicastUnSubscribe(int address, UNetworkCard *subscriber);
 
 protected:
-    UPROPERTY()
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Network")
     int subnet = 0x0A000000;
-    UPROPERTY()
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Network")
     int subnetMask = 0xFF000000;
 
-    UPROPERTY()
+    UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category="Network")
     TMap<FString, int> assignedAddresses;
     UPROPERTY()
     int nextAddress = 0x00000001;
 
+    UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category="Upstream")
     ACNetwork *upstream = nullptr;
+    
+    UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category="Upstream")
+    bool upstreamSameNet = false;
 
     UFUNCTION()
     bool isAddressLocal(int addr);
     UFUNCTION()
-    void sendPacketInt(FNetworkPacket packet, bool fromUpstream, ACNetwork* sourceNet);
+    void sendPacketInt(FNetworkPacket packet, bool fromUpstream);
 
     MulticastTargetSet **multicastSets = nullptr;
     UPROPERTY()
@@ -97,10 +101,6 @@ protected:
     UPROPERTY()
     int multicastPntr;
 
-    UPROPERTY()
+    UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category="Network")
     TArray<UNetworkCard*> cards;
-    UPROPERTY()
-    TArray<ACNetwork*> childNetworks;
-    UPROPERTY()
-    ACNetwork *parentNetwork;
 };

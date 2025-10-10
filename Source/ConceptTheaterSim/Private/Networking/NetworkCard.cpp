@@ -14,12 +14,22 @@ UNetworkCard::~UNetworkCard()
     delete[] multicast;
 }
 
-void UNetworkCard::setup(int ip, FString hw)
+// Called when the game starts or when spawned
+void UNetworkCard::BeginPlay()
+{
+	Super::BeginPlay();
+    if(network != nullptr)
+        connectInternal();
+}
+
+void UNetworkCard::setup(int ip, FString hw, int subnet_, int subnetMask_)
 {
     if (ip > 0)
     {
         address = ip;
         staticIP = true;
+        subnet = subnet_;
+        subnetMask = subnetMask_;
     }
     hwAddress = hw;
 }
@@ -97,6 +107,11 @@ void UNetworkCard::connect(ACNetwork *newNetwork) {
         disconnect();
     }
     network = newNetwork;
+    connectInternal();
+}
+void UNetworkCard::connectInternal() {
+    if(network == nullptr)
+        return;
     subnet = network->getSubnet();
     subnetMask = network->getSubnetMask();
     if(!staticIP)
@@ -112,8 +127,7 @@ void UNetworkCard::disconnect() {
     if(!staticIP)
         network->releaseIP(hwAddress);
     network->disconnect(this);
-    for (int i = 0; i < multicastPntr; i++)
-        network->multicastUnSubscribe(multicast[i], this);
+    network = nullptr;
 }
 
 int UNetworkCard::getIP() {

@@ -12,12 +12,19 @@ AETCLightBoard::AETCLightBoard()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
+    networkCard = CreateDefaultSubobject<UDMXNetworkCard>(TEXT("Network Card"));
 }
 
 // Called when the game starts or when spawned
 void AETCLightBoard::BeginPlay()
 {
 	Super::BeginPlay();
+    networkCard->onNetworkPacket.AddDynamic(this, &AETCLightBoard::onNetworkPacket);
+    for (int u = 0; u < 10; u++)
+    {
+        networkCard->addUniverse(u);
+    }
 
     if(showfile == nullptr)
     {
@@ -132,9 +139,9 @@ void AETCLightBoard::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-    setButtonActive(BUTTON_LIVE, mode == LIVE);
-    setButtonActive(BUTTON_BLIND, mode == BLIND);
-    setButtonActive(BUTTON_STAGE, mode == STAGE);
+    setButtonActive(BUTTON_LIVE, mode == EEOSMode::LIVE);
+    setButtonActive(BUTTON_BLIND, mode == EEOSMode::BLIND);
+    setButtonActive(BUTTON_STAGE, mode == EEOSMode::STAGE);
     
     setButtonActive(BUTTON_HIGH, highlightMode);
 
@@ -143,6 +150,14 @@ void AETCLightBoard::Tick(float DeltaTime)
     setButtonActive(BUTTON_CLEAR, !command.IsEmpty() && !clearCmd);
 
     setButtonActive(BUTTON_SHIFT, shift);
+
+    for (int u = 0; u < 10; u++)
+    {
+        if(!networkCard->hasChanged(u))
+            continue;
+        updateUniverse(u, networkCard->getData(u));
+        networkCard->clearChanged(u);
+    }
 }
 
 void AETCLightBoard::updateUniverse(int universe, TArray<int> dmx)
@@ -214,17 +229,17 @@ void AETCLightBoard::onInteract(UPrimitiveComponent* component)
         FName button = *buttonPntr;
         if(button == BUTTON_LIVE)
         {
-            mode = LIVE;
+            mode = EEOSMode::LIVE;
             return;
         }
         else if(button == BUTTON_BLIND)
         {
-            mode = BLIND;
+            mode = EEOSMode::BLIND;
             return;
         }
         else if(button == BUTTON_STAGE)
         {
-            mode = STAGE;
+            mode = EEOSMode::STAGE;
             return;
         }
         else if(button == BUTTON_GO)
@@ -621,4 +636,9 @@ FCmdSelection AETCLightBoard::getCmdSelection(int start, int *end)
     if(end != nullptr)
         *end = i-1;
     return selection;
+}
+
+void AETCLightBoard::onNetworkPacket(FNetworkPacket packet)
+{
+
 }

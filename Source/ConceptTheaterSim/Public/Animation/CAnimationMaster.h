@@ -483,18 +483,18 @@ protected:
     UFUNCTION(BlueprintCallable)
     void onTimeStop();
 
-    UPROPERTY(VisibleAnywhere)
+    UPROPERTY(VisibleInstanceOnly)
     FAnimationFile animationFile;
-    UPROPERTY(VisibleAnywhere)
+    UPROPERTY(VisibleInstanceOnly)
     bool animationFileLoaded = false;
     
-    UPROPERTY(VisibleAnywhere)
+    UPROPERTY(VisibleInstanceOnly)
     TMap<FName, int> nextEvent;
 
-    UPROPERTY(VisibleAnywhere)
+    UPROPERTY(VisibleInstanceOnly)
     TMap<FName, UCAnimationComponent *> animatedObjects;
 
-    UPROPERTY(VisibleAnywhere)
+    UPROPERTY(VisibleInstanceOnly)
     TMap<FName, USceneComponent*> animationParents;
 
 private:

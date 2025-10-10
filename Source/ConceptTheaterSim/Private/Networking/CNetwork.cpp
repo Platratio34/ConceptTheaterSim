@@ -18,12 +18,12 @@ ACNetwork::~ACNetwork()
     delete[] multicastSets;
 }
 
-void ACNetwork::setup(int _subnet, int _subnetMask, ACNetwork *_upstream)
+void ACNetwork::setup(int _subnet, int _subnetMask, ACNetwork *_upstream, bool sameNet)
 {
     subnet = _subnet;
     subnetMask = _subnetMask;
     if (_upstream)
-        setUpstream(_upstream);
+        setUpstream(_upstream, sameNet);
 }
 
 bool ACNetwork::isAddressLocal(int addr)
@@ -35,21 +35,26 @@ bool ACNetwork::isAddressLocal(int addr)
 
 void ACNetwork::sendPacket(FNetworkPacket packet)
 {
-    sendPacketInt(packet, false, nullptr);
+    sendPacketInt(packet, false);
 }
 
 void ACNetwork::onUpstreamPacket(FNetworkPacket packet)
 {
-    sendPacketInt(packet, true, nullptr);
+    sendPacketInt(packet, true);
 }
 
-void ACNetwork::sendPacketInt(FNetworkPacket packet, bool fromUpstream, ACNetwork* sourceNet)
+void ACNetwork::sendPacketInt(FNetworkPacket packet, bool fromUpstream)
 {
     int dest = packet.dest;
     int packetSubnet = dest & subnetMask;
     int localBroadcast = subnet | (~subnetMask);
-    
-    if (packetSubnet == subnet || dest == -1) // in our network, or all network broadcast
+
+    bool upOnly = !fromUpstream && upstreamSameNet;
+    if(!fromUpstream && upstreamSameNet && upstream != nullptr) // we are a sub-switch, so allways pass up
+    {
+        upstream->sendPacketInt(packet, false);
+    }
+    else if (packetSubnet == subnet || dest == -1) // in our network, or all network broadcast
     {
         onPacketOut.Broadcast(packet);
         bool broadcast = dest == -1 || dest == localBroadcast;
@@ -109,8 +114,9 @@ int ACNetwork::getSubnetMask()
     return subnetMask;
 }
 
-void ACNetwork::setUpstream(ACNetwork *newUpstream)
+void ACNetwork::setUpstream(ACNetwork *newUpstream, bool sameNet)
 {
+    upstreamSameNet = sameNet;
     if (upstream == newUpstream)
         return;
     if (upstream != nullptr)
@@ -173,6 +179,10 @@ void ACNetwork::connect(UNetworkCard *card) {
 }
 void ACNetwork::disconnect(UNetworkCard *card) {
     cards.Remove(card);
+    for (int i = 0; i < multicastPntr; i++)
+    {
+        multicastSets[i]->removeSubscriber(card);
+    }
 }
 
 

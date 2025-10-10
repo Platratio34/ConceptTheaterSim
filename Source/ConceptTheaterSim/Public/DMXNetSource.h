@@ -14,6 +14,7 @@ class CONCEPTTHEATERSIM_API UDMXNetSource : public UObject
 	GENERATED_BODY()    
 
 public:
+    UPROPERTY(VisibleInstanceOnly)
     FName name;
     int priority[DMX_NET_SOURCE_MAX_UNIVERSE];
     uint8 * universes[DMX_NET_SOURCE_MAX_UNIVERSE];

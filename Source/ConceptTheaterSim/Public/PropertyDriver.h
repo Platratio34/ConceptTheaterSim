@@ -41,10 +41,15 @@ public:
     }
 
 protected:
+    UPROPERTY(VisibleInstanceOnly)
     float value;
+    UPROPERTY(VisibleInstanceOnly)
     float targetValue;
+    UPROPERTY(VisibleInstanceOnly)
     float time;
+    UPROPERTY(VisibleInstanceOnly)
     float lastDelta = 0;
 
+    UPROPERTY(VisibleInstanceOnly)
     bool done;
 };

@@ -10,15 +10,15 @@ FString UEOSScreenBase::getCommandString()
     FString str = TEXT("");
     if(board != nullptr)
     {
-        if(board->mode == LIVE)
+        if(board->mode == EEOSMode::LIVE)
         {
             str += TEXT("LIVE");
         }
-        else if(board->mode == BLIND)
+        else if(board->mode == EEOSMode::BLIND)
         {
             str += TEXT("BLIND");
         }
-        else if(board->mode == STAGE)
+        else if(board->mode == EEOSMode::STAGE)
         {
             str += TEXT("STAGING");
         }
@@ -78,7 +78,7 @@ FLinearColor UEOSScreenBase::getCommandColor()
         {
             return FLinearColor(0.25, 1.0, 0.25, 1.0);
         }
-        else if(board->mode == BLIND)
+        else if(board->mode == EEOSMode::BLIND)
         {
             return FLinearColor(0.25, 1.0, 1.0, 1.0);
         }

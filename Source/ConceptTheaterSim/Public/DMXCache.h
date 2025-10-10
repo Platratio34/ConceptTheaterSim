@@ -19,7 +19,7 @@ public:
         
     }
 
-    UPROPERTY()
+    UPROPERTY(VisibleInstanceOnly)
     TArray<int> data;
 };
 
@@ -41,9 +41,9 @@ public:
 protected:
     // source cache?
     //
-    UPROPERTY()
+    UPROPERTY(VisibleInstanceOnly, Category="DMX Cache")
     TMap<int, FUniverse> cache;
 
-    UPROPERTY()
+    UPROPERTY(VisibleInstanceOnly, Category="DMX Cache")
     TMap<FName, UDMXNetSource*> sources;
 };
