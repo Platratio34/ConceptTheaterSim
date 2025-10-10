@@ -111,6 +111,8 @@ void ACTheatricalLight::Tick(float DeltaTime)
 
 void ACTheatricalLight::setup(UStaticMeshComponent* lenseMesh_)
 {
+    if(lenseMesh_ == nullptr)
+        return;
     lenseMesh = lenseMesh_;
 
     if (lenseMaterial != nullptr && (lenseMaterialInstance == nullptr || !IsValid(lenseMaterialInstance)))

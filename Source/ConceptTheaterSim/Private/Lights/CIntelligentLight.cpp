@@ -31,6 +31,7 @@ void ACIntelligentLight::Tick(float DeltaTime)
 
 void ACIntelligentLight::updateDmx(TArray<int> universe)
 {
+    dmxCache = universe;
     if(profile == nullptr)
     {
         UE_LOG(LogTemp, Warning, TEXT("Missing profile"));
@@ -96,4 +97,11 @@ void ACIntelligentLight::onSourceUpdate(UCDMXCableConnector *source)
 double ACIntelligentLight::getPower()
 {
     return powerInput->getWatts() >= requiredPower ? 1 : 0;
+}
+
+void ACIntelligentLight::refreshDMX()
+{
+    if(dmxCache.Num() < 512)
+        return;
+    updateDmx(dmxCache);
 }

@@ -43,6 +43,9 @@ protected:
 
     virtual double getPower() override;
 
+    UPROPERTY()
+    TArray<int> dmxCache;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -51,6 +54,9 @@ public:
 
     UFUNCTION(BlueprintCallable)
     void updateDmx(TArray<int> universe);
+
+    UFUNCTION(BlueprintCallable)
+    void refreshDMX();
 
     UFUNCTION(BlueprintCallable)
     int getParameter(FName id);
