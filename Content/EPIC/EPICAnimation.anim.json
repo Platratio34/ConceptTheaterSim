@@ -131,7 +131,7 @@
                 { "time":"00:01:23:00", "duration": 1, "x": 28 },
                 { "time":"00:01:46:15", "duration": 3, "x": 144 },
                 { "time":"00:01:56:00", "duration": 0, "parent": "", "visibility": false },
-                { "time":"00:39:30:00", "x": 24, "parent": "Balcony-SL" },
+                { "time":"00:39:30:00", "x": 24, "y": -12, "z": 36, "parent": "Balcony-SL" },
                 { "time":"00:39:31:00", "visibility": true },
                 { "time":"00:39:47:15", "duration": 0.5, "x": 12 },
                 { "time":"00:40:30:00", "parent": "", "visibility": false }

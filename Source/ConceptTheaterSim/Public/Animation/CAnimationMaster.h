@@ -10,7 +10,7 @@
 
 DECLARE_LOG_CATEGORY_EXTERN(AnimationLog, Log, All);
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct FAnimationFileTrackEvent
 {
     GENERATED_BODY()
@@ -19,47 +19,47 @@ public:
     UPROPERTY(VisibleAnywhere)
     FString time;
 
-    UPROPERTY(VisibleAnywhere)
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
     double timeSeconds;
-    UPROPERTY(VisibleAnywhere)
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
     double duration = 0;
 
-    UPROPERTY(VisibleAnywhere)
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
     double x;
-    UPROPERTY(VisibleAnywhere)
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
     bool xKey = false;
-    UPROPERTY(VisibleAnywhere)
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
     double y;
-    UPROPERTY(VisibleAnywhere)
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
     bool yKey = false;
-    UPROPERTY(VisibleAnywhere)
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
     double z;
-    UPROPERTY(VisibleAnywhere)
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
     bool zKey = false;
 
-    UPROPERTY(VisibleAnywhere)
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
     double xRot;
-    UPROPERTY(VisibleAnywhere)
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
     bool xRotKey = false;
-    UPROPERTY(VisibleAnywhere)
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
     double yRot;
-    UPROPERTY(VisibleAnywhere)
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
     bool yRotKey = false;
-    UPROPERTY(VisibleAnywhere)
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
     double zRot;
-    UPROPERTY(VisibleAnywhere)
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
     bool zRotKey = false;
 
-    UPROPERTY(VisibleAnywhere)
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
     FName parent;
-    UPROPERTY(VisibleAnywhere)
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
     bool clearParent = false;
-    UPROPERTY(VisibleAnywhere)
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
     bool parentKey = false;
 
-    UPROPERTY(VisibleAnywhere)
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
     bool visible;
-    UPROPERTY(VisibleAnywhere)
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
     bool visibleKey = false;
     
     static double parseTimeString(FString timeString)
@@ -397,13 +397,13 @@ public:
     static inline FString JSON_VISIBILITY = TEXT("visibility");
 };
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct FAnimationFileTrack
 {
     GENERATED_BODY()
 public:
 
-    UPROPERTY(VisibleAnywhere)
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
     TArray<FAnimationFileTrackEvent> events;
 
     UPROPERTY(VisibleAnywhere)
@@ -421,13 +421,13 @@ public:
     }
 };
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct FAnimationFile
 {
     GENERATED_BODY()
 public:
 
-    UPROPERTY(VisibleAnywhere)
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
     TMap<FName, FAnimationFileTrack> tracks;
 };
 
@@ -464,6 +464,7 @@ public:
     UFUNCTION(BlueprintCallable)
     void registerParentObject(FName id, USceneComponent* parent);
 
+    UFUNCTION(BlueprintCallable)
     USceneComponent *getParent(FName id)
     {
         if(USceneComponent** component = animationParents.Find(id))
@@ -483,9 +484,9 @@ protected:
     UFUNCTION(BlueprintCallable)
     void onTimeStop();
 
-    UPROPERTY(VisibleInstanceOnly)
+    UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly)
     FAnimationFile animationFile;
-    UPROPERTY(VisibleInstanceOnly)
+    UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly)
     bool animationFileLoaded = false;
     
     UPROPERTY(VisibleInstanceOnly)
