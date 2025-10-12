@@ -58,15 +58,19 @@ void UCAnimationComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
     AActor *ow = GetOwner();
     // FEulerTransform transform = ow->GetRootComponent()->GetRelativeTransform();
     FVector cPos/* = transform.Location*/;
+    bool posChange = !(xPosDriver->IsDone() && yPosDriver->IsDone() && zPosDriver->IsDone());
     cPos.X = xPosDriver->Update(DeltaTime) * IN_TO_CM;
     cPos.Y = yPosDriver->Update(DeltaTime) * IN_TO_CM;
     cPos.Z = zPosDriver->Update(DeltaTime) * IN_TO_CM;
-    ow->SetActorRelativeLocation(cPos);
+    if(posChange)
+        ow->SetActorRelativeLocation(cPos);
     FRotator cRot /* = transform.Rotation */;
+    bool rotChange = !(xRotDriver->IsDone() && yRotDriver->IsDone() && zRotDriver->IsDone());
     cRot.Roll = xRotDriver->Update(DeltaTime);
     cRot.Pitch = yRotDriver->Update(DeltaTime);
     cRot.Yaw = zRotDriver->Update(DeltaTime);
-    ow->SetActorRelativeRotation(cRot);
+    if(rotChange)
+        ow->SetActorRelativeRotation(cRot);
 }
 
 void UCAnimationComponent::onEvent(FAnimationFileTrackEvent event)

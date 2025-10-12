@@ -52,6 +52,11 @@ float UPropertyDriver::Update(float deltaTime)
     value += move;
     lastDelta = delta;
     done = abs(targetValue - value) < 0.001;
+    if(done)
+    {
+        value = targetValue;
+        time = 0;
+    }
     return value;
 }
 
