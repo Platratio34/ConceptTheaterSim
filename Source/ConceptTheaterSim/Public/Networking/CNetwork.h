@@ -3,27 +3,33 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "UObject/NoExportTypes.h"
 #include "GameFramework/Actor.h"
 #include "Networking/NetworkTypes.h"
 #include "CNetwork.generated.h"
 
-class CONCEPTTHEATERSIM_API MulticastTargetSet {
+UCLASS(BlueprintType)
+class CONCEPTTHEATERSIM_API UMulticastTargetSet : public UObject
+{
 
+	GENERATED_BODY()
+	
 public:
-    MulticastTargetSet(int address);
-    ~MulticastTargetSet();
+    UMulticastTargetSet();
+    ~UMulticastTargetSet();
 
+    UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly)
     int address = 0xe0000000;
 
-    UNetworkCard **subscribers = nullptr;
+    UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly)
+    TArray<UNetworkCard *> subscribers;
 
+    UFUNCTION()
     void addSubscriber(UNetworkCard *subscriber);
+    UFUNCTION()
     void removeSubscriber(UNetworkCard *subscriber);
+    UFUNCTION()
     void sendPacket(FNetworkPacket packet);
-
-protected:
-    int subSize = 4;
-    int subPntr = 0;
 };
 
 /**
@@ -100,11 +106,8 @@ protected:
     UFUNCTION()
     void sendPacketInt(FNetworkPacket packet, bool fromUpstream);
 
-    MulticastTargetSet **multicastSets = nullptr;
-    UPROPERTY()
-    int multicastSize = 1;
-    UPROPERTY()
-    int multicastPntr;
+    UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category="Network")
+    TArray<UMulticastTargetSet *> multicastSets;
 
     UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category="Network")
     TArray<UNetworkCard*> cards;

@@ -6,12 +6,12 @@
 
 UNetworkCard::UNetworkCard()
 {
-    multicast = new int[multicastSize];
+    
 }
 
 UNetworkCard::~UNetworkCard()
 {
-    delete[] multicast;
+    
 }
 
 // Called when the game starts or when spawned
@@ -46,43 +46,18 @@ void UNetworkCard::send(FNetworkPacket packet)
 
 void UNetworkCard::multicastSubscribe(int multicastAddress)
 {
-    for (int i = 0; i < multicastPntr; i++)
-    {
-        if (multicast[i] == multicastAddress) // already subscribed
-            return;
-    }
-    if (multicastPntr == multicastSize)
-    {
-        multicastSize += 8;
-        int *nArr = new int[multicastSize];
-        for (int i = 0; i < multicastPntr; i++)
-        {
-            nArr[i] = multicast[i];
-        }
-        delete[] multicast;
-        multicast = nArr;
-    }
-    multicast[multicastPntr++] = multicastAddress;
+    if(multicast.Contains(multicastAddress))
+        return;
+    multicast.Add(multicastAddress);
     if(network != nullptr) {
         network->multicastSubscribe(multicastAddress, this);
     }
 }
 void UNetworkCard::multicastUnSubscribe(int multicastAddress)
 {
-    int after = -1;
-    for (int i = 0; i < multicastPntr; i++)
-    {
-        if (multicast[i] == multicastAddress)
-        {
-            after = true;
-        }
-        else if (after)
-        {
-            multicast[i - 1] = multicast[i];
-        }
-    }
-    if (after)
-        multicastPntr--;
+    if(!multicast.Contains(multicastAddress))
+        return;
+    multicast.Remove(multicastAddress);
     if(network != nullptr) {
         network->multicastUnSubscribe(multicastAddress, this);
     }
@@ -119,8 +94,10 @@ void UNetworkCard::connectInternal() {
     if(!staticIP)
         address = network->requestIP(hwAddress);
     network->connect(this);
-    for (int i = 0; i < multicastPntr; i++)
-        network->multicastSubscribe(multicast[i], this);
+    for (int multicastAddress : multicast)
+    {
+        network->multicastSubscribe(multicastAddress, this);
+    }
 }
 
 void UNetworkCard::disconnect() {

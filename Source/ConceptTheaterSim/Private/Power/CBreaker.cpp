@@ -25,8 +25,17 @@ void ACBreaker::BeginPlay()
     {
         for(const TPair<FName, FBreakerCircuitConfig> &pair : config->circuits)
         {
+            FName circuit = pair.Key;
             FBreakerCircuitConfig cConfig = pair.Value;
-            setState(pair.Key, cConfig.constantPower ? 1 : cConfig.defaultState);
+            if(cConfig.constantPower)
+            {
+                state.Add(circuit, 1);
+                onCircuitChange.Broadcast(circuit, 1);
+            }
+            else
+            {
+                setState(circuit, cConfig.defaultState);
+            }
         }
     }
 }

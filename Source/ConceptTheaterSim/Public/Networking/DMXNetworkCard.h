@@ -11,7 +11,7 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(BlueprintType, meta=(BlueprintSpawnableComponent))
 class CONCEPTTHEATERSIM_API UDMXNetworkCard : public UNetworkCard
 {
 	GENERATED_BODY()

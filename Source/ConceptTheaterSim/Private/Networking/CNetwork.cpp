@@ -7,18 +7,13 @@
 ACNetwork::ACNetwork()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
 
-    multicastSets = new MulticastTargetSet *[multicastSize];
 }
 
 ACNetwork::~ACNetwork()
 {
-    for (int i = 0; i < multicastPntr; i++)
-    {
-        delete multicastSets[i];
-    }
-    delete[] multicastSets;
+    
 }
 
 
@@ -34,6 +29,7 @@ void ACNetwork::OnConstruction(const FTransform &Transform)
 
 void ACNetwork::BeginPlay()
 {
+    Super::BeginPlay();
     if(upstream != nullptr)
     {
         upstream->onPacketOut.AddDynamic(this, &ACNetwork::onUpstreamPacket);
@@ -96,9 +92,8 @@ void ACNetwork::sendPacketInt(FNetworkPacket packet, bool fromUpstream)
     else if ((dest & 0xF0000000) == 0xE0000000) // multicast
     {
         onPacketOut.Broadcast(packet);
-        for (int i = 0; i < multicastPntr; i++)
+        for (UMulticastTargetSet *set : multicastSets)
         {
-            MulticastTargetSet *set = multicastSets[i];
             if (set->address == dest)
             {
                 set->sendPacket(packet);
@@ -179,36 +174,24 @@ void ACNetwork::clearUpstream()
 
 void ACNetwork::multicastSubscribe(int address, UNetworkCard *subscriber)
 {
-    for (int i = 0; i < multicastPntr; i++)
+    for(UMulticastTargetSet *set : multicastSets)
     {
-        MulticastTargetSet *set = multicastSets[i];
         if (set->address == address)
         {
             set->addSubscriber(subscriber);
             return;
         }
     }
-    if (multicastPntr == multicastSize)
-    {
-        multicastSize *= 2;
-        MulticastTargetSet **newArr = new MulticastTargetSet *[multicastSize];
-        for (int i = 0; i < multicastPntr; i++)
-        {
-            newArr[i] = multicastSets[i];
-        }
-        delete[] multicastSets;
-        multicastSets = newArr;
-    }
-    MulticastTargetSet *set = new MulticastTargetSet(address);
-    multicastSets[multicastPntr++] = set;
+    UMulticastTargetSet *set = NewObject<UMulticastTargetSet>();
+    set->address = address;
+    multicastSets.Add(set);
     set->addSubscriber(subscriber);
 }
 
 void ACNetwork::multicastUnSubscribe(int address, UNetworkCard *subscriber)
 {
-    for (int i = 0; i < multicastPntr; i++)
+    for (UMulticastTargetSet *set : multicastSets)
     {
-        MulticastTargetSet *set = multicastSets[i];
         if (set->address == address)
         {
             set->removeSubscriber(subscriber);
@@ -222,65 +205,35 @@ void ACNetwork::connect(UNetworkCard *card) {
 }
 void ACNetwork::disconnect(UNetworkCard *card) {
     cards.Remove(card);
-    for (int i = 0; i < multicastPntr; i++)
+    for (UMulticastTargetSet *set : multicastSets)
     {
-        multicastSets[i]->removeSubscriber(card);
+        set->removeSubscriber(card);
     }
 }
 
 
-MulticastTargetSet::MulticastTargetSet(int address_)
+UMulticastTargetSet::UMulticastTargetSet()
 {
-    address = address_;
-    subscribers = new UNetworkCard *[subSize];
+    
 }
-MulticastTargetSet::~MulticastTargetSet()
+UMulticastTargetSet::~UMulticastTargetSet()
 {
-    delete[] subscribers;
-}
-
-void MulticastTargetSet::addSubscriber(UNetworkCard *subscriber)
-{
-    for (int i = 0; i < subPntr; i++)
-    {
-        if (subscribers[i] == subscriber)
-            return;
-    }
-    if (subPntr == subSize)
-    {
-        subSize += 4;
-        UNetworkCard **newArr = new UNetworkCard *[subSize];
-        for (int i = 0; i < subPntr; i++)
-        {
-            newArr[i] = subscribers[i];
-        }
-        delete[] subscribers;
-        subscribers = newArr;
-    }
-    subscribers[subPntr++] = subscriber;
+    
 }
 
-void MulticastTargetSet::removeSubscriber(UNetworkCard *subscriber)
+void UMulticastTargetSet::addSubscriber(UNetworkCard *subscriber)
 {
-    bool after = false;
-    for (int i = 0; i < subPntr; i++)
-    {
-        if (subscribers[i] == subscriber)
-        {
-            after = true;
-        }
-        else if (after)
-        {
-            subscribers[i - 1] = subscribers[i];
-        }
-    }
-    if (after)
-        subPntr--;
+    subscribers.AddUnique(subscriber);
 }
 
-void MulticastTargetSet::sendPacket(FNetworkPacket packet) {
-    for (int i = 0; i < subPntr; i++)
+void UMulticastTargetSet::removeSubscriber(UNetworkCard *subscriber)
+{
+    subscribers.Remove(subscriber);
+}
+
+void UMulticastTargetSet::sendPacket(FNetworkPacket packet) {
+    for (UNetworkCard *subscriber : subscribers)
     {
-        subscribers[i]->onPacket(packet);
+        subscriber->onPacket(packet);
     }
 }

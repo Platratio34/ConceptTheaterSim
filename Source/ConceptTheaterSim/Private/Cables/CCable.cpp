@@ -162,7 +162,7 @@ void ACCable::Tick(float DeltaTime)
             {
                 tryConnect(startPort);
                 tryConnect(endPort);
-                UE_LOG(LogTemp, Display, TEXT("Cable connected"));
+                // UE_LOG(LogTemp, Display, TEXT("Cable connected"));
             }
             else
             {

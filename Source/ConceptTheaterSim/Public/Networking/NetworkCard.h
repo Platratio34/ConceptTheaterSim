@@ -10,7 +10,7 @@
 /**
  *
  */
-UCLASS(BlueprintType)
+UCLASS(BlueprintType, meta=(BlueprintSpawnableComponent))
 class CONCEPTTHEATERSIM_API UNetworkCard : public UActorComponent
 {
     GENERATED_BODY()
@@ -62,9 +62,8 @@ protected:
     UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category="Network")
     int subnetMask = 0xffff0000;
 
-    int *multicast = nullptr;
-    int multicastPntr = 0;
-    int multicastSize = 8;
+    UPROPERTY()
+    TArray<int> multicast;
 
     UPROPERTY(EditInstanceOnly, BlueprintReadWrite, Category="Network")
     ACNetwork *network = nullptr;
