@@ -38,6 +38,8 @@ public:
     ACNetwork();
     ~ACNetwork();
 
+    void OnConstruction(const FTransform &Transform) override;
+
     UPROPERTY(VisibleInstanceOnly, BlueprintAssignable, Category="Network")
     FOnNetworkPacket onPacketOut;
 
@@ -74,6 +76,9 @@ public:
     void multicastUnSubscribe(int address, UNetworkCard *subscriber);
 
 protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+    
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Network")
     int subnet = 0x0A000000;
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Network")

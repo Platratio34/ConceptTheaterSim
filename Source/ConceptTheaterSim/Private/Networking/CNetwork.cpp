@@ -6,6 +6,9 @@
 
 ACNetwork::ACNetwork()
 {
+ 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	PrimaryActorTick.bCanEverTick = false;
+
     multicastSets = new MulticastTargetSet *[multicastSize];
 }
 
@@ -16,6 +19,30 @@ ACNetwork::~ACNetwork()
         delete multicastSets[i];
     }
     delete[] multicastSets;
+}
+
+
+void ACNetwork::OnConstruction(const FTransform &Transform)
+{
+    Super::OnConstruction(Transform);
+    if(upstream != nullptr && upstreamSameNet)
+    {
+        subnet = upstream->subnet;
+        subnetMask = upstream->subnetMask;
+    }
+}
+
+void ACNetwork::BeginPlay()
+{
+    if(upstream != nullptr)
+    {
+        upstream->onPacketOut.AddDynamic(this, &ACNetwork::onUpstreamPacket);
+        if(upstreamSameNet)
+        {
+            subnet = upstream->subnet;
+            subnetMask = upstream->subnetMask;
+        }
+    }
 }
 
 void ACNetwork::setup(int _subnet, int _subnetMask, ACNetwork *_upstream, bool sameNet)
@@ -50,7 +77,7 @@ void ACNetwork::sendPacketInt(FNetworkPacket packet, bool fromUpstream)
     int localBroadcast = subnet | (~subnetMask);
 
     bool upOnly = !fromUpstream && upstreamSameNet;
-    if(!fromUpstream && upstreamSameNet && upstream != nullptr) // we are a sub-switch, so allways pass up
+    if(!fromUpstream && upstreamSameNet && upstream != nullptr) // we are a sub-switch, so always pass up
     {
         upstream->sendPacketInt(packet, false);
     }
@@ -87,6 +114,10 @@ void ACNetwork::sendPacketInt(FNetworkPacket packet, bool fromUpstream)
 
 int ACNetwork::requestIP(FString hwAddress)
 {
+    if(upstreamSameNet && upstream != nullptr)
+    {
+        return upstream->requestIP(hwAddress);
+    }
     if (int *addrPntr = assignedAddresses.Find(hwAddress))
     {
         return *addrPntr;
@@ -102,6 +133,11 @@ int ACNetwork::requestIP(FString hwAddress)
 
 void ACNetwork::releaseIP(FString hwAddress)
 {
+    if(upstreamSameNet && upstream != nullptr)
+    {
+        upstream->releaseIP(hwAddress);
+        return;
+    }
     assignedAddresses.Remove(hwAddress);
 }
 
@@ -124,7 +160,14 @@ void ACNetwork::setUpstream(ACNetwork *newUpstream, bool sameNet)
         clearUpstream();
     }
     upstream = newUpstream;
+    if(upstream == nullptr)
+        return;
     upstream->onPacketOut.AddDynamic(this, &ACNetwork::onUpstreamPacket);
+    if(sameNet)
+    {
+        subnet = upstream->subnet;
+        subnetMask = upstream->subnetMask;
+    }
 }
 void ACNetwork::clearUpstream()
 {

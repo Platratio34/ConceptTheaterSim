@@ -18,6 +18,8 @@ UNetworkCard::~UNetworkCard()
 void UNetworkCard::BeginPlay()
 {
 	Super::BeginPlay();
+    if(hwAddress.Len() == 0)
+        hwAddress = GetOwner()->GetName() + TEXT(":") + GetName();
     if(network != nullptr)
         connectInternal();
 }
