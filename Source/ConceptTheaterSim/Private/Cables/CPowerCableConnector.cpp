@@ -9,6 +9,12 @@ UCPowerCableConnector::UCPowerCableConnector()
     PrimaryComponentTick.bCanEverTick = true;
 }
 
+void UCPowerCableConnector::BeginPlay()
+{
+    if(breaker != nullptr)
+        breaker->onCircuitChange.AddDynamic(this, &UCPowerCableConnector::onCircuitUpdate);
+}
+
 void UCPowerCableConnector::onConnect(ACCable* cable_)
 {
     Super::onConnect(cable_);
@@ -74,4 +80,27 @@ double UCPowerCableConnector::getWatts()
     if(source != nullptr)
         return source->getWatts();
     return volts * amps;
+}
+
+void UCPowerCableConnector::updateBreaker(ACBreaker *newBreaker, FName circuit)
+{
+    breakerCircuit = circuit;
+    if(newBreaker == breaker)
+    {
+        if(breaker != nullptr)
+            updatePower(120, 20 * breaker->getState(circuit));
+        return;
+    }
+    if(breaker != nullptr)
+        breaker->onCircuitChange.RemoveDynamic(this, &UCPowerCableConnector::onCircuitUpdate);
+    breaker = newBreaker;
+    if(breaker != nullptr)
+        breaker->onCircuitChange.AddDynamic(this, &UCPowerCableConnector::onCircuitUpdate);
+}
+
+void UCPowerCableConnector::onCircuitUpdate(FName circuit, double state)
+{
+    if(circuit != breakerCircuit)
+        return;
+    updatePower(120, 20 * state);
 }

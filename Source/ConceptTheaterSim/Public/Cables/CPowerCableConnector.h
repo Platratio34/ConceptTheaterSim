@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Cables/CCableConnector.h"
+#include "Power/CBreaker.h"
 #include "CPowerCableConnector.generated.h"
 
 UDELEGATE(BlueprintCallable, BlueprintAuthorityOnly)
@@ -30,6 +31,9 @@ protected:
         connector = connectorObject;
         through = throughConnector;
     }
+    
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
 
 public:
 
@@ -70,6 +74,15 @@ public:
     UPROPERTY(BlueprintAssignable, VisibleAnywhere, Category="Power")
     FOnPowerChange onPowerChange;
 
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Power")
+    ACBreaker *breaker;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Power")
+    FName breakerCircuit;
+
+    UFUNCTION(BlueprintCallable)
+    void updateBreaker(ACBreaker *newBreaker, FName circuit);
+
 protected:
     UFUNCTION()
     void updateSource(UCPowerCableConnector* source_);
@@ -81,5 +94,6 @@ protected:
     double amps;
 
 private:
-    
+    UFUNCTION()
+    void onCircuitUpdate(FName circuit, double state);
 };
