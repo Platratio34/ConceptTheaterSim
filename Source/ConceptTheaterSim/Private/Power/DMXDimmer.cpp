@@ -37,15 +37,23 @@ void ADMXDimmer::Tick(float DeltaTime)
     if(networkCard->hasChanged(config->universe))
     {
         networkCard->clearChanged(config->universe);
-        TArray<int> u = networkCard->getData(config->universe);
-        for(const TPair<FName, FBreakerCircuitConfig> &pair : config->circuits)
-        {
-            FBreakerCircuitConfig cConfig = pair.Value;
-            if(cConfig.constantPower)
-                continue;
-            int dmxV = u[cConfig.address];
-            double nState = 255.0 / dmxV;
-            setState(pair.Key, nState * nState);
-        }
+        updateDMX(networkCard->getData(config->universe));
+    }
+}
+
+void ADMXDimmer::updateDMX(TArray<int> data)
+{
+    for(const TPair<FName, FBreakerCircuitConfig> &pair : config->circuits)
+    {
+        FBreakerCircuitConfig cConfig = pair.Value;
+        if(cConfig.constantPower)
+            continue;
+        int dmxV = data[cConfig.address-1];
+        double nState = dmxV / 255.0;
+        if(nState > 1)
+            nState = 1;
+        if(nState < 0)
+            nState = 0;
+        setState(pair.Key, nState * nState);
     }
 }

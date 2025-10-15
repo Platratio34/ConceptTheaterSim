@@ -37,23 +37,27 @@ void ADMXRelay::Tick(float DeltaTime)
     if(networkCard->hasChanged(config->universe))
     {
         networkCard->clearChanged(config->universe);
-        TArray<int> u = networkCard->getData(config->universe);
-        for(const TPair<FName, FBreakerCircuitConfig> &pair : config->circuits)
+        updateDMX(networkCard->getData(config->universe));
+        
+    }
+}
+void ADMXRelay::updateDMX(TArray<int> data)
+{
+    for(const TPair<FName, FBreakerCircuitConfig> &pair : config->circuits)
+    {
+        FBreakerCircuitConfig cConfig = pair.Value;
+        if(cConfig.constantPower)
+            continue;
+        int dmxV = data[cConfig.address-1];
+        double cState = dmxV > 127 ? 1 : 0;
+        if(double* p = state.Find(pair.Key))
         {
-            FBreakerCircuitConfig cConfig = pair.Value;
-            if(cConfig.constantPower)
-                continue;
-            int dmxV = u[cConfig.address];
-            double cState = dmxV > 127 ? 1 : 0;
-            if(double* p = state.Find(pair.Key))
-            {
-                if(cState != (*p))
-                    setState(pair.Key, cState);
-            }
-            else
-            {
+            if(cState != (*p))
                 setState(pair.Key, cState);
-            }
+        }
+        else
+        {
+            setState(pair.Key, cState);
         }
     }
 }

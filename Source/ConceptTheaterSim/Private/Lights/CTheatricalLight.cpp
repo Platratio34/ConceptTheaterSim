@@ -136,6 +136,14 @@ void ACTheatricalLight::setIntensity(double newIntensity)
         newIntensity = 1;
     intensity = newIntensity;
     actualIntensity = intensity * getIntensityScale() * getPower();
+    if(actualIntensity > 1)
+    {
+        actualIntensity = 1;
+    }
+    else if(actualIntensity < 0)
+    {
+        actualIntensity = 0;
+    }
     if(intensityCurve != nullptr)
         actualIntensity = intensityCurve->GetFloatValue(actualIntensity);
     if(light != nullptr && !dummy)
