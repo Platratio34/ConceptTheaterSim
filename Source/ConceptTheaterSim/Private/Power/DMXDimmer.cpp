@@ -21,6 +21,7 @@ void ADMXDimmer::OnConstruction(const FTransform &Transform)
     if(config != nullptr)
         networkCard->addUniverse(config->universe);
     switched = false;
+    lData.Init(-1, 512);
 }
 
 void ADMXDimmer::BeginPlay()
@@ -48,7 +49,12 @@ void ADMXDimmer::updateDMX(TArray<int> data)
         FBreakerCircuitConfig cConfig = pair.Value;
         if(cConfig.constantPower)
             continue;
-        int dmxV = data[cConfig.address-1];
+        int addr = cConfig.address - 1;
+        int lDmxV = lData[addr];
+        int dmxV = data[addr];
+        lData[addr] = dmxV;
+        if(dmxV == lDmxV)
+            continue;
         double nState = dmxV / 255.0;
         if(nState > 1)
             nState = 1;

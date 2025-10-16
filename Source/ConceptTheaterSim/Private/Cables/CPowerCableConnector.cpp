@@ -95,7 +95,10 @@ void UCPowerCableConnector::updateBreaker(ACBreaker *newBreaker, FName circuit)
         breaker->onCircuitChange.RemoveDynamic(this, &UCPowerCableConnector::onCircuitUpdate);
     breaker = newBreaker;
     if(breaker != nullptr)
+    {
         breaker->onCircuitChange.AddDynamic(this, &UCPowerCableConnector::onCircuitUpdate);
+        updatePower(120, 20 * breaker->getState(circuit));
+    }
 }
 
 void UCPowerCableConnector::onCircuitUpdate(FName circuit, double state)

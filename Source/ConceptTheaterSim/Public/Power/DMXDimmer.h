@@ -34,5 +34,6 @@ protected:
     UDMXNetworkCard* networkCard;
 
 private:
-
+    UPROPERTY()
+    TArray<int> lData;
 };

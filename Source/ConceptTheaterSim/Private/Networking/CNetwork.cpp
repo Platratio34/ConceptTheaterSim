@@ -176,6 +176,8 @@ void ACNetwork::multicastSubscribe(int address, UNetworkCard *subscriber)
 {
     for(UMulticastTargetSet *set : multicastSets)
     {
+        if(set == nullptr)
+            continue;
         if (set->address == address)
         {
             set->addSubscriber(subscriber);
