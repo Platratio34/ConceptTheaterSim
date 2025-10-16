@@ -83,6 +83,8 @@ void ACNetwork::sendPacketInt(FNetworkPacket packet, bool fromUpstream)
         bool broadcast = dest == -1 || dest == localBroadcast;
         for(auto& card : cards)
         {
+            if(card == nullptr)
+                continue;
             if(broadcast || dest == card->getIP())
             {
                 card->onPacket(packet);
@@ -92,6 +94,8 @@ void ACNetwork::sendPacketInt(FNetworkPacket packet, bool fromUpstream)
     else if ((dest & 0xF0000000) == 0xE0000000) // multicast
     {
         onPacketOut.Broadcast(packet);
+        multicastSets.RemoveAll([](const auto *el)
+                                { return el == nullptr; });
         for (UMulticastTargetSet *set : multicastSets)
         {
             if (set->address == dest)
@@ -174,10 +178,10 @@ void ACNetwork::clearUpstream()
 
 void ACNetwork::multicastSubscribe(int address, UNetworkCard *subscriber)
 {
+    multicastSets.RemoveAll([](const auto *el)
+                            { return el == nullptr; });
     for(UMulticastTargetSet *set : multicastSets)
     {
-        if(set == nullptr)
-            continue;
         if (set->address == address)
         {
             set->addSubscriber(subscriber);
@@ -192,6 +196,8 @@ void ACNetwork::multicastSubscribe(int address, UNetworkCard *subscriber)
 
 void ACNetwork::multicastUnSubscribe(int address, UNetworkCard *subscriber)
 {
+    multicastSets.RemoveAll([](const auto *el)
+                            { return el == nullptr; });
     for (UMulticastTargetSet *set : multicastSets)
     {
         if (set->address == address)
@@ -209,6 +215,8 @@ void ACNetwork::disconnect(UNetworkCard *card) {
     cards.Remove(card);
     for (UMulticastTargetSet *set : multicastSets)
     {
+        if(set == nullptr)
+            continue;
         set->removeSubscriber(card);
     }
 }
@@ -234,6 +242,8 @@ void UMulticastTargetSet::removeSubscriber(UNetworkCard *subscriber)
 }
 
 void UMulticastTargetSet::sendPacket(FNetworkPacket packet) {
+    subscribers.RemoveAll([](const auto *el)
+                            { return el == nullptr; });
     for (UNetworkCard *subscriber : subscribers)
     {
         subscriber->onPacket(packet);
