@@ -33,3 +33,9 @@ void ACIntelligentLightRect::onLightUpdate()
     rectLight->SetIntensity(actualIntensity * maxIntensity);
     rectLight->SetLightColor(color);
 }
+
+void ACIntelligentLightRect::updateCull(FName volume, bool active)
+{
+    if(rectLight != nullptr)
+        rectLight->SetVisibility(active);
+}

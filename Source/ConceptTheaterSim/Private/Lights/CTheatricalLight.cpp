@@ -98,6 +98,12 @@ void ACTheatricalLight::BeginPlay()
     }
     if(dummy && light != nullptr)
         light->SetIntensity(0);
+    if(cullVolume.IsValid())
+    {
+        ACCullVolume *v = cullVolume.Get();
+        if(v)
+            v->onActiveChange.AddDynamic(this, &ACTheatricalLight::updateCull);
+    }
 }
 
 // Called every frame
@@ -296,4 +302,10 @@ void ACTheatricalLight::setGoboRotation(double newGoboRotation)
 double ACTheatricalLight::getPower()
 {
     return powerInput->getWatts() / requiredPower;
+}
+
+void ACTheatricalLight::updateCull(FName volume, bool active)
+{
+    if(light != nullptr)
+        light->SetVisibility(active);
 }

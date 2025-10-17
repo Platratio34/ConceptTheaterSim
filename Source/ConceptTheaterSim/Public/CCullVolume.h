@@ -40,6 +40,9 @@ public:
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly)
     bool disabled;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly)
+    bool oneDirection;
 };
 
 UCLASS(BlueprintType)
@@ -63,14 +66,23 @@ public:
 
     void OnConstruction(const FTransform &Transform) override;
     
-    UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "Cull Volume")
+    UPROPERTY(EditInstanceOnly, BlueprintReadWrite, Category = "Cull Volume")
     FName name;
     
-    UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "Cull Volume")
+    UPROPERTY(EditInstanceOnly, BlueprintReadWrite, Category = "Cull Volume")
     TArray<ACCullVolume*> subVolumes;
 
-    UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "Cull Volume")
+    UPROPERTY(EditInstanceOnly, BlueprintReadWrite, Category = "Cull Volume")
     TArray<FCCullVolumeConnection> connections;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cull Volume")
+    bool requireSky = false;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cull Volume")
+    FVector boxSize = FVector(120, 120, 120);
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Cull Volume")
+    bool outOnly = false;
 
     UFUNCTION(BlueprintCallable)
     bool isActive()
@@ -81,16 +93,16 @@ public:
     UPROPERTY(VisibleInstanceOnly, BlueprintAssignable, Category="Cull Volume")
     FOnCullVolumeChange onActiveChange;
 
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Cull Volume Mesh")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cull Volume Mesh")
     UStaticMesh *volumeMesh;
 
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Cull Volume Mesh")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cull Volume Mesh")
     FVector meshOffset;
 
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Cull Volume Mesh")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cull Volume Mesh")
     bool meshVisibleInEditor;
 
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Cull Volume Mesh")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cull Volume Mesh")
     FVector checkOffset = FVector(0, 0, 2000);
 
 protected:
@@ -121,7 +133,7 @@ protected:
     void setConnectionIn(FName other, bool connectionActive);
 
     UFUNCTION()
-    void updateArrows();
+    void updateArrows(bool notify);
 
     UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "Cull Volume")
     bool hasPawn = false;
@@ -140,7 +152,7 @@ protected:
     UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "Cull Volume", AdvancedDisplay)
     TSet<FName> activeConnectionsOut;
 
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Debug")
+    UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category="Debug")
     TMap<FName, UArrowComponent*> arrows;
 
 private:

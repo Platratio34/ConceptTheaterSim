@@ -24,6 +24,8 @@ protected:
 
     virtual void onLightUpdate() override;
 
+    virtual void updateCull(FName volume, bool active) override;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

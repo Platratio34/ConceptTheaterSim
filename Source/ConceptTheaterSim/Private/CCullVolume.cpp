@@ -4,6 +4,7 @@
 #include "GameFramework/Pawn.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "CVisibilityBlocker.h"
 
 ACCullVolume::ACCullVolume()
@@ -29,12 +30,14 @@ void ACCullVolume::OnConstruction(const FTransform &Transform)
     {
         meshCollider->SetVisibility(meshVisibleInEditor);
         meshCollider->SetStaticMesh(volumeMesh);
+        meshCollider->SetRelativeLocation(meshOffset*2.54);
     }
     else
     {
         meshCollider->SetVisibility(false);
+        collider->SetBoxExtent(boxSize * 2.54 * 0.5);
     }
-    updateArrows();
+    updateArrows(true);
 }
 
 void ACCullVolume::BeginPlay()
@@ -62,7 +65,7 @@ void ACCullVolume::Tick(float DeltaTime)
         {
             for(FCCullVolumeConnection connection : connections)
             {
-                if(!connection.other)
+                if(!connection.other || connection.disabled)
                     continue;
                 connection.other->setConnectionIn(name, false);
             }
@@ -73,6 +76,8 @@ void ACCullVolume::Tick(float DeltaTime)
     {
         for(FCCullVolumeConnection connection : connections)
         {
+            if(connection.disabled)
+                continue;
             updateConnection(connection);
         }
     }
@@ -132,6 +137,17 @@ bool ACCullVolume::updateHasPawn()
             FHitResult hit2;
             n = meshCollider->LineTraceComponent(hit2, loc, bottom, queryParams);
         }
+    }
+    if(n && requireSky) // only check sky if we *could* be in the volume
+    {
+        APawn* playerPawn = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
+        FVector loc = playerPawn->GetActorLocation();
+        FVector top = loc + checkOffset;
+        FCollisionQueryParams queryParams;
+        queryParams.AddIgnoredActor(playerPawn);
+        FHitResult hit;
+        bool sky = GetWorld()->LineTraceSingleByChannel(hit, loc, top, ECollisionChannel::ECC_Visibility, queryParams);
+        n &= sky;
     }
     if(n == hasPawn) // No change in overall state
         return false;
@@ -215,15 +231,21 @@ void ACCullVolume::updateConnection(FCCullVolumeConnection connection)
     }
 }
 
-void ACCullVolume::updateArrows()
+void ACCullVolume::updateArrows(bool notify)
 {
     TSet<FName> usedArrows;
+    FVector sPos = GetActorLocation();
     for(FCCullVolumeConnection connection : connections)
     {
         ACCullVolume *other = connection.other;
         if(!other)
             continue;
         FName otherName = other->name;
+        if(usedArrows.Contains(otherName))
+        {
+            UE_LOG(LogTemp, Warning, TEXT("Duplicate connection to %s from %s"), *(otherName.ToString()), *(name.ToString()));
+            continue;
+        }
         usedArrows.Add(otherName);
         UArrowComponent *arrow = nullptr;
         if(UArrowComponent** p = arrows.Find(otherName))
@@ -236,9 +258,8 @@ void ACCullVolume::updateArrows()
             arrows.Add(otherName, arrow);
         }
         FVector endPos = other->GetActorLocation();
-        endPos = GetActorTransform().TransformPosition(endPos);
-        arrow->SetWorldRotation(UKismetMathLibrary::FindLookAtRotation(FVector(), endPos));
-        double len = endPos.Size();
+        arrow->SetWorldRotation(UKismetMathLibrary::FindLookAtRotation(sPos, endPos));
+        double len = (endPos - sPos).Size();
         if(connection.disabled)
         {
             arrow->SetArrowColor(FLinearColor(0.1, 0.1, 0.1, 1.0));
@@ -246,20 +267,25 @@ void ACCullVolume::updateArrows()
         }
         else 
         {
-            bool hasSelf = true;
-            for(FCCullVolumeConnection con2 : other->connections)
-            {
-                if(con2.other != this)
-                    continue;
-                hasSelf = true;
-                break;
-            }
-            arrow->ArrowLength = hasSelf ? (len * 0.5) : (len - 15);
+            bool oneDir = connection.oneDirection || outOnly;
+            bool hasSelf = oneDir;
             if(!hasSelf)
             {
-                arrow->SetArrowColor(FLinearColor(1.0, 0.1, 0.1, 1.0));
+                for(FCCullVolumeConnection con2 : other->connections)
+                {
+                    if(con2.other != this)
+                        continue;
+                    hasSelf = true;
+                    break;
+                }
             }
-            else if(connection.blockers.Num() > 0)
+            bool isConditional = connection.blockers.Num() > 0;
+            arrow->ArrowLength = (hasSelf && !oneDir) ? (len * 0.5) : (len - 15);
+            if(!hasSelf)
+            {
+                arrow->SetArrowColor(FLinearColor(1.0, 0.1, isConditional ? 0.3 : 0.1, 1.0));
+            }
+            else if(isConditional)
             {
                 arrow->SetArrowColor(FLinearColor(0.1, 0.1, 1.0, 1.0));
             }
@@ -267,6 +293,10 @@ void ACCullVolume::updateArrows()
             {
                 arrow->SetArrowColor(FLinearColor(0.1, 1.0, 0.1, 1.0));
             }
+        }
+        if(notify)
+        {
+            other->updateArrows(false);
         }
     }
     for(ACCullVolume* sub : subVolumes)
@@ -286,10 +316,10 @@ void ACCullVolume::updateArrows()
             arrows.Add(otherName, arrow);
         }
         FVector endPos = sub->GetActorLocation();
-        endPos = GetActorTransform().TransformPosition(endPos);
-        arrow->SetWorldRotation(UKismetMathLibrary::FindLookAtRotation(FVector(), endPos));
+        arrow->SetWorldLocation(endPos);
+        arrow->SetWorldRotation(UKismetMathLibrary::FindLookAtRotation(endPos, sPos));
         arrow->SetArrowColor(FLinearColor(0.75, 0.75, 0.75, 1.0));
-        arrow->ArrowLength = endPos.Size();
+        arrow->ArrowLength = (endPos - sPos).Size() - 15;
     }
     TArray<FName> arrowsToRemove;
     for(TPair<FName, UArrowComponent*> pair : arrows)

@@ -7,6 +7,7 @@
 #include "GameFramework/Actor.h"
 #include "Components/SpotLightComponent.h"
 #include "Cables/CPowerCableConnector.h"
+#include "CCullVolume.h"
 #include "CTheatricalLight.generated.h"
 
 const double DEG_TO_RAD = 3.14592653589793 / 180;
@@ -155,6 +156,10 @@ public:
     UFUNCTION(BlueprintCallable)
     void setShutterFrame(double position);
 
+    UPROPERTY(EditInstanceOnly, Category="Cull")
+    TSoftObjectPtr<ACCullVolume> cullVolume = nullptr;
+
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -191,6 +196,9 @@ protected:
 
     UPROPERTY()
     double actualIntensity = 0;
+
+    UFUNCTION()
+    virtual void updateCull(FName volume, bool active);
 
 private:
     virtual double getIntensityScale_Implementation() { return 1; }
