@@ -50,8 +50,23 @@ void ACTheatricalLight::OnConstruction(const FTransform &Transform)
     {
         lightFunctionInstance = nullptr;
     }
+    activeLightFunction = lightFunctionInstance;
+    if(lightFunctionNoGobo != nullptr)
+    {
+        lightFunctionNGInstance = UMaterialInstanceDynamic::Create(lightFunctionNoGobo, this);
+        if(gobo == nullptr)
+            activeLightFunction = lightFunctionNGInstance;
+    }
+    else
+    {
+        lightFunctionNGInstance = nullptr;
+        if(gobo == nullptr)
+            activeLightFunction = lightFunctionInstance;
+    }
     if(light != nullptr)
-        light->SetLightFunctionMaterial(lightFunctionInstance);
+    {
+        light->SetLightFunctionMaterial(activeLightFunction);
+    }
 
     if(focusMode)
     {
@@ -79,11 +94,13 @@ void ACTheatricalLight::OnConstruction(const FTransform &Transform)
     setZoom(zoom);
     updateShutters();
 
-    setGobo(gobo);
+    UTexture2D *g = gobo;
+    gobo = nullptr;
+    setGobo(g);
     setGoboRotation(goboRotation);
     
-    if(lightFunctionInstance != nullptr)
-        lightFunctionInstance->SetVectorParameterValue(FName("LightPosition"), GetActorLocation());
+    if(activeLightFunction != nullptr)
+        activeLightFunction->SetVectorParameterValue(FName("LightPosition"), GetActorLocation());
     onLightUpdate();
 }
 
@@ -111,8 +128,8 @@ void ACTheatricalLight::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
     
-    if(lightFunctionInstance != nullptr)
-        lightFunctionInstance->SetVectorParameterValue(FName("LightPosition"), GetActorLocation());
+    if(activeLightFunction != nullptr)
+        activeLightFunction->SetVectorParameterValue(FName("LightPosition"), GetActorLocation());
 }
 
 void ACTheatricalLight::setup(UStaticMeshComponent* lenseMesh_)
@@ -130,8 +147,18 @@ void ACTheatricalLight::setup(UStaticMeshComponent* lenseMesh_)
     if(lightFunction != nullptr && (lightFunctionInstance == nullptr || !IsValid(lightFunctionInstance)))
     {
         lightFunctionInstance = UMaterialInstanceDynamic::Create(lightFunction, this);
+        activeLightFunction = lightFunctionInstance;
     }
-    light->SetLightFunctionMaterial(lightFunctionInstance);
+    if(gobo == nullptr && lightFunctionNoGobo != nullptr && (lightFunctionNGInstance == nullptr || !IsValid(lightFunctionNGInstance)))
+    {
+        lightFunctionNGInstance = UMaterialInstanceDynamic::Create(lightFunctionNoGobo, this);
+        activeLightFunction = lightFunctionNGInstance;
+    }
+    else if(lightFunctionNGInstance != nullptr && gobo == nullptr)
+    {
+        activeLightFunction = lightFunctionNGInstance;
+    }
+    light->SetLightFunctionMaterial(activeLightFunction);
 }
 
 void ACTheatricalLight::setIntensity(double newIntensity)
@@ -214,8 +241,8 @@ void ACTheatricalLight::updateBeam()
     {
         if(light != nullptr)
             light->SetInnerConeAngle(zoom * 0.5);
-        if(lightFunctionInstance != nullptr)
-            lightFunctionInstance->SetScalarParameterValue(FName("Focus"), edge);
+        if(activeLightFunction != nullptr)
+            activeLightFunction->SetScalarParameterValue(FName("Focus"), edge);
     }
     onLightUpdate();
 }
@@ -228,8 +255,11 @@ void ACTheatricalLight::setShutter(int index, FShutterPosition position)
     FName posNames[4] = {FName("Shutter A In"), FName("Shutter B In"), FName("Shutter C In"), FName("Shutter D In")};
     FName angleOffNames[4] = {FName("Shutter A AngleOff"), FName("Shutter B AngleOff"), FName("Shutter C AngleOff"), FName("Shutter D AngleOff")};
     
-    lightFunctionInstance->SetScalarParameterValue(posNames[index], position.position);
-    lightFunctionInstance->SetScalarParameterValue(angleOffNames[index], position.angleOffset);
+    if(activeLightFunction != nullptr)
+    {
+        activeLightFunction->SetScalarParameterValue(posNames[index], position.position);
+        activeLightFunction->SetScalarParameterValue(angleOffNames[index], position.angleOffset);
+    }
     if(USceneComponent** p = shutterHandles.Find(index))
     {
         USceneComponent *handle = *p;
@@ -240,15 +270,15 @@ void ACTheatricalLight::setShutter(int index, FShutterPosition position)
 
 void ACTheatricalLight::updateShutters()
 {
-    if(lightFunctionInstance == nullptr)
+    if(activeLightFunction == nullptr)
         return;
 
     FName posNames[4] = {FName("Shutter A In"), FName("Shutter B In"), FName("Shutter C In"), FName("Shutter D In")};
     FName angleOffNames[4] = {FName("Shutter A AngleOff"), FName("Shutter B AngleOff"), FName("Shutter C AngleOff"), FName("Shutter D AngleOff")};
     for (int i = 0; i < 4; i++)
     {
-        lightFunctionInstance->SetScalarParameterValue(posNames[i], shutterPositions[i].position);
-        lightFunctionInstance->SetScalarParameterValue(angleOffNames[i], shutterPositions[i].angleOffset);
+        activeLightFunction->SetScalarParameterValue(posNames[i], shutterPositions[i].position);
+        activeLightFunction->SetScalarParameterValue(angleOffNames[i], shutterPositions[i].angleOffset);
         if(USceneComponent** p = shutterHandles.Find(i))
         {
             USceneComponent *handle = *p;
@@ -261,9 +291,9 @@ void ACTheatricalLight::updateShutters()
 void ACTheatricalLight::setShutterFrame(double position)
 {
     shutterFrame = position;
-    if(lightFunctionInstance == nullptr)
+    if(activeLightFunction == nullptr)
         return;
-    lightFunctionInstance->SetScalarParameterValue(FName("Frame Rotate"), position);
+    activeLightFunction->SetScalarParameterValue(FName("Frame Rotate"), position);
 }
 
 void ACTheatricalLight::addShutterHandle(int index, UStaticMeshComponent* handle)
@@ -275,17 +305,43 @@ void ACTheatricalLight::addShutterHandle(int index, UStaticMeshComponent* handle
 
 void ACTheatricalLight::setGobo(UTexture2D* newGobo)
 {
+    if(gobo == newGobo) // no need to update
+        return;
     gobo = newGobo;
-    if(lightFunctionInstance == nullptr)
+    if(lightFunctionInstance == nullptr || light == nullptr)
         return;
 
     if(gobo == nullptr)
     {
-        lightFunctionInstance->SetScalarParameterValue(FName("Gobo Active"), 0);
+        if(lightFunctionNGInstance != nullptr)
+        {
+            activeLightFunction = lightFunctionNGInstance;
+            light->SetLightFunctionMaterial(activeLightFunction);
+            updateShutters();
+            updateBeam();
+            activeLightFunction->SetScalarParameterValue(FName("Gobo Rotation"), goboRotation);
+            activeLightFunction->SetScalarParameterValue(FName("Frame Rotate"), shutterFrame);
+        }
+        else
+        {
+            lightFunctionInstance->SetScalarParameterValue(FName("Gobo Active"), 0);
+        }
     }
     else
     {
-        lightFunctionInstance->SetScalarParameterValue(FName("Gobo Active"), 1);
+        if(lightFunctionNGInstance != nullptr)
+        {
+            activeLightFunction = lightFunctionInstance;
+            light->SetLightFunctionMaterial(activeLightFunction);
+            updateShutters();
+            updateBeam();
+            activeLightFunction->SetScalarParameterValue(FName("Gobo Rotation"), goboRotation);
+            activeLightFunction->SetScalarParameterValue(FName("Frame Rotate"), shutterFrame);
+        }
+        else
+        {
+            lightFunctionInstance->SetScalarParameterValue(FName("Gobo Active"), 1);
+        }
         lightFunctionInstance->SetTextureParameterValue(FName("Gobo"), gobo);
     }
 }
@@ -293,10 +349,10 @@ void ACTheatricalLight::setGobo(UTexture2D* newGobo)
 void ACTheatricalLight::setGoboRotation(double newGoboRotation)
 {
     goboRotation = newGoboRotation;
-    if(lightFunctionInstance == nullptr)
+    if(activeLightFunction == nullptr)
         return;
 
-    lightFunctionInstance->SetScalarParameterValue(FName("Gobo Rotation"), goboRotation);
+    activeLightFunction->SetScalarParameterValue(FName("Gobo Rotation"), goboRotation);
 }
 
 double ACTheatricalLight::getPower()

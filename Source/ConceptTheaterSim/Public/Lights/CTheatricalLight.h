@@ -68,9 +68,17 @@ public:
 
     UPROPERTY(EditDefaultsOnly, Category="Light")
     UMaterialInterface* lightFunction = nullptr;
+    UPROPERTY(EditDefaultsOnly, Category="Light")
+    UMaterialInterface* lightFunctionNoGobo = nullptr;
 
     UPROPERTY(VisibleInstanceOnly, Category="Light")
     UMaterialInstanceDynamic *lightFunctionInstance = nullptr;
+
+    UPROPERTY(VisibleInstanceOnly, Category="Light")
+    UMaterialInstanceDynamic *lightFunctionNGInstance = nullptr;
+
+    UPROPERTY(VisibleInstanceOnly, Category="Light")
+    UMaterialInstanceDynamic *activeLightFunction = nullptr;
 
     UPROPERTY(EditAnywhere, Category="Light")
     bool dummy = false;
