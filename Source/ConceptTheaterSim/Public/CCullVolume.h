@@ -159,4 +159,10 @@ private:
     UPROPERTY()
     bool activeConnectionsInDirty = false;
 
+    UPROPERTY()
+    bool skippedTick = false;
+
+    UPROPERTY()
+    bool firstTick = true;
+
 };

@@ -6,6 +6,9 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "CVisibilityBlocker.h"
+#include "Engine/Engine.h"
+
+// #define DEBUG_PRINT
 
 ACCullVolume::ACCullVolume()
 {
@@ -58,11 +61,27 @@ void ACCullVolume::BeginPlay()
 void ACCullVolume::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
-
+    if(firstTick)
+    {
+        TArray<AActor*> overlappingActors;
+        collider->GetOverlappingActors(overlappingActors);
+        for(AActor* actor : overlappingActors)
+        {
+            if(Cast<APawn>(actor))
+            {
+                pawnInBox = true;
+                break;
+            }
+        }
+    }
     if(updateHasPawn()) // if we've updated this:
     {
         if(!hasPawn) // de-activate all outbound connections if we no longer have the pawn
         {
+            #ifdef DEBUG_PRINT
+            if(GEngine)
+                GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("Exiting %s"), *(name.ToString())));
+            #endif
             for(FCCullVolumeConnection connection : connections)
             {
                 if(!connection.other || connection.disabled)
@@ -70,6 +89,13 @@ void ACCullVolume::Tick(float DeltaTime)
                 connection.other->setConnectionIn(name, false);
             }
             activeConnectionsOut.Empty();
+        }
+        else
+        {
+            #ifdef DEBUG_PRINT
+            if(GEngine)
+                GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("Entering %s"), *(name.ToString())));
+            #endif
         }
     }
     if(hasPawn) // else update all outbound connections
@@ -81,7 +107,12 @@ void ACCullVolume::Tick(float DeltaTime)
             updateConnection(connection);
         }
     }
-    updateActive(); // finally update our active status
+    if(!updateActive() && firstTick) // finally update our active status
+    {
+        // just this once, make sure we broadcast the active state even if it didn't change
+        onActiveChange.Broadcast(name, active);
+    }
+    firstTick = false;
 }
 
 void ACCullVolume::onBeginBoxOverlap(UPrimitiveComponent *OverlappedComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult)
@@ -122,9 +153,9 @@ bool ACCullVolume::updateHasPawn()
             }
         }
     }
-    if(volumeMesh && !n) // We have a volume mesh, and we don't yet know the pawn *is* in the volume, so we have to do line traces
+    if((volumeMesh != nullptr) && !n) // We have a volume mesh, and we don't yet know the pawn *is* in the volume, so we have to do line traces
     {
-        // might make sense of cache the pawn? But what if it changes?
+        // might make sense to cache the pawn? But what if it changes?
         // TODO: Also probably should do something to get local pawn/camera rather than P0, but that is a future Peter problem
         APawn* PlayerPawn = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
         FVector loc = PlayerPawn->GetActorLocation();
@@ -162,28 +193,61 @@ bool ACCullVolume::updateActive()
     {
         if(activeConnectionsInDirty) // If the incoming connections have changed since last time we checked
         {
+            bool wasActive = connectionInActive;
             connectionInActive = !activeConnectionsIn.IsEmpty();
-            activeConnectionsInDirty = false;
+            if(!connectionInActive && wasActive) // going from active to non-active
+            {
+                if(!skippedTick) // we skip a tick to prevent flashing
+                {
+                    skippedTick = true;
+                    connectionInActive = false;
+                }
+                else // we skipped the tick, so clear everything
+                {
+                    activeConnectionsInDirty = false;
+                    skippedTick = false;
+                }
+            }
+            else // Otherwise, we can clear the dirty flag now
+            {
+                activeConnectionsInDirty = false;
+            }
         }
         a |= connectionInActive;
     }
     if(a == active) // No change in overall state
         return false;
-    onActiveChange.Broadcast(name, active);
     active = a;
+    onActiveChange.Broadcast(name, active);
+    #ifdef DEBUG_PRINT
+    if(GEngine)
+        GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("%s active: %s"), *(name.ToString()), active ? TEXT("True") : TEXT("False")));
+    #endif
     return true;
 }
 
 void ACCullVolume::setConnectionIn(FName other, bool connectionActive)
 {
-    activeConnectionsInDirty = true;
-    if(active)
+    if(connectionActive)
     {
         activeConnectionsIn.Add(other);
+        if (!active) // if we weren't active, update it now
+        {
+            active = true;
+            onActiveChange.Broadcast(name, active);
+            connectionInActive = true;
+            // We aren't marking dirty, 'cause we just updated all that
+            // And just to ensure there are no problems, clear the dirty and skip flags
+            activeConnectionsInDirty = false;
+            skippedTick = false;
+        }
     }
     else
     {
         activeConnectionsIn.Remove(other);
+        // We won't broadcast it here, because it might have just changed where it was being activated from
+        // But we will mark it as dirty to be re-evaluated on the next tick
+        activeConnectionsInDirty = true;
     }
 }
 
@@ -191,31 +255,39 @@ void ACCullVolume::updateConnection(FCCullVolumeConnection connection)
 {
     if(connection.other == nullptr)
         return;
-    bool open = false;
+    bool open = connection.blockers.IsEmpty();
+    FName otherName = connection.other->name;
     for(FCVisiblityBlockerSet set : connection.blockers)
     {
         for(AActor* actor : set.blockers)
         {
-            ICVisibilityBlocker *blocker = Cast<ICVisibilityBlocker>(actor);
-            if(!blocker) // just to prevent issues if a non blocker is added to the connection
+            if(!actor) // just skip nullptrs
+            {
+                UE_LOG(LogTemp, Warning, TEXT("Null blocker in connection from %s to %s"), *(name.ToString()), *(otherName.ToString()));
                 continue;
-            if(blocker->isVisibilityBlocking())
+            }
+            // ICVisibilityBlocker *blocker = Cast<ICVisibilityBlocker>(actor);
+            if(!actor->GetClass()->ImplementsInterface(UCVisibilityBlocker::StaticClass())) // just to prevent issues if a non blocker is added to the connection
+            {
+                UE_LOG(LogTemp, Warning, TEXT("Invalid blocker in connection from %s to %s: %s"), *(name.ToString()), *(otherName.ToString()), *(actor->GetName()));
+                continue;
+            }
+            if(ICVisibilityBlocker::Execute_isVisibilityBlocking(actor)) // if is blocking (aka. is open)
             {
                 if(set.andBlockers) // Early exit if blocking for AND
                     break;
             }
             else if(!set.andBlockers) // Early exit if not blocking for OR
             {
-                open |= true;
+                open = true;
                 break;
             }
         }
-        if(!open)
+        if(open)
             break;
     }
     if(open)
     {
-        FName otherName = connection.other->name;
         if(activeConnectionsOut.Contains(otherName))
             return;
         connection.other->setConnectionIn(name, true);
@@ -223,7 +295,6 @@ void ACCullVolume::updateConnection(FCCullVolumeConnection connection)
     }
     else
     {
-        FName otherName = connection.other->name;
         if(!activeConnectionsOut.Contains(otherName))
             return;
         connection.other->setConnectionIn(name, false);
