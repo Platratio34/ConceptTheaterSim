@@ -177,8 +177,8 @@ bool ACCullVolume::updateHasPawn()
         FCollisionQueryParams queryParams;
         queryParams.AddIgnoredActor(playerPawn);
         FHitResult hit;
-        bool sky = GetWorld()->LineTraceSingleByChannel(hit, loc, top, ECollisionChannel::ECC_Visibility, queryParams);
-        n &= sky;
+        bool blocked = GetWorld()->LineTraceSingleByChannel(hit, loc, top, ECollisionChannel::ECC_Visibility, queryParams);
+        n &= !blocked;
     }
     if(n == hasPawn) // No change in overall state
         return false;
