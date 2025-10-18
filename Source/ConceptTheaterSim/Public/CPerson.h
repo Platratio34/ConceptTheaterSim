@@ -24,6 +24,19 @@ enum class EPersonLegType : uint8
     FEMALE_HEEL_2 UMETA(DisplayName="Female Heel 2")
 };
 
+UENUM(BlueprintType)
+enum class EClothingType : uint8
+{
+    OTHER UMETA(DisplayName="Other"),
+    SHOE UMETA(DisplayName="Shoe"),
+    BOTTOM UMETA(DisplayName="Bottom"),
+    TOP UMETA(DisplayName="Top"),
+    HEAD UMETA(DisplayName="Head"),
+    DRESS UMETA(DisplayName="Dress"),
+    UNDERWEAR UMETA(DisplayName="Underwear (Lower)"),
+    UNDERWEAR_UPPER UMETA(DisplayName="Underwear (Upper)")
+};
+
 UCLASS(BlueprintType)
 class CONCEPTTHEATERSIM_API UPersonClothingAsset : public UPrimaryDataAsset
 {
@@ -33,20 +46,23 @@ public:
     UPROPERTY(EditAnywhere)
     FText displayName;
 
-    UPROPERTY(EditAnywhere)
+    UPROPERTY(EditAnywhere, BlueprintReadOnly)
     TMap<EPersonBodyType, UStaticMesh*> meshes;
 
-    UPROPERTY(EditAnywhere)
+    UPROPERTY(EditAnywhere, BlueprintReadOnly)
     TArray<UMaterialInterface *> defaultMaterials;
 
-    UPROPERTY(EditAnywhere, AdvancedDisplay)
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, AdvancedDisplay)
     TMap<EPersonLegType, UStaticMesh*> legMeshes;
     
-    UPROPERTY(EditAnywhere, AdvancedDisplay)
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, AdvancedDisplay)
     bool hasLegVariants = false;
 
-    UPROPERTY(EditAnywhere, AdvancedDisplay)
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, AdvancedDisplay)
     EPersonLegType requiredLeg = EPersonLegType::NONE;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Metadata")
+    EClothingType clothingType;
 
     UMaterialInterface* getMaterial(int index, TArray<UMaterialInterface*> materialOverrides)
     {
@@ -75,6 +91,8 @@ public:
     UPROPERTY(EditAnywhere)
     TArray<UMaterialInterface*> materialOverrides;
 
+    UPROPERTY(EditAnywhere, BlueprintReadOnly)
+    FName name;
 };
 
 UCLASS(BlueprintType)
@@ -84,39 +102,42 @@ class CONCEPTTHEATERSIM_API ACPerson : public APawn
 
 protected:
 
-    UPROPERTY(EditDefaultsOnly, Category="Body")
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Body")
     float defaultHeight = 66;
 
 public:
 	// Sets default values for this pawn's properties
 	ACPerson();
 
-    UPROPERTY(EditAnywhere, Category="Animation")
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Animation")
     FName name;
 
-    UPROPERTY(EditAnywhere, Category="Animation")
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Animation")
     bool dummy = false;
 
-    UPROPERTY(EditAnywhere, Category="Body")
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Body")
     EPersonBodyType bodyType = EPersonBodyType::MALE;
 
-    UPROPERTY(EditAnywhere, Category="Body")
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Body")
     FLinearColor skinColor = FLinearColor(0.823, 0.597, 0.392, 1.0);
 
-    UPROPERTY(EditInstanceOnly, Category="Body")
+    UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category="Body")
     float height = defaultHeight;
 
-    UPROPERTY(EditAnywhere, Category="Head")
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Head")
     FLinearColor eyeColor = FLinearColor(0.431, 0.816, 0.878, 1.0);
 
-    UPROPERTY(EditAnywhere, Category="Head")
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Head")
     FLinearColor hairColor = FLinearColor(0.072, 0.016, 0.0, 1.0);
 
-    UPROPERTY(EditAnywhere, Category="Head")
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Head")
     int hairType = -1;
 
-    UPROPERTY(EditAnywhere, Category="Clothing")
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Clothing")
     TArray<FPersonClothing> clothing;
+
+    UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category="Clothing")
+    TMap<FName, bool> hiddenClothing;
 
 protected:
 	// Called when the game starts or when spawned
@@ -195,10 +216,10 @@ protected:
     UPROPERTY(BlueprintReadOnly, Category="Components")
     TMap<int, bool> clothingMeshComponentsVisible;
 
-    UPROPERTY(BlueprintReadOnly, Category="Components")
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Components")
     UCAnimationComponent* animationComponent;
 
-    UFUNCTION()
+    UFUNCTION(BlueprintCallable)
     void setVisibility(bool newVisibility);
 
 public:	
@@ -210,35 +231,16 @@ public:
 
     void OnConstruction(const FTransform &Transform) override;
 
+    UFUNCTION(BlueprintCallable)
+    void hideClothing(FName item, bool hidden);
+
 private:
 
+    UFUNCTION()
     void updateMeshes();
+    UFUNCTION()
     void updateHeight();
 
-    EPersonLegType getLegType()
-    {
-        EPersonLegType type = EPersonLegType::FEMALE;
-        for (int i = 0; i < clothing.Num(); i++)
-        {
-            FPersonClothing c = clothing[i];
-            UPersonClothingAsset *asset = c.asset;
-            if(asset == nullptr)
-                continue;
-            if(asset->requiredLeg != EPersonLegType::NONE)
-            {
-                return asset->requiredLeg;
-            }
-        }
-        switch (bodyType)
-        {
-        case EPersonBodyType::MALE:
-            return EPersonLegType::MALE;
-        case EPersonBodyType::FEMALE:
-            return EPersonLegType::FEMALE;
-
-        default:
-            return EPersonLegType::MALE;
-        }
-        
-    }
+    UFUNCTION()
+    EPersonLegType getLegType();
 };

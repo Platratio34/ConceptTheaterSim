@@ -63,6 +63,36 @@ void ACPerson::updateHeight()
     hOffset *= hScale;
     bodyRoot->SetRelativeLocation(FVector(0, 0, hOffset));
 }
+
+EPersonLegType ACPerson::getLegType()
+{
+    EPersonLegType type = EPersonLegType::FEMALE;
+    for (int i = 0; i < clothing.Num(); i++)
+    {
+        FPersonClothing c = clothing[i];
+        if(bool*p = hiddenClothing.Find(c.name)) // skipp hidden clothing items
+            if(*p == true)
+                continue;
+        UPersonClothingAsset *asset = c.asset;
+        if(asset == nullptr)
+            continue;
+        if(asset->requiredLeg != EPersonLegType::NONE)
+        {
+            return asset->requiredLeg;
+        }
+    }
+    switch (bodyType)
+    {
+    case EPersonBodyType::MALE:
+        return EPersonLegType::MALE;
+    case EPersonBodyType::FEMALE:
+        return EPersonLegType::FEMALE;
+
+    default:
+        return EPersonLegType::MALE;
+    }
+}
+
 void ACPerson::updateMeshes()
 {
     if(skinMaterialInstance == nullptr || !IsValid(skinMaterialInstance))
@@ -157,6 +187,9 @@ void ACPerson::updateMeshes()
         FPersonClothing c = clothing[i];
         UPersonClothingAsset* clothingAsset = c.asset;
         UStaticMeshComponent *meshComponent = clothingMeshComponents[i];
+        bool hidden = false;
+        if(bool*p = hiddenClothing.Find(c.name))
+            hidden = *p;
         if(meshComponent == nullptr || !IsValid(meshComponent))
         {
             meshComponent = NewObject<UStaticMeshComponent>(this);
@@ -185,7 +218,7 @@ void ACPerson::updateMeshes()
         if(mesh != nullptr)
         {
             meshComponent->SetStaticMesh(mesh);
-            setMeshVisible(meshComponent, true);
+            setMeshVisible(meshComponent, !hidden);
             clothingMeshComponentsVisible[i] = true;
             for (int index = 0; index < clothingAsset->defaultMaterials.Num(); index++)
             {
@@ -240,7 +273,10 @@ void ACPerson::setVisibility(bool newVisibility)
         setMeshVisible(hairMeshComponent, newVisibility);
     for (int i = 0; i < clothingMeshComponents.Num(); i++)
     {
-        if(clothingMeshComponentsVisible[i])
+        bool hidden = false;
+        if(bool*p = hiddenClothing.Find(clothing[i].name))
+            hidden = *p;
+        if(clothingMeshComponentsVisible[i] && !hidden)
         {
             setMeshVisible(clothingMeshComponents[i], newVisibility);
         }
@@ -255,4 +291,15 @@ void ACPerson::setVisibility(bool newVisibility)
             (Cast<ACPerson>(actor))->setVisibility(newVisibility);
         }
     }
+}
+
+void ACPerson::hideClothing(FName item, bool hidden)
+{
+    if(bool *p = hiddenClothing.Find(item))
+    {
+        if((*p) == hidden) // no change
+            return;
+    }
+    hiddenClothing.Add(item, hidden);
+    updateMeshes();
 }

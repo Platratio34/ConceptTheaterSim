@@ -387,8 +387,13 @@
                 { "time":"00:10:06:00", "duration": 5, "x": -300, "visibility": true },
                 { "time":"00:11:06:15", "duration": 1, "x": -98 },
                 { "time":"00:12:46:15", "duration": 5, "x": -420 },
-                { "time":"00:12:51:15", "visibility": false },
-                { "time":"00:59:30:00", "x": "-30'", "y": "-6'11", "visibility": true },
+                { "time":"00:12:51:15", "visibility": false }
+            ]
+        },
+        "Souls": {
+            "events": [
+                { "time":"00:00:00:01", "duration": 0, "x": "-35'", "y": "-6'11", "z": 0, "xRot": 0, "yRot": 0, "zRot": 0, "parent": "", "visibility": false },
+                { "time":"00:59:30:00", "duration": 5, "x": "-30'", "visibility": true },
                 { "time":"00:59:41:15", "duration": 5, "x": "4'", "y": "-6'11" },
                 { "time":"01:00:46:00", "duration": 5, "y": "-9'0" },
                 { "time":"01:03:25:00", "duration": 4, "x": "-30'", "y": "-19'4" },
