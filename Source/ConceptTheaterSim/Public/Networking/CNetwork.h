@@ -61,9 +61,9 @@ public:
     UFUNCTION(BlueprintCallable)
     void releaseIP(FString hwAddress);
 
-    UFUNCTION(BlueprintCallable)
+    UFUNCTION()
     void connect(UNetworkCard *card);
-    UFUNCTION(BlueprintCallable)
+    UFUNCTION()
     void disconnect(UNetworkCard *card);
 
     UFUNCTION(BlueprintCallable)
@@ -111,4 +111,6 @@ protected:
 
     UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category="Network")
     TArray<UNetworkCard*> cards;
+    UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category="Network")
+    TMap<int, UNetworkCard *> cardsByIP;
 };

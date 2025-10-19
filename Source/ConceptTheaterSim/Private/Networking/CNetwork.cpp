@@ -77,16 +77,39 @@ void ACNetwork::sendPacketInt(FNetworkPacket packet, bool fromUpstream)
     {
         upstream->sendPacketInt(packet, false);
     }
-    else if (packetSubnet == subnet || dest == -1) // in our network, or all network broadcast
+    else if (packetSubnet == subnet || dest == -1 || dest == 0xffffffff) // in our network, or all network broadcast
     {
         onPacketOut.Broadcast(packet);
-        bool broadcast = dest == -1 || dest == localBroadcast;
-        for(auto& card : cards)
+        bool broadcast = dest == -1 || dest == localBroadcast || dest == 0xffffffff;
+        if(!broadcast)
         {
-            if(card == nullptr)
-                continue;
-            if(broadcast || dest == card->getIP())
+            bool sent = false;
+            if (UNetworkCard** p = cardsByIP.Find(dest))
             {
+                UNetworkCard *card = *p;
+                if(card != nullptr)
+                {
+                    card->onPacket(packet);
+                    sent = true;
+                }
+            }
+            if(!sent) // this is a backup, incase the cards-by-IP map is wrong
+            {
+                for(auto& card : cards)
+                {
+                    if(card == nullptr)
+                        continue;
+                    if(card->getIP() == dest)
+                        card->onPacket(packet);
+                }
+            }
+        }
+        else
+        {
+            for(auto& card : cards)
+            {
+                if(card == nullptr)
+                    continue;
                 card->onPacket(packet);
             }
         }
@@ -135,15 +158,18 @@ void ACNetwork::releaseIP(FString hwAddress)
     if(upstreamSameNet && upstream != nullptr)
     {
         upstream->releaseIP(hwAddress);
-        return;
     }
-    assignedAddresses.Remove(hwAddress);
+    else
+    {
+        assignedAddresses.Remove(hwAddress);
+    }
 }
 
 int ACNetwork::getSubnet()
 {
     return subnet;
 }
+
 int ACNetwork::getSubnetMask()
 {
     return subnetMask;
@@ -168,6 +194,7 @@ void ACNetwork::setUpstream(ACNetwork *newUpstream, bool sameNet)
         subnetMask = upstream->subnetMask;
     }
 }
+
 void ACNetwork::clearUpstream()
 {
     if (upstream == nullptr)
@@ -209,8 +236,24 @@ void ACNetwork::multicastUnSubscribe(int address, UNetworkCard *subscriber)
 }
 
 void ACNetwork::connect(UNetworkCard *card) {
+    if(card == nullptr)
+        return;
     cards.AddUnique(card);
+    if(card->getIP() == 0)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("Card %s had no IP address when connecting to network %s"), *(card->getHWAddress()), *GetName());
+        return;
+    }
+    if(cardsByIP.Contains(card->getIP()))
+    {
+        UE_LOG(LogTemp, Warning, TEXT("Duplicate IP address in network %s for card %s. It will not receive unicast messages"), *GetName(), *(card->getHWAddress()));
+    }
+    else
+    {
+        cardsByIP.Add(card->getIP(), card);
+    }
 }
+
 void ACNetwork::disconnect(UNetworkCard *card) {
     cards.Remove(card);
     for (UMulticastTargetSet *set : multicastSets)
@@ -218,6 +261,14 @@ void ACNetwork::disconnect(UNetworkCard *card) {
         if(set == nullptr)
             continue;
         set->removeSubscriber(card);
+    }
+    for(TPair<int, UNetworkCard*> pair : cardsByIP)
+    {
+        if(card == pair.Value)
+        {
+            cardsByIP.Remove(pair.Key);
+            break;
+        }
     }
 }
 

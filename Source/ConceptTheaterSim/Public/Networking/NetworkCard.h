@@ -43,6 +43,9 @@ public:
     UFUNCTION(BlueprintCallable)
     int getIP();
 
+    UFUNCTION(BlueprintCallable)
+    FString getHWAddress();
+
     UPROPERTY(VisibleInstanceOnly, BlueprintAssignable, Category="Network")
     FOnNetworkPacket onNetworkPacket;
 

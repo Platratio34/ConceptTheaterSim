@@ -112,3 +112,7 @@ void UNetworkCard::disconnect() {
 int UNetworkCard::getIP() {
     return address;
 }
+
+FString UNetworkCard::getHWAddress() {
+    return hwAddress;
+}
