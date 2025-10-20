@@ -8,6 +8,7 @@
 #include "NetworkPacketTypes.generated.h"
 
 #define DMX_NETWORK_PACKET "DMX"
+static FName DMX_NETWORK_PACKET_TYPE = FName(DMX_NETWORK_PACKET);
 USTRUCT(BlueprintType)
 struct CONCEPTTHEATERSIM_API FDMXNetworkPacket : public FNetworkPacket
 {
@@ -25,6 +26,7 @@ public:
 };
 
 #define TIMECODE_NETWORK_PACKET "Timecode"
+static FName TIMECODE_NETWORK_PACKET_TYPE = FName(TIMECODE_NETWORK_PACKET);
 USTRUCT(BlueprintType)
 struct CONCEPTTHEATERSIM_API FTimecodeNetworkPacket : public FNetworkPacket
 {

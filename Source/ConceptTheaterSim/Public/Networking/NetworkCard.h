@@ -27,6 +27,9 @@ public:
     UFUNCTION(BlueprintCallable)
     void send(FNetworkPacket packet);
 
+    UFUNCTION(BlueprintCallable)
+    void sendBroadcast(FNetworkPacket packet);
+
     UFUNCTION()
     void onPacket(FNetworkPacket packet);
 

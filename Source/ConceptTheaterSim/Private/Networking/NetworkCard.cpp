@@ -116,3 +116,9 @@ int UNetworkCard::getIP() {
 FString UNetworkCard::getHWAddress() {
     return hwAddress;
 }
+
+void UNetworkCard::sendBroadcast(FNetworkPacket packet)
+{
+    packet.dest = subnet | (~subnetMask);
+    send(packet);
+}
