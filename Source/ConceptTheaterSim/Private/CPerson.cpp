@@ -181,6 +181,17 @@ void ACPerson::updateMeshes()
             clothingMeshComponentsVisible.Add(i, false);
         }
     }
+
+    clothingHides.Empty();
+    for(FPersonClothing c : clothing)
+    {
+        bool hidden = false;
+        if(bool*p = hiddenClothing.Find(c.name))
+            hidden = *p;
+        if(hidden || c.asset == nullptr)
+            continue;
+        clothingHides.Append(c.asset->hides);
+    }
     // then actually update the clothing meshes
     for (int i = 0; i < clothing.Num(); i++)
     {
@@ -198,7 +209,7 @@ void ACPerson::updateMeshes()
             meshComponent->RegisterComponent();
             meshComponent->CreationMethod = EComponentCreationMethod::Instance;
         }
-        if(clothingAsset == nullptr)
+        if(clothingAsset == nullptr || hidden || clothingHides.Contains(clothingAsset))
         {
             setMeshVisible(meshComponent, false);
             clothingMeshComponentsVisible[i] = false;
@@ -218,7 +229,7 @@ void ACPerson::updateMeshes()
         if(mesh != nullptr)
         {
             meshComponent->SetStaticMesh(mesh);
-            setMeshVisible(meshComponent, !hidden);
+            setMeshVisible(meshComponent, true);
             clothingMeshComponentsVisible[i] = true;
             for (int index = 0; index < clothingAsset->defaultMaterials.Num(); index++)
             {
@@ -274,9 +285,7 @@ void ACPerson::setVisibility(bool newVisibility)
     for (int i = 0; i < clothingMeshComponents.Num(); i++)
     {
         bool hidden = false;
-        if(bool*p = hiddenClothing.Find(clothing[i].name))
-            hidden = *p;
-        if(clothingMeshComponentsVisible[i] && !hidden)
+        if(clothingMeshComponentsVisible[i])
         {
             setMeshVisible(clothingMeshComponents[i], newVisibility);
         }

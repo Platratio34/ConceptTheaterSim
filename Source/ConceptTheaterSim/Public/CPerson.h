@@ -43,26 +43,29 @@ class CONCEPTTHEATERSIM_API UPersonClothingAsset : public UPrimaryDataAsset
     GENERATED_BODY()
 
 public:
-    UPROPERTY(EditAnywhere)
+    UPROPERTY(EditAnywhere, Category="Default")
     FText displayName;
 
-    UPROPERTY(EditAnywhere, BlueprintReadOnly)
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Default")
     TMap<EPersonBodyType, UStaticMesh*> meshes;
 
-    UPROPERTY(EditAnywhere, BlueprintReadOnly)
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Default")
     TArray<UMaterialInterface *> defaultMaterials;
 
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, AdvancedDisplay)
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Legs")
     TMap<EPersonLegType, UStaticMesh*> legMeshes;
     
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, AdvancedDisplay)
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Legs")
     bool hasLegVariants = false;
 
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, AdvancedDisplay)
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Legs")
     EPersonLegType requiredLeg = EPersonLegType::NONE;
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Metadata")
     EClothingType clothingType;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Optimization")
+    TSet<UPersonClothingAsset*> hides;
 
     UMaterialInterface* getMaterial(int index, TArray<UMaterialInterface*> materialOverrides)
     {
@@ -215,6 +218,9 @@ protected:
 
     UPROPERTY(BlueprintReadOnly, Category="Components")
     TMap<int, bool> clothingMeshComponentsVisible;
+
+    UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category="Clothing")
+    TSet<UPersonClothingAsset*> clothingHides;
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Components")
     UCAnimationComponent* animationComponent;
