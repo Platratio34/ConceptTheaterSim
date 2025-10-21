@@ -25,13 +25,13 @@ public:
     void setup(int address, FString hwAddress, int subnet_, int subnetMask_);
 
     UFUNCTION(BlueprintCallable)
-    void send(FNetworkPacket packet);
+    void send(UNetworkPacket *packet);
 
     UFUNCTION(BlueprintCallable)
-    void sendBroadcast(FNetworkPacket packet);
+    void sendBroadcast(UNetworkPacket *packet);
 
     UFUNCTION()
-    void onPacket(FNetworkPacket packet);
+    void onPacket(UNetworkPacket *packet);
 
     UFUNCTION(BlueprintCallable)
     void multicastSubscribe(int address);
@@ -75,8 +75,13 @@ protected:
     ACNetwork *network = nullptr;
 
     UFUNCTION()
-    virtual bool onPacketInternal(FNetworkPacket packet) { return false; };
+    virtual bool onPacketInternal(UNetworkPacket *packet) { return false; };
 
     UFUNCTION()
     void connectInternal();
+
+    UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category="Debug")
+    int packetsIn;
+    UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category="Debug")
+    int packetsOut;
 };

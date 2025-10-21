@@ -29,15 +29,15 @@ void ACAutomationProcessor::Tick(float DeltaTime)
     
 }
 
-void ACAutomationProcessor::onNetworkPacket(FNetworkPacket packet)
+void ACAutomationProcessor::onNetworkPacket(UNetworkPacket *packet)
 {
-    if(packet.type == AUTOMATION_NETWORK_PACKET_TYPE)
+    if(packet->type == AUTOMATION_NETWORK_PACKET_TYPE)
     {
-        FAutomationPacket autoPacket = (FAutomationPacket)packet;
-        switch (autoPacket.action)
+        UAutomationPacket *autoPacket = Cast<UAutomationPacket>(packet);
+        switch (autoPacket->action)
         {
         case EAutomationPacketType::PING: // just respond to it immediately
-            networkCard->send(FAutomationPacket::Pong(autoPacket));
+            networkCard->send(UAutomationPacket::Pong(autoPacket));
             break;
         case EAutomationPacketType::PONG:
             // nothing here at the moment
@@ -62,41 +62,41 @@ void ACAutomationProcessor::onNetworkPacket(FNetworkPacket packet)
             break;
 
         case EAutomationPacketType::E_STOP:
-            onEStopPacket((FAutomationEStopPacket)autoPacket);
+            onEStopPacket((UAutomationEStopPacket*)autoPacket);
             break;
         
         default:
             break;
         }
     }
-    else if(packet.type == TIMECODE_NETWORK_PACKET_TYPE)
+    else if(packet->type == TIMECODE_NETWORK_PACKET_TYPE)
     {
-        FTimecodeNetworkPacket timePacket = (FTimecodeNetworkPacket)packet;
-        onTimeUpdate(timePacket.frames, timePacket.seconds, timePacket.running);
+        UTimecodeNetworkPacket *timePacket = Cast<UTimecodeNetworkPacket>(packet);
+        onTimeUpdate(timePacket->frames, timePacket->seconds, timePacket->running);
     }
 }
 
-void ACAutomationProcessor::onEStopPacket(FAutomationEStopPacket packet)
+void ACAutomationProcessor::onEStopPacket(UAutomationEStopPacket *packet)
 {
-    if(packet.request)
+    if(packet->request)
     {
-        FAutomationEStopPacket rsp = FAutomationEStopPacket::EStopSet(eStopSources, eStopActive);
-        rsp.dest = packet.source;
+        UAutomationEStopPacket *rsp = UAutomationEStopPacket::EStopSet(eStopSources, eStopActive);
+        rsp->dest = packet->source;
         networkCard->send(rsp);
         return;
     }
-    if(packet.stopSource == FName("None"))
+    if(packet->stopSource == FName("None"))
     {
         return;
     }
     
-    if(packet.active)
+    if(packet->active)
     {
-        eStopSources.Add(packet.stopSource);
+        eStopSources.Add(packet->stopSource);
     }
     else
     {
-        eStopSources.Remove(packet.stopSource);
+        eStopSources.Remove(packet->stopSource);
     }
     bool newActive = eStopSources.IsEmpty();
     // If wasn't active and isn't being activated, we don't need to broadcast the 'new' state
@@ -105,7 +105,7 @@ void ACAutomationProcessor::onEStopPacket(FAutomationEStopPacket packet)
         return;
     eStopActive = newActive;
     // We are doing a local broadcast here so that non-automation devices can find out about the update
-    networkCard->sendBroadcast(FAutomationEStopPacket::EStopSet(eStopSources, eStopActive));
+    networkCard->sendBroadcast(UAutomationEStopPacket::EStopSet(eStopSources, eStopActive));
 }
 
 void ACAutomationProcessor::onTimeUpdate(int frames, float seconds, bool running)
@@ -121,7 +121,7 @@ void ACAutomationProcessor::sendEvent(FName device, TMap<FName, double> properti
         UE_LOG(AutomationLog, Warning, TEXT("Automation event for device %s, but no IP was known"), *(device.ToString()));
         return;
     }
-    FAutomationEventPacket outPacket = FAutomationEventPacket::Event(properties, duration);
-    outPacket.dest = *p;
+    UAutomationEventPacket *outPacket = UAutomationEventPacket::Event(properties, duration);
+    outPacket->dest = *p;
     networkCard->send(outPacket);
 }

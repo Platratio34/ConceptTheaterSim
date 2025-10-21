@@ -124,6 +124,7 @@ void ADMXPlayback::LoadFile(FString filename) {
     cFrame = frames[0];
     frameIndex = 0;
     loaded = true;
+    sendFramePackets();
     UE_LOG(LogTemp, Display, TEXT("DMX recording loaded (%i universes, %i frames)"), numUniverses, numFrames);
 }
 

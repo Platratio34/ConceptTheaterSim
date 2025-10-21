@@ -638,7 +638,7 @@ FCmdSelection AETCLightBoard::getCmdSelection(int start, int *end)
     return selection;
 }
 
-void AETCLightBoard::onNetworkPacket(FNetworkPacket packet)
+void AETCLightBoard::onNetworkPacket(UNetworkPacket *packet)
 {
 
 }

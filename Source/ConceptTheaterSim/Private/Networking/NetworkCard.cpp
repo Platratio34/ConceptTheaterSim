@@ -36,12 +36,13 @@ void UNetworkCard::setup(int ip, FString hw, int subnet_, int subnetMask_)
     hwAddress = hw;
 }
 
-void UNetworkCard::send(FNetworkPacket packet)
+void UNetworkCard::send(UNetworkPacket *packet)
 {
-    packet.source = address;
+    packet->source = address;
     if(network != nullptr) {
         network->sendPacket(packet);
     }
+    packetsOut++;
 }
 
 void UNetworkCard::multicastSubscribe(int multicastAddress)
@@ -63,16 +64,15 @@ void UNetworkCard::multicastUnSubscribe(int multicastAddress)
     }
 }
 
-void UNetworkCard::onPacket(FNetworkPacket packet)
+void UNetworkCard::onPacket(UNetworkPacket *packet)
 {
-    if(packet.type == FName(TEXT("Ping"))) { // automatically respond to Ping messages and comsume them
-        FNetworkPacket rsp;
-        rsp.dest = packet.source;
-        rsp.source = address;
-        rsp.type = FName(TEXT("Pong"));
+    if(packet->type == FName(TEXT("Ping"))) { // automatically respond to Ping messages and comsume them
+        UNetworkPacket *rsp = UNetworkPacket::createPacket(packet->source, FName(TEXT("Pong")));
+        rsp->source = address;
         send(rsp);
         return;
     }
+    packetsIn++;
     if(!onPacketInternal(packet)) // if the internal function did not consume it send it to listeners
         onNetworkPacket.Broadcast(packet);
 }
@@ -117,8 +117,8 @@ FString UNetworkCard::getHWAddress() {
     return hwAddress;
 }
 
-void UNetworkCard::sendBroadcast(FNetworkPacket packet)
+void UNetworkCard::sendBroadcast(UNetworkPacket *packet)
 {
-    packet.dest = subnet | (~subnetMask);
+    packet->dest = subnet | (~subnetMask);
     send(packet);
 }

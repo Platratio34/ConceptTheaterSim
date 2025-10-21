@@ -5,7 +5,7 @@
 
 UDMXNetworkCard::UDMXNetworkCard() : UNetworkCard()
 {
-    cache = NewObject<UDMXCache>();
+    
 }
 
 UDMXNetworkCard::~UDMXNetworkCard()
@@ -13,16 +13,24 @@ UDMXNetworkCard::~UDMXNetworkCard()
     
 }
 
-bool UDMXNetworkCard::onPacketInternal(FNetworkPacket packet)
+void UDMXNetworkCard::BeginPlay()
 {
-    if(packet.type != DMX_NETWORK_PACKET) {
+	Super::BeginPlay();
+
+    cache = NewObject<UDMXCache>();
+}
+
+
+bool UDMXNetworkCard::onPacketInternal(UNetworkPacket *packet)
+{
+    if(packet->type != DMX_NETWORK_PACKET_TYPE) {
         return false;
     }
-    FDMXNetworkPacket dmxPacket = (FDMXNetworkPacket)packet;
+    UDMXNetworkPacket *dmxPacket = Cast<UDMXNetworkPacket>(packet);
     bool has = false;
     for(auto& universe : activeUniverses)
     {
-        if(dmxPacket.universe == universe)
+        if(dmxPacket->universe == universe)
         {
             has = true;
             break;
@@ -31,8 +39,13 @@ bool UDMXNetworkCard::onPacketInternal(FNetworkPacket packet)
     if(!has)
         return true;
     
-    cache->updateSource(dmxPacket.sourceDevice, dmxPacket.priority, dmxPacket.universe, dmxPacket.dmxData);
-    changedUniverses.Add(dmxPacket.universe, true);
+    if(dmxPacket->dmxData.Num() != 512)
+    {
+        UE_LOG(LogTemp, Error, TEXT("DMX data incorrect size in onPacketInternal: Expected 512 elements, found %d"), dmxPacket->dmxData.Num());
+        return true;
+    }
+    cache->updateSource(dmxPacket->sourceDevice, dmxPacket->priority, dmxPacket->universe, dmxPacket->dmxData);
+    changedUniverses.Add(dmxPacket->universe, true);
 
     return true;
 }
@@ -42,18 +55,12 @@ TArray<int> UDMXNetworkCard::getData(int universe) {
 }
 
 void UDMXNetworkCard::sendData(FName source, int priority, int universe, TArray<int> data) {
-    FDMXNetworkPacket dmxPacket;
-
-    dmxPacket.dest = 0xe0000000 | universe;
-    dmxPacket.type = DMX_NETWORK_PACKET;
-
-    dmxPacket.sourceDevice = source;
-    dmxPacket.priority = priority;
-
-    dmxPacket.universe = universe;
-    dmxPacket.dmxData = data;
-    
-    send(dmxPacket);
+    if(data.Num() != 512)
+    {
+        UE_LOG(LogTemp, Error, TEXT("DMX data incorrect size in sendData: Expected 512 elements, found %d"), data.Num());
+        return;
+    }
+    send(UDMXNetworkPacket::createDMXPacket(source, universe, priority, data));
 }
 
 bool UDMXNetworkCard::hasChanged(int universe)
@@ -75,7 +82,7 @@ void UDMXNetworkCard::addUniverse(int universe)
     if(activeUniverses.Contains(universe))
         return;
     activeUniverses.Add(universe);
-    multicastSubscribe(0xF0000000 + universe);
+    multicastSubscribe(UDMXNetworkPacket::getAddress(universe));
 }
 
 void UDMXNetworkCard::removeUniverse(int universe)
@@ -83,5 +90,5 @@ void UDMXNetworkCard::removeUniverse(int universe)
     if(!activeUniverses.Contains(universe))
         return;
     activeUniverses.Remove(universe);
-    multicastUnSubscribe(0xF0000000 + universe);
+    multicastUnSubscribe(UDMXNetworkPacket::getAddress(universe));
 }

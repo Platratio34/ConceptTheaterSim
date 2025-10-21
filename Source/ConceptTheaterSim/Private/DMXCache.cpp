@@ -3,14 +3,26 @@
 
 #include "DMXCache.h"
 
+UDMXCache::UDMXCache()
+{
+
+}
+UDMXCache::~UDMXCache()
+{
+
+}
 
 bool UDMXCache::updateSource(FName name, int priority, int universe, TArray<int> data) {
     // UE_LOG(LogTemp, Display, TEXT("Updating DMX Net Source: %s"), *(name.ToString()));
     UDMXNetSource *source = nullptr;
     const FName &nPtn = name;
-    if(sources.Contains(name)) {
+    if(auto** p = sources.Find(name))
+    {
+        source = *p;
+    }
+    /*if(sources.Contains(name)) {
         source = *sources.Find(name);
-    } else {
+    }*/ else {
         source = NewObject<UDMXNetSource>();
         sources.Add(name, source);
         source->name = name;

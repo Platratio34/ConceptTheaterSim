@@ -42,10 +42,13 @@ public:
     void removeUniverse(int universe);
 
 protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+
     UPROPERTY(VisibleInstanceOnly, Category="DMX")
     UDMXCache *cache = nullptr;
 
-    virtual bool onPacketInternal(FNetworkPacket packet) override;
+    virtual bool onPacketInternal(UNetworkPacket *packet) override;
 
     UPROPERTY(VisibleInstanceOnly, Category="DMX")
     TMap<int, bool> changedUniverses;

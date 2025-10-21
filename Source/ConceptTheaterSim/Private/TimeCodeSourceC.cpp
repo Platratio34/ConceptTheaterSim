@@ -67,16 +67,5 @@ void ATimeCodeSourceC::sendTimePacket()
 {
     if(networkCard == nullptr)
         return;
-    
-    FTimecodeNetworkPacket packet;
-
-    packet.dest = -1;
-    packet.type = TIMECODE_NETWORK_PACKET;
-
-    packet.timeSource = timeSourceName;
-    packet.frames = frames;
-    packet.seconds = GetSeconds();
-    packet.running = running;
-
-    networkCard->send(packet);
+    networkCard->send(UTimecodeNetworkPacket::createTCPacket(timeSourceName, frames, GetSeconds(), running));
 }

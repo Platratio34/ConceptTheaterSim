@@ -22,8 +22,8 @@ enum class EAutomationPacketType : uint8
     E_STOP UMETA(DisplayName="E-Stop")
 };
 
-USTRUCT(BlueprintType)
-struct CONCEPTTHEATERSIM_API FAutomationPacket : public FNetworkPacket
+UCLASS(BlueprintType)
+class CONCEPTTHEATERSIM_API UAutomationPacket : public UNetworkPacket
 {
     GENERATED_BODY()
 
@@ -31,26 +31,26 @@ public:
     UPROPERTY(BlueprintReadWrite, VisibleAnywhere, Category="Automation")
     EAutomationPacketType action;
 
-    static FAutomationPacket Ping()
+    static UAutomationPacket* Ping()
     {
-        FAutomationPacket packet;
-        packet.type = AUTOMATION_NETWORK_PACKET_TYPE;
-        packet.action = EAutomationPacketType::PING;
+        UAutomationPacket* packet = NewObject<UAutomationPacket>();
+        packet->type = AUTOMATION_NETWORK_PACKET_TYPE;
+        packet->action = EAutomationPacketType::PING;
         return packet;
     };
 
-    static FAutomationPacket Pong(FAutomationPacket src)
+    static UAutomationPacket* Pong(UAutomationPacket* src)
     {
-        FAutomationPacket packet;
-        packet.type = AUTOMATION_NETWORK_PACKET_TYPE;
-        packet.action = EAutomationPacketType::PONG;
-        packet.dest = src.source;
+        UAutomationPacket* packet = NewObject<UAutomationPacket>();
+        packet->type = AUTOMATION_NETWORK_PACKET_TYPE;
+        packet->action = EAutomationPacketType::PONG;
+        packet->dest = src->source;
         return packet;
     };
 };
 
-USTRUCT(BlueprintType)
-struct CONCEPTTHEATERSIM_API FAutomationEventPacket : public FAutomationPacket
+UCLASS(BlueprintType)
+class CONCEPTTHEATERSIM_API UAutomationEventPacket : public UAutomationPacket
 {
     GENERATED_BODY()
 
@@ -61,19 +61,19 @@ public:
     UPROPERTY(BlueprintReadWrite, VisibleAnywhere, Category="Automation")
     double duration;
 
-    static FAutomationEventPacket Event(TMap<FName, double> properties, double duration)
+    static UAutomationEventPacket* Event(TMap<FName, double> properties, double duration)
     {
-        FAutomationEventPacket packet;
-        packet.type = AUTOMATION_NETWORK_PACKET_TYPE;
-        packet.action = EAutomationPacketType::EVENT;
-        packet.properties = properties;
-        packet.duration = duration;
+        UAutomationEventPacket* packet = NewObject<UAutomationEventPacket>();
+        packet->type = AUTOMATION_NETWORK_PACKET_TYPE;
+        packet->action = EAutomationPacketType::EVENT;
+        packet->properties = properties;
+        packet->duration = duration;
         return packet;
     };
 };
 
-USTRUCT(BlueprintType)
-struct CONCEPTTHEATERSIM_API FAutomationEStopPacket : public FAutomationPacket
+UCLASS(BlueprintType)
+class CONCEPTTHEATERSIM_API UAutomationEStopPacket : public UAutomationPacket
 {
     GENERATED_BODY()
 
@@ -94,40 +94,42 @@ public:
     UPROPERTY(BlueprintReadWrite, VisibleAnywhere, Category="Automation")
     bool request = false;
 
-    static FAutomationEStopPacket EStopActive(FName source)
+    static UAutomationEStopPacket* EStopActive(FName source)
     {
-        FAutomationEStopPacket packet;
-        packet.type = AUTOMATION_NETWORK_PACKET_TYPE;
-        packet.action = EAutomationPacketType::E_STOP;
-        packet.stopSource = source;
-        packet.active = true;
+        UAutomationEStopPacket* packet = NewObject<UAutomationEStopPacket>();
+        packet->type = AUTOMATION_NETWORK_PACKET_TYPE;
+        packet->action = EAutomationPacketType::E_STOP;
+        packet->stopSource = source;
+        packet->active = true;
         return packet;
     };
 
-    static FAutomationEStopPacket EStopReleased(FName source)
+    static UAutomationEStopPacket* EStopReleased(FName source)
     {
-        FAutomationEStopPacket packet;
-        packet.type = AUTOMATION_NETWORK_PACKET_TYPE;
-        packet.action = EAutomationPacketType::E_STOP;
-        packet.stopSource = source;
-        packet.active = false;
+        UAutomationEStopPacket* packet = NewObject<UAutomationEStopPacket>();
+        packet->type = AUTOMATION_NETWORK_PACKET_TYPE;
+        packet->action = EAutomationPacketType::E_STOP;
+        packet->stopSource = source;
+        packet->active = false;
         return packet;
     };
 
-    static FAutomationEStopPacket EStopSet(TSet<FName> sources, bool active)
+    static UAutomationEStopPacket* EStopSet(TSet<FName> sources, bool active)
     {
-        FAutomationEStopPacket packet;
-        packet.type = AUTOMATION_NETWORK_PACKET_TYPE;
-        packet.action = EAutomationPacketType::E_STOP;
-        packet.sources = sources;
-        packet.active = active;
+        UAutomationEStopPacket* packet = NewObject<UAutomationEStopPacket>();
+        packet->type = AUTOMATION_NETWORK_PACKET_TYPE;
+        packet->action = EAutomationPacketType::E_STOP;
+        packet->sources = sources;
+        packet->active = active;
         return packet;
     };
 
-    static FAutomationEStopPacket Request()
+    static UAutomationEStopPacket* Request()
     {
-        FAutomationEStopPacket packet;
-        packet.request = true;
+        UAutomationEStopPacket* packet = NewObject<UAutomationEStopPacket>();
+        packet->type = AUTOMATION_NETWORK_PACKET_TYPE;
+        packet->action = EAutomationPacketType::E_STOP;
+        packet->request = true;
         return packet;
     };
 };

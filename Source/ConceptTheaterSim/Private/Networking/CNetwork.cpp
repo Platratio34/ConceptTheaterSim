@@ -56,19 +56,19 @@ bool ACNetwork::isAddressLocal(int addr)
     return packetSubnet == subnet || addr == -1 || isMulticast;
 }
 
-void ACNetwork::sendPacket(FNetworkPacket packet)
+void ACNetwork::sendPacket(UNetworkPacket *packet)
 {
     sendPacketInt(packet, false);
 }
 
-void ACNetwork::onUpstreamPacket(FNetworkPacket packet)
+void ACNetwork::onUpstreamPacket(UNetworkPacket *packet)
 {
     sendPacketInt(packet, true);
 }
 
-void ACNetwork::sendPacketInt(FNetworkPacket packet, bool fromUpstream)
+void ACNetwork::sendPacketInt(UNetworkPacket *packet, bool fromUpstream)
 {
-    int dest = packet.dest;
+    int dest = packet->dest;
     int packetSubnet = dest & subnetMask;
     int localBroadcast = subnet | (~subnetMask);
 
@@ -79,6 +79,7 @@ void ACNetwork::sendPacketInt(FNetworkPacket packet, bool fromUpstream)
     }
     else if (packetSubnet == subnet || dest == -1 || dest == 0xffffffff) // in our network, or all network broadcast
     {
+        numUnicastPackets++;
         onPacketOut.Broadcast(packet);
         bool broadcast = dest == -1 || dest == localBroadcast || dest == 0xffffffff;
         if(!broadcast)
@@ -100,8 +101,16 @@ void ACNetwork::sendPacketInt(FNetworkPacket packet, bool fromUpstream)
                     if(card == nullptr)
                         continue;
                     if(card->getIP() == dest)
+                    {
                         card->onPacket(packet);
+                        sent = true;
+                        break;
+                    }
                 }
+            }
+            if(!sent)
+            {
+                UE_LOG(LogTemp, Warning, TEXT("Network %s did not have device for IP %s"), *GetName(), *ipToString(dest));
             }
         }
         else
@@ -117,20 +126,22 @@ void ACNetwork::sendPacketInt(FNetworkPacket packet, bool fromUpstream)
     else if ((dest & 0xF0000000) == 0xE0000000) // multicast
     {
         onPacketOut.Broadcast(packet);
-        multicastSets.RemoveAll([](const auto *el)
-                                { return el == nullptr; });
-        for (UMulticastTargetSet *set : multicastSets)
+        UMulticastTargetSet **p = multicastSets.Find(dest);
+        if (p != nullptr && *p != nullptr)
         {
-            if (set->address == dest)
-            {
-                set->sendPacket(packet);
-                break;
-            }
+            UMulticastTargetSet *set = *p;
+            set->sendPacket(packet);
         }
+        else
+        {
+            UE_LOG(LogTemp, Warning, TEXT("Network %s did not have any listeners for multicast address %s"), *GetName(), *ipToString(dest));
+        }
+        numMulticastPackets++;
     }
     else if (upstream != nullptr && !fromUpstream) // else send to upstream if present
     {
         upstream->sendPacket(packet);
+        packetsUp++;
     }
 }
 
@@ -205,32 +216,29 @@ void ACNetwork::clearUpstream()
 
 void ACNetwork::multicastSubscribe(int address, UNetworkCard *subscriber)
 {
-    multicastSets.RemoveAll([](const auto *el)
-                            { return el == nullptr; });
-    for(UMulticastTargetSet *set : multicastSets)
+    UMulticastTargetSet **p = multicastSets.Find(address);
+    UMulticastTargetSet *set = nullptr;
+    if(p && (*p) != nullptr)
     {
-        if (set->address == address)
-        {
-            set->addSubscriber(subscriber);
-            return;
-        }
+        set = *p;
     }
-    UMulticastTargetSet *set = NewObject<UMulticastTargetSet>();
-    set->address = address;
-    multicastSets.Add(set);
+    else
+    {
+        set = NewObject<UMulticastTargetSet>();
+        set->address = address;
+        multicastSets.Add(address, set);
+    }
     set->addSubscriber(subscriber);
 }
 
 void ACNetwork::multicastUnSubscribe(int address, UNetworkCard *subscriber)
 {
-    multicastSets.RemoveAll([](const auto *el)
-                            { return el == nullptr; });
-    for (UMulticastTargetSet *set : multicastSets)
+    if(UMulticastTargetSet **p = multicastSets.Find(address))
     {
-        if (set->address == address)
+        UMulticastTargetSet *set = *p;
+        if(set != nullptr)
         {
             set->removeSubscriber(subscriber);
-            return;
         }
     }
 }
@@ -256,11 +264,11 @@ void ACNetwork::connect(UNetworkCard *card) {
 
 void ACNetwork::disconnect(UNetworkCard *card) {
     cards.Remove(card);
-    for (UMulticastTargetSet *set : multicastSets)
+    for (TPair<int, UMulticastTargetSet*> pair : multicastSets)
     {
-        if(set == nullptr)
-            continue;
-        set->removeSubscriber(card);
+        UMulticastTargetSet *set = pair.Value;
+        if(set != nullptr)
+            set->removeSubscriber(card);
     }
     for(TPair<int, UNetworkCard*> pair : cardsByIP)
     {
@@ -292,7 +300,7 @@ void UMulticastTargetSet::removeSubscriber(UNetworkCard *subscriber)
     subscribers.Remove(subscriber);
 }
 
-void UMulticastTargetSet::sendPacket(FNetworkPacket packet) {
+void UMulticastTargetSet::sendPacket(UNetworkPacket *packet) {
     subscribers.RemoveAll([](const auto *el)
                             { return el == nullptr; });
     for (UNetworkCard *subscriber : subscribers)

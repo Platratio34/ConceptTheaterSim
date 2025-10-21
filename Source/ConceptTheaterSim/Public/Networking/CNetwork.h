@@ -29,7 +29,7 @@ public:
     UFUNCTION()
     void removeSubscriber(UNetworkCard *subscriber);
     UFUNCTION()
-    void sendPacket(FNetworkPacket packet);
+    void sendPacket(UNetworkPacket *packet);
 };
 
 /**
@@ -53,9 +53,9 @@ public:
     void setup(int subnet, int subnetMask, ACNetwork *upstream, bool sameNet);
 
     UFUNCTION(BlueprintCallable)
-    void sendPacket(FNetworkPacket packet);
+    void sendPacket(UNetworkPacket *packet);
     UFUNCTION()
-    void onUpstreamPacket(FNetworkPacket packet);
+    void onUpstreamPacket(UNetworkPacket *packet);
     UFUNCTION(BlueprintCallable)
     int requestIP(FString hwAddress);
     UFUNCTION(BlueprintCallable)
@@ -81,6 +81,16 @@ public:
     UFUNCTION(BlueprintCallable)
     void multicastUnSubscribe(int address, UNetworkCard *subscriber);
 
+    static FString ipToString(int ip)
+    {
+        FString out = "";
+        out += FString::FromInt((ip >> 24) & 0xff) + ".";
+        out += FString::FromInt((ip >> 16) & 0xff) + ".";
+        out += FString::FromInt((ip >> 8) & 0xff) + ".";
+        out += FString::FromInt(ip & 0xff);
+        return out;
+    }
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -104,13 +114,20 @@ protected:
     UFUNCTION()
     bool isAddressLocal(int addr);
     UFUNCTION()
-    void sendPacketInt(FNetworkPacket packet, bool fromUpstream);
+    void sendPacketInt(UNetworkPacket *packet, bool fromUpstream);
 
     UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category="Network")
-    TArray<UMulticastTargetSet *> multicastSets;
+    TMap<int, UMulticastTargetSet *> multicastSets;
 
     UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category="Network")
     TArray<UNetworkCard*> cards;
     UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category="Network")
     TMap<int, UNetworkCard *> cardsByIP;
+
+    UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category="Debug")
+    int packetsUp;
+    UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category="Debug")
+    int numUnicastPackets;
+    UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category="Debug")
+    int numMulticastPackets;
 };

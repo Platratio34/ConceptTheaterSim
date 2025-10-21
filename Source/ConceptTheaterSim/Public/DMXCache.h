@@ -32,6 +32,9 @@ class CONCEPTTHEATERSIM_API UDMXCache : public UObject
 	GENERATED_BODY()
 	
 public:
+    UDMXCache();
+    ~UDMXCache();
+
     UFUNCTION(BlueprintCallable)
     bool updateSource(FName name, int priority, int universe, TArray<int> data);
 

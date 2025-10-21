@@ -28,7 +28,7 @@ protected:
     UNetworkCard *networkCard;
 
     UFUNCTION()
-    void onNetworkPacket(FNetworkPacket packet);
+    void onNetworkPacket(UNetworkPacket *packet);
 
     UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category="Automation")
     bool eStopActive;
@@ -49,7 +49,7 @@ public:
 private:
 
     UFUNCTION()
-    void onEStopPacket(FAutomationEStopPacket packet);
+    void onEStopPacket(UAutomationEStopPacket *packet);
 
     UFUNCTION(BlueprintCallable)
     void onTimeUpdate(int frames, float seconds, bool running);
