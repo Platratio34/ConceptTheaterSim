@@ -81,16 +81,6 @@ public:
     UFUNCTION(BlueprintCallable)
     void multicastUnSubscribe(int address, UNetworkCard *subscriber);
 
-    static FString ipToString(int ip)
-    {
-        FString out = "";
-        out += FString::FromInt((ip >> 24) & 0xff) + ".";
-        out += FString::FromInt((ip >> 16) & 0xff) + ".";
-        out += FString::FromInt((ip >> 8) & 0xff) + ".";
-        out += FString::FromInt(ip & 0xff);
-        return out;
-    }
-
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
