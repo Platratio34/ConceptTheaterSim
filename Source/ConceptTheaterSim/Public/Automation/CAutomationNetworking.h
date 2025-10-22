@@ -19,7 +19,9 @@ enum class EAutomationPacketType : uint8
     QUERY UMETA(DisplayName="Query"),
     QUERY_RESPONSE UMETA(DisplayName="Query Response"),
     STATUS UMETA(DisplayName="Status"),
-    E_STOP UMETA(DisplayName="E-Stop")
+    E_STOP UMETA(DisplayName="E-Stop"),
+    PROCESSOR_QUERY UMETA(DisplayName="Processor Query"),
+    REGISTER UMETA(DisplayName="Device Register")
 };
 
 UCLASS(BlueprintType)
@@ -130,6 +132,81 @@ public:
         packet->type = AUTOMATION_NETWORK_PACKET_TYPE;
         packet->action = EAutomationPacketType::E_STOP;
         packet->request = true;
+        return packet;
+    };
+};
+
+UCLASS(BlueprintType)
+class CONCEPTTHEATERSIM_API UAutomationProcessorQueryPacket : public UAutomationPacket
+{
+    GENERATED_BODY()
+
+public:
+    // If this is request for processor. Should can a broadcast message
+    UPROPERTY(BlueprintReadWrite, VisibleAnywhere, Category="Automation")
+    bool request;
+
+    static UAutomationProcessorQueryPacket* Request()
+    {
+        UAutomationProcessorQueryPacket* packet = NewObject<UAutomationProcessorQueryPacket>();
+        packet->type = AUTOMATION_NETWORK_PACKET_TYPE;
+        packet->action = EAutomationPacketType::PROCESSOR_QUERY;
+        packet->request = true;
+        return packet;
+    };
+
+    // Map of devices the processor
+    UPROPERTY(BlueprintReadWrite, VisibleAnywhere, Category="Automation")
+    TMap<FName, int> devices;
+
+    static UAutomationProcessorQueryPacket* Response(UAutomationPacket* req, TMap<FName, int> devices)
+    {
+        UAutomationProcessorQueryPacket* packet = NewObject<UAutomationProcessorQueryPacket>();
+        packet->type = AUTOMATION_NETWORK_PACKET_TYPE;
+        packet->dest = req->source;
+        packet->action = EAutomationPacketType::PROCESSOR_QUERY;
+        packet->request = false;
+        packet->devices = devices;
+        return packet;
+    };
+};
+
+UCLASS(BlueprintType)
+class CONCEPTTHEATERSIM_API UAutomationRegistrationPacket : public UAutomationPacket
+{
+    GENERATED_BODY()
+
+public:
+    // If the is a registration or un-registration message
+    UPROPERTY(BlueprintReadWrite, VisibleAnywhere, Category="Automation")
+    bool isRegister = true;
+
+    // The ID of the devices being registered/un-registered
+    UPROPERTY(BlueprintReadWrite, VisibleAnywhere, Category="Automation")
+    FName deviceID;
+
+    // The set of device property IDs (registration only)
+    UPROPERTY(BlueprintReadWrite, VisibleAnywhere, Category="Automation")
+    TSet<FName> properties;
+
+    static UAutomationRegistrationPacket* Register(FName deviceID, TSet<FName> properties)
+    {
+        UAutomationRegistrationPacket* packet = NewObject<UAutomationRegistrationPacket>();
+        packet->type = AUTOMATION_NETWORK_PACKET_TYPE;
+        packet->action = EAutomationPacketType::REGISTER;
+        packet->isRegister = true;
+        packet->deviceID = deviceID;
+        packet->properties = properties;
+        return packet;
+    };
+
+    static UAutomationRegistrationPacket* Unregister(FName deviceID)
+    {
+        UAutomationRegistrationPacket* packet = NewObject<UAutomationRegistrationPacket>();
+        packet->type = AUTOMATION_NETWORK_PACKET_TYPE;
+        packet->action = EAutomationPacketType::REGISTER;
+        packet->isRegister = false;
+        packet->deviceID = deviceID;
         return packet;
     };
 };

@@ -2,6 +2,7 @@
 
 #include "Automation/CAutomationProcessor.h"
 #include "Networking/NetworkPacketTypes.h"
+#include "Networking/NetworkTypes.h"
 #include "Json.h"
 
 DEFINE_LOG_CATEGORY(AutomationLog);
@@ -62,7 +63,15 @@ void ACAutomationProcessor::onNetworkPacket(UNetworkPacket *packet)
             break;
 
         case EAutomationPacketType::E_STOP:
-            onEStopPacket((UAutomationEStopPacket*)autoPacket);
+            onEStopPacket(Cast<UAutomationEStopPacket>(autoPacket));
+            break;
+
+        case EAutomationPacketType::PROCESSOR_QUERY:
+            networkCard->send(UAutomationProcessorQueryPacket::Response(autoPacket, deviceIPsByName));
+            break;
+
+        case EAutomationPacketType::REGISTER:
+            onRegistrationPacket(Cast<UAutomationRegistrationPacket>(autoPacket));
             break;
         
         default:
@@ -87,6 +96,7 @@ void ACAutomationProcessor::onEStopPacket(UAutomationEStopPacket *packet)
     }
     if(packet->stopSource == FName("None"))
     {
+        // This would only be a broadcast from another processor, so ignore it for now.
         return;
     }
     
@@ -124,4 +134,59 @@ void ACAutomationProcessor::sendEvent(FName device, TMap<FName, double> properti
     UAutomationEventPacket *outPacket = UAutomationEventPacket::Event(properties, duration);
     outPacket->dest = *p;
     networkCard->send(outPacket);
+}
+
+void ACAutomationProcessor::onRegistrationPacket(UAutomationRegistrationPacket *packet)
+{
+    if(!packet->isRegister)
+    {
+        deviceIPsByName.Remove(packet->deviceID);
+        return;
+    }
+    if(deviceIPsByName.Contains(packet->deviceID))
+    {
+        UE_LOG(AutomationLog, Warning, TEXT("Duplicate device registration for ID `%s`"), *(packet->deviceID.ToString()));
+        return;
+    }
+    deviceIPsByName.Add(packet->deviceID, packet->source);
+    UE_LOG(AutomationLog, Verbose, TEXT("Registered device %s at IP %s"), *(packet->deviceID.ToString()), *FIPAddress::ipToString(packet->source));
+}
+
+bool ACAutomationProcessor::loadFile(FString filePath)
+{
+    fileLoadError = TEXT("");
+    if(filePath.Len() <= 0)
+    {
+        fileLoadError = TEXT("Null path");
+        return false;
+    }
+    FString path = FPaths::ProjectContentDir() + "/" + filePath;
+    UE_LOG(AutomationLog, Display, TEXT("Loading automation show file: %s"), *path);
+
+    FString jsonString;
+    if(!FFileHelper::LoadFileToString(jsonString, *path))
+    {
+        UE_LOG(AutomationLog, Warning, TEXT("Error Loading automation show file: %s; Error loading file"), *path);
+        fileLoadError = TEXT("Unable to open file");
+        return false;
+    }
+
+    TSharedPtr<FJsonObject> jsonObject;
+    TSharedRef<TJsonReader<>> reader = TJsonReaderFactory<>::Create(jsonString);
+    if(!FJsonSerializer::Deserialize(reader, jsonObject) || !jsonObject.IsValid())
+    {
+        UE_LOG(AutomationLog, Warning, TEXT("Error Loading automation show file: %s; Error parsing JSON"), *path);
+        fileLoadError = TEXT("Invalid JSON");
+        return false;
+    }
+
+    TArray<FAutomationCue> newCues;
+    TArray<TSharedPtr<FJsonValue>> cuesJSON = jsonObject->GetArrayField(TEXT("cues"));
+    for(TSharedPtr<FJsonValue> cueJSON : cuesJSON)
+    {
+        newCues.Add(FAutomationCue::ParseJSON(cueJSON->AsObject()));
+    }
+    cues = newCues;
+    fileLoaded = true;
+    return true;
 }

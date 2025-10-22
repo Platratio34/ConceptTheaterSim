@@ -1,0 +1,382 @@
+{
+    "cues": [
+        {
+            "name": "TOS",
+            "time": "00:00:00:01",
+            "duration": 1,
+            "properties": {
+                "PitLift.Dir Door": 1,
+                "PitLift.Dir Position": -66,
+                "PitLift.Position": -108,
+                "Ship.Position": 370,
+                "Ship.Rotation": 75,
+                "Horse-SL.Position": 0,
+                "Horse-SR.Position": 0,
+                "Balcony-SL.Position": 216,
+                "Balcony-SR.Position": -216,
+                "Line25.Height": 288,
+                "DSLift.Height": 0,
+                "DSLift.Door": 1,
+                "MSLift.Height": -144,
+                "MSLift.Door": 0,
+                "Line8.Height": 564,
+                "Line15.Height": 564,
+                "Line20.Height": 564,
+                "Grand Travler.Width": 0,
+                "CirceStairs.Position": 420,
+                "CirceTable.Position": 420,
+                "SL1.Position": 420,
+                "SL2.Position": 420,
+                "SL3.Position": 420,
+                "SR1.Position": -420,
+                "SR2.Position": -420,
+                "SR3.Position": -420
+            }
+        },
+        {
+            "name": "Grand Open",
+            "time": "00:00:13:00",
+            "duration": 2,
+            "properties": {
+                "Grand Travler.Width": 45
+            }
+        },
+        {
+            "name": "Q17",
+            "time": "00:01:46:15",
+            "duration": 3,
+            "properties": {
+                "Horse-SL.Position": 420,
+                "Horse-SR.Position": -420
+            },
+            "cueDevices": ["SMP-SL"]
+        },
+        {
+            "name": "Q25",
+            "time": "00:04:07:00",
+            "duration": 5,
+            "properties": {
+                "Balcony-SL.Position": 420,
+                "Balcony-SR.Position": -420,
+                "DSLift.Height": 36
+            },
+            "cueDevices": ["SMP-SL"]
+        },
+        {
+            "name": "Q27",
+            "time": "00:05:44:15",
+            "duration": 10,
+            "properties": {
+                "DSLift.Height": 144
+            },
+            "cueDevices": ["SMP-SL"]
+        },
+        {
+            "name": "Q39",
+            "time": "00:06:40:00",
+            "duration": 10,
+            "properties": {
+                "DSLift.Height": -144
+            },
+            "subCues": [
+                {
+                    "offset": 7,
+                    "duration": 1,
+                    "properties": {
+                        "DSLift.Door": 0
+                    },
+                    "cueDevices": ["DSLift"]
+                }
+            ],
+            "cueDevices": ["SMP-SL", "DSLift"]
+        },
+        {
+            "name": "Q40 - Q40.3",
+            "time": "00:06:50:00",
+            "duration": 3,
+            "properties": {
+                "Line25.Height": 408
+            },
+            "subCues": [
+                {
+                    "offset": 1,
+                    "duration": 5,
+                    "properties": {
+                        "Ship.Position": 120
+                    }
+                },
+                {
+                    "offset": 5,
+                    "duration": 3,
+                    "properties": {
+                        "Line25.Height": 288
+                    }
+                },
+                {
+                    "offset": 6,
+                    "duration": 3,
+                    "properties": {
+                        "Ship.Position": 0,
+                        "Ship.Rotation": 40
+                    }
+                }
+            ],
+            "cueDevices": ["SMP-SL"]
+        },
+        {
+            "name": "Q42",
+            "time": "00:07:25:00",
+            "duration": 30,
+            "properties": {
+                "Ship.Rotation": -50
+            }
+        },
+        {
+            "name": "Q43",
+            "time": "00:08:21:00",
+            "duration": 20,
+            "properties": {
+                "Ship.Rotation": -100,
+                "Ship.Position": -24
+            }
+        },
+        {
+            "name": "Q46",
+            "time": "00:09:05:00",
+            "duration": 20,
+            "properties": {
+                "Ship.Rotation": -35,
+                "Ship.Position": 0
+            }
+        },
+        {
+            "name": "Q48",
+            "time": "00:09:50:00",
+            "duration": 10,
+            "properties": {
+                "Ship.Rotation": -130,
+                "Ship.Position": 10
+            }
+        },
+        {
+            "name": "Q48.2 - Q48.4",
+            "time": "00:10:01:00",
+            "duration": 5,
+            "properties": {
+                "Line25.Height": 408
+            },
+            "subCues": [
+                {
+                    "offset": 1,
+                    "duration": 5,
+                    "properties": {
+                        "Ship.Position": 360,
+                        "Ship.Rotation": -90
+                    }
+                },
+                {
+                    "offset": 4,
+                    "duration": 5,
+                    "properties": {
+                        "Line25.Height": 288
+                    }
+                }
+            ],
+            "cueDevices": ["SMP-SL"]
+        },
+        {
+            "name": "Q62.1",
+            "time": "00:13:32:00",
+            "duration": 10,
+            "properties": {
+                "DSLift.Height": -84
+            },
+            "cueDevices": ["DSLift"]
+        },
+        {
+            "name": "Q62 Setup",
+            "time": "00:14:02:15",
+            "duration": 0.5,
+            "properties": {
+                "DSLift.Door": 1
+            },
+            "cueDevices": ["DSLift", "SMP-SL"]
+        },
+        {
+            "name": "Q62",
+            "time": "00:14:03:00",
+            "duration": 2,
+            "properties": {
+                "DSLift.Height": 60
+            },
+            "cueDevices": ["DSLift", "SMP-SL"]
+        },
+        {
+            "name": "Q62.5",
+            "time": "00:14:18:00",
+            "duration": 10,
+            "properties": {
+                "DSLift.Height": 12
+            },
+            "cueDevices": ["SMP-SL"]
+        },
+        {
+            "name": "Q65",
+            "time": "00:15:15:05",
+            "duration": 5,
+            "properties": {
+                "DSLift.Height": 36
+            },
+            "cueDevices": ["SMP-SL"]
+        },
+        {
+            "name": "Q67",
+            "time": "00:15:32:00",
+            "duration": 3,
+            "properties": {
+                "DSLift.Height": 0
+            },
+            "cueDevices": ["SMP-SL"]
+        },
+        {
+            "name": "Q69",
+            "time": "00:16:04:00",
+            "duration": 3,
+            "properties": {
+                "DSLift.Height": 12
+            },
+            "cueDevices": ["SMP-SL"]
+        },
+        {
+            "name": "Q69",
+            "time": "00:16:53:00",
+            "duration": 3,
+            "properties": {
+                "DSLift.Height": -84
+            },
+            "subCues": [
+                {
+                    "offset": 3.5,
+                    "duration": 2,
+                    "properties": {
+                        "DSLift.Door": 0
+                    },
+                    "cueDevices": ["DSLift"]
+                },
+                {
+                    "offset": 3.5,
+                    "duration": 5,
+                    "properties": {
+                        "DSLift.Height": -144
+                    },
+                    "cueDevices": ["DSLift"]
+                }
+            ],
+            "cueDevices": ["SMP-SL", "DSLift"]
+        },
+        {
+            "name": "Cave setup",
+            "time": "00:16:58:00",
+            "duration": 2,
+            "properties": {
+                "SL1.Position": 250,
+                "SL2.Position": 216,
+                "SR1.Position": -250,
+                "SR2.Position": -216
+            },
+            "cueDevices": ["SMP-SL"]
+        },
+        {
+            "name": "Q99.1 - Q99.3",
+            "time": "00:27:44:15",
+            "duration": 2,
+            "properties": {
+                "Line25.Height": 408,
+                "SL1.Position": 420,
+                "SL2.Position": 420,
+                "SR1.Position": -420,
+                "SR2.Position": -420
+            },
+            "subCues": [
+                {
+                    "offset": 1,
+                    "duration": 5,
+                    "properties": {
+                        "Ship.Position": 0,
+                        "Ship.Rotation": 80
+                    }
+                },
+                {
+                    "offset": 3,
+                    "duration": 2,
+                    "properties": {
+                        "Line25.Height": 288
+                    }
+                }
+            ],
+            "cueDevices": ["SMP-SL"]
+        },
+        {
+            "name": "Q105",
+            "time": "00:30:25:00",
+            "duration": 5,
+            "properties": {
+                "Ship.Position": -24,
+                "Ship.Rotation": 95
+            },
+            "subCues": [
+                {
+                    "offset": 9,
+                    "duration": 5,
+                    "properties": {
+                        "DSLift.Height": -84,
+                        "DSLift.Door": 1
+                    },
+                    "cueDevices": ["SMP-SL", "DSLift"]
+                }
+            ],
+            "cueDevices": ["SMP-SL"]
+        },
+        {
+            "name": "Q106",
+            "time": "00:30:39:00",
+            "duration": 5,
+            "properties": {
+                "DSLift.Height": 36
+            },
+            "cueDevices": ["SMP-SL"]
+        },
+        {
+            "name": "Q106.2",
+            "time": "00:30:44:15",
+            "duration": 1,
+            "properties": {
+                "DSLift.Height": 60
+            },
+            "cueDevices": ["SMP-SL"]
+        },
+        {
+            "name": "Q107",
+            "time": "00:31:02:15",
+            "duration": 5,
+            "properties": {
+                "DSLift.Height": -84
+            },
+            "subCues": [
+                {
+                    "offset": 5,
+                    "duration": 5,
+                    "properties": {
+                        "DSLift.Door": 0,
+                        "DSLift.Height": -144
+                    },
+                    "cueDevices": ["DSLift"]
+                }
+            ],
+            "cueDevices": ["SMP-SL", "DSLift"]
+        }
+    ],
+    "metadata": {
+        "lastUpdated": "10/21/2025"
+    }
+}

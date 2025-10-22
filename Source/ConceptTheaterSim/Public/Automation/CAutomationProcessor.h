@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Automation/CAutomationNetworking.h"
+#include "Automation/CAutomationShowFile.h"
 #include "Networking/NetworkCard.h"
 #include "JsonUtilities.h"
 #include "CAutomationProcessor.generated.h"
@@ -42,9 +43,21 @@ protected:
     UFUNCTION()
     void sendEvent(FName device, TMap<FName, double> properties, double duration);
 
+    UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category="Automation")
+    TArray<FAutomationCue> cues;
+
+    UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category="Automation")
+    bool fileLoaded = false;
+
+    UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category="Automation")
+    FString fileLoadError = TEXT("");
+
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+    UFUNCTION(BlueprintCallable)
+    bool loadFile(FString path);
 
 private:
 
@@ -53,5 +66,8 @@ private:
 
     UFUNCTION(BlueprintCallable)
     void onTimeUpdate(int frames, float seconds, bool running);
+
+    UFUNCTION()
+    void onRegistrationPacket(UAutomationRegistrationPacket *packet);
     
 };
