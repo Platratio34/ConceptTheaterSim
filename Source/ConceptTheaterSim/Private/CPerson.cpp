@@ -105,15 +105,83 @@ void ACPerson::updateMeshes()
     armMeshComponent->SetMaterial(0, skinMaterialInstance);
     headMeshComponent->SetMaterial(0, skinMaterialInstance);
     earMeshComponent->SetMaterial(0, skinMaterialInstance);
+    
+    chestCoverage = 0;
+    armCoverage = 0;
+    legCoverage = 0;
+    clothingHides.Empty();
+    for(FPersonClothing c : clothing)
+    {
+        bool hidden = false;
+        if(bool*p = hiddenClothing.Find(c.name))
+            hidden = *p;
+        if(hidden || c.asset == nullptr)
+            continue;
+        clothingHides.Append(c.asset->hides);
+        chestCoverage |= c.asset->chestCoverage;
+        armCoverage |= c.asset->armCoverage;
+        legCoverage |= c.asset->legCoverage;
+    }
 
     EPersonLegType legType = getLegType();
-    if(UStaticMesh** mesh = legMeshes.Find(legType))
-        legMeshComponent->SetStaticMesh(*mesh);
-    if(UStaticMesh** mesh = bodyMeshes.Find(bodyType))
-        chestMeshComponent->SetStaticMesh(*mesh);
+    if(FPersonMeshSet* pLegSet = legMeshes.Find(legType))
+    {
+        UStaticMesh *legMesh = nullptr;
+        if(UStaticMesh** p2 = (*pLegSet).meshes.Find(legCoverage))
+        {
+            legMesh = *p2;
+        }
+        else if(UStaticMesh** p2d = (*pLegSet).meshes.Find(0))
+        {
+            legMesh = *p2d;
+        }
+        if(legMesh != nullptr)
+        {
+            legMeshComponent->SetStaticMesh(legMesh);
+        }
+        else
+        {
+            UE_LOG(LogTemp, Warning, TEXT("Missing mesh for leg coverage %d"), legCoverage);
+        }
+    }
+    if(FPersonMeshSet* pChestSet = bodyMeshes.Find(bodyType))
+    {
+        UStaticMesh *chestMesh = nullptr;
+        if(UStaticMesh** p2 = (*pChestSet).meshes.Find(chestCoverage))
+        {
+            chestMesh = *p2;
+        }
+        else if(UStaticMesh** p2d = (*pChestSet).meshes.Find(0))
+        {
+            chestMesh = *p2d;
+        }
+        if(chestMesh != nullptr)
+        {
+            chestMeshComponent->SetStaticMesh(chestMesh);
+        }
+        else
+        {
+            UE_LOG(LogTemp, Warning, TEXT("Missing mesh for chest coverage %d"), chestCoverage);
+        }
+    }
 
+    UStaticMesh *armMesh = nullptr;
+    if(UStaticMesh** p3 = armMeshes.meshes.Find(armCoverage))
+    {
+        armMesh = *p3;
+    }
+    else if(UStaticMesh** p3d = armMeshes.meshes.Find(0))
+    {
+        armMesh = *p3d;
+    }
     if(armMesh != nullptr)
+    {
         armMeshComponent->SetStaticMesh(armMesh);
+    }
+    else
+    {
+        UE_LOG(LogTemp, Warning, TEXT("Missing mesh for arm coverage %d"), armCoverage);
+    }
     if(headMesh != nullptr)
         headMeshComponent->SetStaticMesh(headMesh);
     if(eyeMesh != nullptr)
@@ -182,16 +250,6 @@ void ACPerson::updateMeshes()
         }
     }
 
-    clothingHides.Empty();
-    for(FPersonClothing c : clothing)
-    {
-        bool hidden = false;
-        if(bool*p = hiddenClothing.Find(c.name))
-            hidden = *p;
-        if(hidden || c.asset == nullptr)
-            continue;
-        clothingHides.Append(c.asset->hides);
-    }
     // then actually update the clothing meshes
     for (int i = 0; i < clothing.Num(); i++)
     {

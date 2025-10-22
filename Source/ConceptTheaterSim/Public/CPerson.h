@@ -37,6 +37,63 @@ enum class EClothingType : uint8
     UNDERWEAR_UPPER UMETA(DisplayName="Underwear (Upper)")
 };
 
+UENUM(BlueprintType, Meta = (Bitflags, UseEnumValuesAsMaskValuesInEditor="true"))
+enum class EChestCoverage : uint8
+{
+    NONE UMETA(Hidden),
+    LOWER = 1 UMETA(DisplayName="Lower Body"),
+    MIDDEL = 2 UMETA(DisplayName="Mid Body"),
+    SHOULDERS = 4 UMETA(DisplayName="Shoulders")
+};
+/*
+0000 0 - None
+0001 1 - only lower missing
+0010 2 - only mid missing
+0011 3 - missing lower & mid
+0100 4 - only shoulders missing
+0101 5 - shoulders and lower missing, mid present
+0110 6 - shoulders & mid missing, lower present
+0111 7 - all missing
+*/
+
+UENUM(BlueprintType, Meta = (Bitflags, UseEnumValuesAsMaskValuesInEditor="true"))
+enum class ELegCoverage : uint8
+{
+    NONE = 0 UMETA(Hidden),
+    UPPER = 1 UMETA(DisplayName="Upper Legs"),
+    LOWER = 2 UMETA(DisplayName="Lower Legs"),
+    FEET = 4 UMETA(DisplayName="Feet")
+};
+/*
+0000 0 - None
+0001 1 - upper legs missing
+0010 2 - lower legs missing
+0011 3 - upper & lower legs missing (ankle & foot)
+0100 4 - foot missing
+0101 5 - foot & upper leg missing
+0110 6 - foot & lower leg missing (upper only)
+0111 7 - all missing (only ankle)
+*/
+
+UENUM(BlueprintType, Meta = (Bitflags, UseEnumValuesAsMaskValuesInEditor="true"))
+enum class EArmCoverage : uint8
+{
+    NONE UMETA(Hidden),
+    UPPER = 1 UMETA(DisplayName="Upper Arms"),
+    LOWER = 2 UMETA(DisplayName="Lower Arms"),
+    HANDS = 4 UMETA(DisplayName="Hands")
+};
+/*
+0000 0 - None
+0001 1 - upper arms missing
+0010 2 - only lower arms missing
+0011 3 - lower & upper arms missing
+0100 4 - hands missing
+0101 5 - hands & upper arms missing
+0110 6 - hands & lower arms missing (upper only)
+0111 7 - all missing (only wrist)
+*/
+
 UCLASS(BlueprintType)
 class CONCEPTTHEATERSIM_API UPersonClothingAsset : public UPrimaryDataAsset
 {
@@ -67,6 +124,15 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Optimization")
     TSet<UPersonClothingAsset*> hides;
 
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Optimization", Meta = (Bitmask, BitmaskEnum = "/Script/ConceptTheaterSim.EChestCoverage"))
+    uint8 chestCoverage;
+    
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Optimization", Meta = (Bitmask, BitmaskEnum = "/Script/ConceptTheaterSim.EArmCoverage"))
+    uint8 armCoverage;
+    
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Optimization", Meta = (Bitmask, BitmaskEnum = "/Script/ConceptTheaterSim.ELegCoverage"))
+    uint8 legCoverage;
+
     UMaterialInterface* getMaterial(int index, TArray<UMaterialInterface*> materialOverrides)
     {
         if(index >= defaultMaterials.Num())
@@ -96,6 +162,16 @@ public:
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly)
     FName name;
+};
+
+USTRUCT(BlueprintType)
+struct CONCEPTTHEATERSIM_API FPersonMeshSet 
+{
+    GENERATED_BODY()
+
+public:
+    UPROPERTY(EditDefaultsOnly)
+    TMap<int, UStaticMesh *> meshes;
 };
 
 UCLASS(BlueprintType)
@@ -166,13 +242,13 @@ protected:
 
     // Meshes
     UPROPERTY(EditDefaultsOnly, Category="Meshes")
-    TMap<EPersonBodyType, UStaticMesh*> bodyMeshes;
+    TMap<EPersonBodyType, FPersonMeshSet> bodyMeshes;
 
     UPROPERTY(EditDefaultsOnly, Category="Meshes")
-    TMap<EPersonLegType, UStaticMesh *> legMeshes;
+    TMap<EPersonLegType, FPersonMeshSet> legMeshes;
 
     UPROPERTY(EditDefaultsOnly, Category="Meshes")
-    UStaticMesh *armMesh;
+    FPersonMeshSet armMeshes;
     
     UPROPERTY(EditDefaultsOnly, Category="Meshes")
     UStaticMesh *headMesh;
@@ -185,6 +261,13 @@ protected:
 
     UPROPERTY(EditDefaultsOnly, Category="Meshes")
     TArray<UStaticMesh*> hairMeshes;
+
+    UPROPERTY(VisibleInstanceOnly, Category="Debug")
+    uint8 chestCoverage = 0;
+    UPROPERTY(VisibleInstanceOnly, Category="Debug")
+    uint8 armCoverage = 0;
+    UPROPERTY(VisibleInstanceOnly, Category="Debug")
+    uint8 legCoverage = 0;
 
     // components
     UPROPERTY(BlueprintReadOnly, Category="Components")
