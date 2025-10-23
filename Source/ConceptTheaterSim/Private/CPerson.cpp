@@ -50,7 +50,6 @@ void ACPerson::updateHeight()
     float hScale = height / defaultHeight;
     float wScale = (hScale - 1) * 0.75 + 1;
     bodyRoot->SetRelativeScale3D(FVector(wScale, wScale, hScale));
-    EPersonLegType legType = getLegType();
     float hOffset = 0;
     if(legType == EPersonLegType::FEMALE_HEEL_1)
     {
@@ -66,6 +65,10 @@ void ACPerson::updateHeight()
 
 EPersonLegType ACPerson::getLegType()
 {
+    if(bodyType == EPersonBodyType::MALE)
+    {
+        return EPersonLegType::MALE;
+    }
     EPersonLegType type = EPersonLegType::FEMALE;
     for (int i = 0; i < clothing.Num(); i++)
     {
@@ -123,9 +126,10 @@ void ACPerson::updateMeshes()
         legCoverage |= c.asset->legCoverage;
     }
 
-    EPersonLegType legType = getLegType();
+    legType = getLegType();
     if(FPersonMeshSet* pLegSet = legMeshes.Find(legType))
     {
+        // UE_LOG(LogTemp, Warning, TEXT("Searching for leg %d"), (int)legType);
         UStaticMesh *legMesh = nullptr;
         if(UStaticMesh** p2 = (*pLegSet).meshes.Find(legCoverage))
         {
@@ -137,6 +141,7 @@ void ACPerson::updateMeshes()
         }
         if(legMesh != nullptr)
         {
+            // UE_LOG(LogTemp, Warning, TEXT("Found %s"), *(legMesh->GetName()));
             legMeshComponent->SetStaticMesh(legMesh);
         }
         else

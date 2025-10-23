@@ -268,6 +268,8 @@ protected:
     uint8 armCoverage = 0;
     UPROPERTY(VisibleInstanceOnly, Category="Debug")
     uint8 legCoverage = 0;
+    UPROPERTY(VisibleInstanceOnly, Category="Debug")
+    EPersonLegType legType = EPersonLegType::MALE;
 
     // components
     UPROPERTY(BlueprintReadOnly, Category="Components")

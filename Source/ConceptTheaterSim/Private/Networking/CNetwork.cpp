@@ -110,7 +110,7 @@ void ACNetwork::sendPacketInt(UNetworkPacket *packet, bool fromUpstream)
             }
             if(!sent)
             {
-                UE_LOG(LogTemp, Warning, TEXT("Network %s did not have device for IP %s"), *GetName(), *FIPAddress::ipToString(dest));
+                // UE_LOG(LogTemp, Warning, TEXT("Network %s did not have device for IP %s"), *GetName(), *FIPAddress::ipToString(dest));
             }
         }
         else
@@ -134,7 +134,7 @@ void ACNetwork::sendPacketInt(UNetworkPacket *packet, bool fromUpstream)
         }
         else
         {
-            UE_LOG(LogTemp, Warning, TEXT("Network %s did not have any listeners for multicast address %s"), *GetName(), *FIPAddress::ipToString(dest));
+            // UE_LOG(LogTemp, Warning, TEXT("Network %s did not have any listeners for multicast address %s"), *GetName(), *FIPAddress::ipToString(dest));
         }
         numMulticastPackets++;
     }
