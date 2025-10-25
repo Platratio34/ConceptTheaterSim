@@ -21,7 +21,7 @@ void AETCLightBoard::BeginPlay()
 {
 	Super::BeginPlay();
     networkCard->onNetworkPacket.AddDynamic(this, &AETCLightBoard::onNetworkPacket);
-    for (int u = 0; u < 10; u++)
+    for (int u = 1; u <= 10; u++)
     {
         networkCard->addUniverse(u);
     }
@@ -151,7 +151,7 @@ void AETCLightBoard::Tick(float DeltaTime)
 
     setButtonActive(BUTTON_SHIFT, shift);
 
-    for (int u = 0; u < 10; u++)
+    for (int u = 1; u <= 10; u++)
     {
         if(!networkCard->hasChanged(u))
             continue;
@@ -171,17 +171,17 @@ void AETCLightBoard::updateUniverse(int universe, TArray<int> dmx)
         for (int i = 0; i < patchSet.devices.Num(); i++)
         {
             FEOSPatch patch = patchSet.devices[i];
-            if(patch.universe == universe)
+            if(patch.universe != universe)
+                continue;
+            
+            EOSLightOutputType* outputType = EOSLightOutputType::getType(patch.type);
+            TArray<int> d2;
+            d2.Init(0, patch.size);
+            for (int j = 0; j < patch.size; j++)
             {
-                EOSLightOutputType* outputType = EOSLightOutputType::getType(patch.type);
-                TArray<int> d2;
-                d2.Init(0, patch.size);
-                for (int j = 0; j < patch.size; j++)
-                {
-                    d2[j] = dmx[j+patch.address];
-                }
-                outputType->input(d2, showfile->channels[ch].properties);
+                d2[j] = dmx[j+patch.address];
             }
+            outputType->input(d2, &showfile->channels[ch].properties);
         }
     }
 }
@@ -640,5 +640,5 @@ FCmdSelection AETCLightBoard::getCmdSelection(int start, int *end)
 
 void AETCLightBoard::onNetworkPacket(UNetworkPacket *packet)
 {
-
+    
 }

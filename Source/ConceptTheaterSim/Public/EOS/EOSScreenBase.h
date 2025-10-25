@@ -32,6 +32,9 @@ protected:
     UFUNCTION(BlueprintCallable)
     double getChannelParameter(int ch, FName parameter);
 
+    UFUNCTION(BlueprintCallable)
+    TArray<FName> getChannelParameters(int ch);
+
     static TMap<FName, FString> getNamesToDisplay()
     {
         static bool namesToDisplayInit = false;

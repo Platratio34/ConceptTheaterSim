@@ -207,6 +207,7 @@ public:
             patch.properties.Add(PROPERTY_WHITE);
             return patch;
         }
+        UE_LOG(LogTemp, Warning, TEXT("Unknown patch type: %s"), *(type.ToString()));
         FEOSPatch def(type, 1);
         return def;
     }

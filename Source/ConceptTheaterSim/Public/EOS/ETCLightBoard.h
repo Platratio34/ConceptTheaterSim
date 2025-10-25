@@ -133,5 +133,6 @@ private:
     int getCmdNumber(int start, int* len);
     FCmdSelection getCmdSelection(int start, int *end);
 
+    UFUNCTION()
     void onNetworkPacket(UNetworkPacket *packet);
 };

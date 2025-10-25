@@ -104,3 +104,14 @@ double UEOSScreenBase::getChannelParameter(int ch, FName parameter)
     }
     return board->showfile->getParameter(ch, parameter);
 }
+
+TArray<FName> UEOSScreenBase::getChannelParameters(int ch)
+{
+    TArray<FName> params;
+    if(board == nullptr)
+        return params;
+    if(!board->showfile->channels.Contains(ch))
+        return params;
+    board->showfile->channels[ch].properties.GetKeys(params);
+    return params;
+}
