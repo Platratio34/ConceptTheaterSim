@@ -94,6 +94,30 @@ enum class EArmCoverage : uint8
 0111 7 - all missing (only wrist)
 */
 
+USTRUCT(BlueprintType)
+struct CONCEPTTHEATERSIM_API FPersonMeshSet 
+{
+    GENERATED_BODY()
+
+public:
+    UPROPERTY(EditDefaultsOnly)
+    TMap<int, UStaticMesh *> meshes;
+
+    static UStaticMesh* GetMesh(FPersonMeshSet set, int coverage)
+    {
+        if(UStaticMesh** p = set.meshes.Find(coverage))
+        {
+            return *p;
+        }
+        else if(UStaticMesh** pd = set.meshes.Find(0))
+        {
+            return *pd;
+        }
+        UE_LOG(LogTemp, Warning, TEXT("Missing default coverage"));
+        return nullptr;
+    }
+};
+
 UCLASS(BlueprintType)
 class CONCEPTTHEATERSIM_API UPersonClothingAsset : public UPrimaryDataAsset
 {
@@ -109,8 +133,11 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Default")
     TArray<UMaterialInterface *> defaultMaterials;
 
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Default")
+    int skinMaterialIndex = -1;
+
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Legs")
-    TMap<EPersonLegType, UStaticMesh*> legMeshes;
+    TMap<EPersonLegType, FPersonMeshSet> legMeshes;
     
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Legs")
     bool hasLegVariants = false;
@@ -133,9 +160,13 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Optimization", Meta = (Bitmask, BitmaskEnum = "/Script/ConceptTheaterSim.ELegCoverage"))
     uint8 legCoverage;
 
-    UMaterialInterface* getMaterial(int index, TArray<UMaterialInterface*> materialOverrides)
+    UMaterialInterface* getMaterial(int index, TArray<UMaterialInterface*> materialOverrides, UMaterialInterface* skinMaterial)
     {
-        if(index >= defaultMaterials.Num())
+        if(index == skinMaterialIndex)
+        {
+            return skinMaterial;
+        }
+        else if(index >= defaultMaterials.Num())
         {
             if(defaultMaterials.Num())
                 return nullptr;
@@ -162,16 +193,6 @@ public:
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly)
     FName name;
-};
-
-USTRUCT(BlueprintType)
-struct CONCEPTTHEATERSIM_API FPersonMeshSet 
-{
-    GENERATED_BODY()
-
-public:
-    UPROPERTY(EditDefaultsOnly)
-    TMap<int, UStaticMesh *> meshes;
 };
 
 UCLASS(BlueprintType)

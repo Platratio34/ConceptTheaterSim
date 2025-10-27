@@ -282,7 +282,7 @@ void ACPerson::updateMeshes()
         if(clothingAsset->hasLegVariants)
         {
             if(clothingAsset->legMeshes.Contains(legType))
-                mesh = clothingAsset->legMeshes[legType];
+                mesh = FPersonMeshSet::GetMesh(clothingAsset->legMeshes[legType], legCoverage);
         }
         else
         {
@@ -296,7 +296,7 @@ void ACPerson::updateMeshes()
             clothingMeshComponentsVisible[i] = true;
             for (int index = 0; index < clothingAsset->defaultMaterials.Num(); index++)
             {
-                meshComponent->SetMaterial(index, clothingAsset->getMaterial(index, c.materialOverrides));
+                meshComponent->SetMaterial(index, clothingAsset->getMaterial(index, c.materialOverrides, skinMaterialInstance));
             }
         }
         else
