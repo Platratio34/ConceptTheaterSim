@@ -3,10 +3,11 @@
 #include "Networking/NetworkCard.h"
 
 #include "Networking/CNetwork.h"
+#include "Networking/NetworkSocket.h"
 
 UNetworkCard::UNetworkCard()
 {
-    
+    PrimaryComponentTick.bCanEverTick = true;
 }
 
 UNetworkCard::~UNetworkCard()
@@ -22,6 +23,14 @@ void UNetworkCard::BeginPlay()
         hwAddress = GetOwner()->GetName() + TEXT(":") + GetName();
     if(network != nullptr)
         connectInternal();
+}
+
+void UNetworkCard::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+{
+    for(TPair<int, UNetworkSocket*> pair : sockets)
+    {
+        pair.Value->update();
+    }
 }
 
 void UNetworkCard::setup(int ip, FString hw, int subnet_, int subnetMask_)
@@ -73,6 +82,16 @@ void UNetworkCard::onPacket(UNetworkPacket *packet)
         return;
     }
     packetsIn++;
+    if(UNetworkSocket** p = sockets.Find(packet->destPort))
+    {
+        UNetworkSocket *socket = *p;
+        int tgtIP = socket->getIP();
+        if(socket->getType() == packet->type && (tgtIP == 0 || tgtIP == packet->dest))
+        {
+            socket->onPacket(packet);
+            return; // comsume socket packets as well
+        }
+    }
     if(!onPacketInternal(packet)) // if the internal function did not consume it send it to listeners
         onNetworkPacket.Broadcast(packet);
 }
@@ -121,4 +140,42 @@ void UNetworkCard::sendBroadcast(UNetworkPacket *packet)
 {
     packet->dest = subnet | (~subnetMask);
     send(packet);
+}
+
+UNetworkSocket *UNetworkCard::createSocket(int ip, FName type, int port)
+{
+    UNetworkSocket *socket = NewObject<UNetworkSocket>();
+    int outPort = nextPortOut++;
+    while(sockets.Contains(outPort))
+    {
+        outPort++;
+    }
+    socket->setup(this, ip, type, outPort, port);
+    sockets.Add(outPort, socket);
+    return socket;
+}
+
+void UNetworkCard::closeSocket(int port)
+{
+    if(UNetworkSocket** p = sockets.Find(port))
+    {
+        sockets.Remove(port);
+    }
+}
+
+UNetworkSocket *UNetworkCard::openSocket(FName type, int port)
+{
+    if(sockets.Contains(port))
+    {
+        return nullptr;
+    }
+    UNetworkSocket *socket = NewObject<UNetworkSocket>();
+    int outPort = nextPortOut++;
+    while(sockets.Contains(outPort))
+    {
+        outPort++;
+    }
+    socket->setup(this, 0, type, outPort, port);
+    sockets.Add(outPort, socket);
+    return socket;
 }

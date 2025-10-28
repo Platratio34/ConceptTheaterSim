@@ -21,6 +21,9 @@ protected:
 
 public:
 
+	// Called every frame
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
     UFUNCTION(BlueprintCallable)
     void setup(int address, FString hwAddress, int subnet_, int subnetMask_);
 
@@ -48,6 +51,15 @@ public:
 
     UFUNCTION(BlueprintCallable)
     FString getHWAddress();
+
+    UFUNCTION(BlueprintCallable)
+    UNetworkSocket *createSocket(int ip, FName type, int port);
+
+    UFUNCTION(BlueprintCallable)
+    void closeSocket(int port);
+
+    UFUNCTION(BlueprintCallable)
+    UNetworkSocket *openSocket(FName type, int port);
 
     UPROPERTY(VisibleInstanceOnly, BlueprintAssignable, Category="Network")
     FOnNetworkPacket onNetworkPacket;
@@ -84,4 +96,7 @@ protected:
     int packetsIn;
     UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category="Debug")
     int packetsOut;
+
+    int nextPortOut = 0x1001;
+    TMap<int, UNetworkSocket*> sockets;
 };

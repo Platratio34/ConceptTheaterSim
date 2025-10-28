@@ -18,17 +18,36 @@ public:
     UPROPERTY(BlueprintReadOnly)
     int source = 0;
 
+    UPROPERTY(BlueprintReadOnly)
+    int destPort = 0;
+
+    UPROPERTY(BlueprintReadOnly)
+    int sourcePort = 0;
+
     UPROPERTY(BlueprintReadWrite)
     FName type;
 
     UPROPERTY(BlueprintReadWrite)
     UObject *data = nullptr;
 
-    static UNetworkPacket* createPacket(int dest, FName type)
+    static UNetworkPacket* createPacket(int dest, FName type, int destPort = 0, int sourcePort = 0)
     {
         UNetworkPacket* packet = NewObject<UNetworkPacket>();
         packet->dest = dest;
         packet->type = type;
+        packet->destPort = destPort;
+        packet->sourcePort = sourcePort;
+        return packet;
+    }
+
+    static UNetworkPacket* createDataPacket(int dest, FName type, UObject* data, int destPort = 0, int sourcePort = 0)
+    {
+        UNetworkPacket* packet = NewObject<UNetworkPacket>();
+        packet->dest = dest;
+        packet->type = type;
+        packet->data = data;
+        packet->destPort = destPort;
+        packet->sourcePort = sourcePort;
         return packet;
     }
 };
@@ -40,6 +59,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnNetworkPacket, UNetworkPacket*, p
 class CONCEPTTHEATERSIM_API ACNetwork;
 
 class CONCEPTTHEATERSIM_API UNetworkCard;
+
+class CONCEPTTHEATERSIM_API UNetworkSocket;
 
 USTRUCT(BlueprintType)
 struct CONCEPTTHEATERSIM_API FIPAddress
