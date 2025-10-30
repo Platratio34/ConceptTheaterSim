@@ -84,6 +84,12 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Cull Volume")
     bool outOnly = false;
 
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cull Volume", AdvancedDisplay)
+    bool forcePawn = false;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cull Volume", AdvancedDisplay)
+    bool forceActive = false;
+
     UFUNCTION(BlueprintCallable)
     bool isActive()
     {

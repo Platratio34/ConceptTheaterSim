@@ -141,7 +141,7 @@ void ACCullVolume::onBoxOverlapEnd(UPrimitiveComponent* OverlappedComponent, AAc
 
 bool ACCullVolume::updateHasPawn()
 {
-    bool n = pawnInBox; // Pawn is in the box collider OR pawn is overlapping with the edge of the volume mesh
+    bool n = pawnInBox || forcePawn; // Pawn is in the box collider OR pawn is overlapping with the edge of the volume mesh
     if(!n) // Only bother checking sub-volumes if the pawn is not overlapping the box or mesh right now
     {
         for(ACCullVolume* sub : subVolumes)
@@ -188,7 +188,7 @@ bool ACCullVolume::updateHasPawn()
 
 bool ACCullVolume::updateActive()
 {
-    bool a = hasPawn;
+    bool a = hasPawn || forceActive;
     if(!a) // If we have the pawn, no need to check incoming connections
     {
         if(activeConnectionsInDirty) // If the incoming connections have changed since last time we checked
