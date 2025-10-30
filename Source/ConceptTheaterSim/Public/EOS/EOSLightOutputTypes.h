@@ -7,7 +7,8 @@
 class CONCEPTTHEATERSIM_API EOSLightOutputType
 {
 public:
-    virtual TArray<int> output(TMap<FName, double> *parameters) { TArray<int> arr;
+    virtual TArray<int> output(TMap<FName, double> *parameters) {
+        TArray<int> arr;
         return arr;
     }
     virtual void input(TArray<int> dmx, TMap<FName, double> *params) {}
@@ -27,12 +28,34 @@ public:
         return (int)(65535 * v) & 0xff;
     }
 
+    int toByteRanged(double v, double min, double max)
+    {
+        return (int)((v - min) / (max - min) * 255);
+    }
+    int toByteCoarseRanged(double v, double min, double max)
+    {
+        return (int)((v - min) / (max - min) * 65535) >> 8;
+    }
+    int toByteFineRanged(double v, double min, double max)
+    {
+        return (int)((v - min) / (max - min) * 65535) & 0xff;
+    }
+
     double fromByte(int b)
     {
-        return 255.0 / ((double)b);
+        return ((double)b) / 255.0;
     }
-    double fromByte16b(int b1, int b2)
+    double fromByte16b(int bCoarse, int bFine)
     {
-        return ((double)((b1 << 8) | b2)) / 65535;
+        return ((double)((bCoarse * 256) + bFine)) / 65535.0;
+    }
+
+    double fromByteRanged(int b, double min, double max)
+    {
+        return (((double)b) / 255.0) * (max - min) + min;
+    }
+    double fromByte16bRanged(int bCoarse, int bFine, double min, double max)
+    {
+        return ((((bCoarse * 256.0) + (double)bFine)) / 65535.0) * (max - min) + min;
     }
 };

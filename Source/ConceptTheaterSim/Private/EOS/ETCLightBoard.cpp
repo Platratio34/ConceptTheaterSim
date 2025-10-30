@@ -37,9 +37,9 @@ void AETCLightBoard::BeginPlay()
             {
                 int ch = chs[i];
                 FEOSShowPatchLight light = showPatch->lights[ch];
-                FEOSPatch patch = EOSPatchTypes::create(light.type);
-                patch.universe = light.universe;
-                patch.address = light.address;
+                UEOSPatch *patch = EOSPatchTypes::create(light.type);
+                patch->universe = light.universe;
+                patch->address = light.address;
                 showfile->patchLight(ch, patch);
             }
         }
@@ -166,22 +166,26 @@ void AETCLightBoard::updateUniverse(int universe, TArray<int> dmx)
         return;
     for (auto &elem : showfile->patch)
     {
-        FEOSPatchSet patchSet = elem.Value;
+        UEOSPatchSet* patchSet = elem.Value;
         int ch = elem.Key;
-        for (int i = 0; i < patchSet.devices.Num(); i++)
+        for (int i = 0; i < patchSet->devices.Num(); i++)
         {
-            FEOSPatch patch = patchSet.devices[i];
-            if(patch.universe != universe)
-                continue;
-            
-            EOSLightOutputType* outputType = EOSLightOutputType::getType(patch.type);
-            TArray<int> d2;
-            d2.Init(0, patch.size);
-            for (int j = 0; j < patch.size; j++)
+            UEOSPatch *patch = patchSet->devices[i];
+            if(patch->universe != universe)
             {
-                d2[j] = dmx[j+patch.address];
+                // UE_LOG(LogTemp, Display, TEXT("Skipping channel %d; (u %d)"), ch, patch->universe);
+                continue;
             }
-            outputType->input(d2, &showfile->channels[ch].properties);
+            // UE_LOG(LogTemp, Display, TEXT("Updating channel %d"), ch);
+            
+            EOSLightOutputType* outputType = EOSLightOutputType::getType(patch->type);
+            TArray<int> d2;
+            d2.Init(0, patch->size);
+            for (int j = 0; j < patch->size; j++)
+            {
+                d2[j] = dmx[j+patch->address-1];
+            }
+            outputType->input(d2, &(showfile->channels[ch]->properties));
         }
     }
 }
@@ -423,9 +427,9 @@ void AETCLightBoard::executeCommand()
             int c = selection.values[i];
             if(parkedChannels.Contains(c))
                 continue;
-            if(FEOSPropertySet *set = showfile->channels.Find(c))
+            if(UEOSPropertySet **set = showfile->channels.Find(c))
             {
-                set->set(PROPERTY_INTENSITY, v);
+                (*set)->set(PROPERTY_INTENSITY, v);
             }
         }
         clearCmd = true;
@@ -450,9 +454,9 @@ void AETCLightBoard::executeCommand()
             int c = selection.values[i];
             if(parkedChannels.Contains(c))
                 continue;
-            if(FEOSPropertySet *set = showfile->channels.Find(c))
+            if(UEOSPropertySet **set = showfile->channels.Find(c))
             {
-                set->set(PROPERTY_INTENSITY, v);
+                (*set)->set(PROPERTY_INTENSITY, v);
             }
         }
         clearCmd = true;

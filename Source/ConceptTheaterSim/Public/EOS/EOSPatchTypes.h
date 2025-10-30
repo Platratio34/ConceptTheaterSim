@@ -106,109 +106,109 @@ const FName PROPERTY_PIXEL_MASK_EFFECT_STEP_TIME = FName(TEXT("PixelMaskEffectSt
 class CONCEPTTHEATERSIM_API EOSPatchTypes
 {
 public:
-    static FEOSPatch create(FName type)
+    static UEOSPatch* create(FName type)
     {
         if(type == LIGHT_TYPE_DIMMER)
         {
-            FEOSPatch patch(type, 1);
-            patch.properties.Add(PROPERTY_INTENSITY);
+            UEOSPatch *patch = UEOSPatch::Create(type, 1);
+            patch->addProperty(PROPERTY_INTENSITY);
             return patch;
         }
         if(type == LIGHT_TYPE_ETC_S4_LUSTR_P_DIRECT || type == LIGHT_TYPE_ETC_D60_DIRECT)
         {
-            FEOSPatch patch(type, 10);
-            patch.properties.Add(PROPERTY_INTENSITY);
-            patch.properties.Add(PROPERTY_RED);
-            patch.properties.Add(PROPERTY_WHITE);
-            patch.properties.Add(PROPERTY_AMBER);
-            patch.properties.Add(PROPERTY_GREEN);
-            patch.properties.Add(PROPERTY_CYAN);
-            patch.properties.Add(PROPERTY_BLUE);
-            patch.properties.Add(PROPERTY_INDIGO);
-            patch.properties.Add(PROPERTY_STROBE);
-            patch.properties.Add(PROPERTY_FAN);
+            UEOSPatch *patch = UEOSPatch::Create(type, 10);
+            patch->addProperty(PROPERTY_INTENSITY);
+            patch->addProperty(PROPERTY_RED);
+            patch->addProperty(PROPERTY_WHITE);
+            patch->addProperty(PROPERTY_AMBER);
+            patch->addProperty(PROPERTY_GREEN);
+            patch->addProperty(PROPERTY_CYAN);
+            patch->addProperty(PROPERTY_BLUE);
+            patch->addProperty(PROPERTY_INDIGO);
+            patch->addProperty(PROPERTY_STROBE);
+            patch->addProperty(PROPERTY_FAN);
             return patch;
         }
         if(type == LIGHT_TYPE_ETC_COLOR_SOURCE_CYC_DIRECT)
         {
-            FEOSPatch patch(type, 10);
-            patch.properties.Add(PROPERTY_INTENSITY);
-            patch.properties.Add(PROPERTY_RED);
-            patch.properties.Add(PROPERTY_GREEN);
-            patch.properties.Add(PROPERTY_BLUE);
-            patch.properties.Add(PROPERTY_INDIGO);
-            patch.properties.Add(PROPERTY_LIME);
-            patch.properties.Add(PROPERTY_STROBE);
+            UEOSPatch *patch = UEOSPatch::Create(type, 10);
+            patch->addProperty(PROPERTY_INTENSITY);
+            patch->addProperty(PROPERTY_RED);
+            patch->addProperty(PROPERTY_GREEN);
+            patch->addProperty(PROPERTY_BLUE);
+            patch->addProperty(PROPERTY_INDIGO);
+            patch->addProperty(PROPERTY_LIME);
+            patch->addProperty(PROPERTY_STROBE);
             return patch;
         }
         if(type == LIGHT_TYPE_MAVERICK_MK3_PROFILE_54CH)
         {
-            FEOSPatch patch(type, 54);
-            patch.properties.Add(PROPERTY_PAN);
-            patch.properties.Add(PROPERTY_TILT);
-            patch.properties.Add(PROPERTY_POSITION_MSPEED);
-            patch.properties.Add(PROPERTY_INTENSITY);
-            patch.properties.Add(PROPERTY_STROBE);
-            patch.properties.Add(PROPERTY_CYAN);
-            patch.properties.Add(PROPERTY_MAGENTA);
-            patch.properties.Add(PROPERTY_YELLOW);
-            patch.properties.Add(PROPERTY_CT);
-            patch.properties.Add(PROPERTY_COLOR_SELECT);
-            patch.properties.Add(PROPERTY_GOBO_SELECT);
-            patch.properties.Add(PROPERTY_GOBO_INDEX_SPEED);
-            patch.properties.Add(PROPERTY_GOBO_SELECT_2);
-            patch.properties.Add(PROPERTY_ANIMATION_SELECT);
-            patch.properties.Add(PROPERTY_ANIMATION_INDEX_SPEED);
-            patch.properties.Add(PROPERTY_SHUTTER_3_B);
-            patch.properties.Add(PROPERTY_SHUTTER_3_A);
-            patch.properties.Add(PROPERTY_SHUTTER_2_B);
-            patch.properties.Add(PROPERTY_SHUTTER_2_A);
-            patch.properties.Add(PROPERTY_SHUTTER_1_B);
-            patch.properties.Add(PROPERTY_SHUTTER_1_A);
-            patch.properties.Add(PROPERTY_SHUTTER_4_B);
-            patch.properties.Add(PROPERTY_SHUTTER_4_A);
-            patch.properties.Add(PROPERTY_SHUTTER_FRAME_ROT);
-            patch.properties.Add(PROPERTY_EDGE);
-            patch.properties.Add(PROPERTY_EDGE_MODE);
-            patch.properties.Add(PROPERTY_ZOOM);
-            patch.properties.Add(PROPERTY_BEAM_FX_SELECT);
-            patch.properties.Add(PROPERTY_BEAM_FX_INDEX_SPEED);
-            patch.properties.Add(PROPERTY_BEAM_FX_SELECT_2);
-            patch.properties.Add(PROPERTY_BEAM_FX_INDEX_SPEED_2);
-            patch.properties.Add(PROPERTY_IRIS);
-            patch.properties.Add(PROPERTY_DIFFUSION);
-            patch.properties.Add(PROPERTY_DIFFUSION_2);
-            patch.properties.Add(PROPERTY_CRI);
-            patch.properties.Add(PROPERTY_COLOR_MIX);
-            patch.properties.Add(PROPERTY_POSITION_BLINK);
+            UEOSPatch *patch = UEOSPatch::Create(type, 54);
+            patch->addProperty(PROPERTY_PAN);
+            patch->addProperty(PROPERTY_TILT);
+            patch->addProperty(PROPERTY_POSITION_MSPEED);
+            patch->addProperty(PROPERTY_INTENSITY);
+            patch->addProperty(PROPERTY_STROBE);
+            patch->addProperty(PROPERTY_CYAN);
+            patch->addProperty(PROPERTY_MAGENTA);
+            patch->addProperty(PROPERTY_YELLOW);
+            patch->addProperty(PROPERTY_CT);
+            patch->addProperty(PROPERTY_COLOR_SELECT);
+            patch->addProperty(PROPERTY_GOBO_SELECT);
+            patch->addProperty(PROPERTY_GOBO_INDEX_SPEED);
+            patch->addProperty(PROPERTY_GOBO_SELECT_2);
+            patch->addProperty(PROPERTY_ANIMATION_SELECT);
+            patch->addProperty(PROPERTY_ANIMATION_INDEX_SPEED);
+            patch->addProperty(PROPERTY_SHUTTER_3_B);
+            patch->addProperty(PROPERTY_SHUTTER_3_A);
+            patch->addProperty(PROPERTY_SHUTTER_2_B);
+            patch->addProperty(PROPERTY_SHUTTER_2_A);
+            patch->addProperty(PROPERTY_SHUTTER_1_B);
+            patch->addProperty(PROPERTY_SHUTTER_1_A);
+            patch->addProperty(PROPERTY_SHUTTER_4_B);
+            patch->addProperty(PROPERTY_SHUTTER_4_A);
+            patch->addProperty(PROPERTY_SHUTTER_FRAME_ROT);
+            patch->addProperty(PROPERTY_EDGE);
+            patch->addProperty(PROPERTY_EDGE_MODE);
+            patch->addProperty(PROPERTY_ZOOM);
+            patch->addProperty(PROPERTY_BEAM_FX_SELECT);
+            patch->addProperty(PROPERTY_BEAM_FX_INDEX_SPEED);
+            patch->addProperty(PROPERTY_BEAM_FX_SELECT_2);
+            patch->addProperty(PROPERTY_BEAM_FX_INDEX_SPEED_2);
+            patch->addProperty(PROPERTY_IRIS);
+            patch->addProperty(PROPERTY_DIFFUSION);
+            patch->addProperty(PROPERTY_DIFFUSION_2);
+            patch->addProperty(PROPERTY_CRI);
+            patch->addProperty(PROPERTY_COLOR_MIX);
+            patch->addProperty(PROPERTY_POSITION_BLINK);
             return patch;
         }
         if(type == LIGHT_TYPE_MAVERICK_MK3_WASH_BASIC)
         {
-            FEOSPatch patch(type, 21);
-            patch.properties.Add(PROPERTY_PAN);
-            patch.properties.Add(PROPERTY_TILT);
-            patch.properties.Add(PROPERTY_POSITION_MSPEED);
-            patch.properties.Add(PROPERTY_CT);
-            patch.properties.Add(PROPERTY_COLOR_MIX);
-            patch.properties.Add(PROPERTY_PIXEL_MASK_2);
-            patch.properties.Add(PROPERTY_PIXEL_MASK);
-            patch.properties.Add(PROPERTY_PIXEL_MASK_EFFECT_TIME);
-            patch.properties.Add(PROPERTY_PIXEL_MASK_EFFECT_STEP_TIME);
-            patch.properties.Add(PROPERTY_BACKGROUND_COLOR_MIX);
-            patch.properties.Add(PROPERTY_BACKGROUND_INTENSITY);
-            patch.properties.Add(PROPERTY_INTENSITY);
-            patch.properties.Add(PROPERTY_STROBE);
-            patch.properties.Add(PROPERTY_ZOOM);
-            patch.properties.Add(PROPERTY_POSITION_BLINK);
-            patch.properties.Add(PROPERTY_RED);
-            patch.properties.Add(PROPERTY_GREEN);
-            patch.properties.Add(PROPERTY_BLUE);
-            patch.properties.Add(PROPERTY_WHITE);
+            UEOSPatch *patch = UEOSPatch::Create(type, 21);
+            patch->addProperty(PROPERTY_PAN);
+            patch->addProperty(PROPERTY_TILT);
+            patch->addProperty(PROPERTY_POSITION_MSPEED);
+            patch->addProperty(PROPERTY_CT);
+            patch->addProperty(PROPERTY_COLOR_MIX);
+            patch->addProperty(PROPERTY_PIXEL_MASK_2);
+            patch->addProperty(PROPERTY_PIXEL_MASK);
+            patch->addProperty(PROPERTY_PIXEL_MASK_EFFECT_TIME);
+            patch->addProperty(PROPERTY_PIXEL_MASK_EFFECT_STEP_TIME);
+            patch->addProperty(PROPERTY_BACKGROUND_COLOR_MIX);
+            patch->addProperty(PROPERTY_BACKGROUND_INTENSITY);
+            patch->addProperty(PROPERTY_INTENSITY);
+            patch->addProperty(PROPERTY_STROBE);
+            patch->addProperty(PROPERTY_ZOOM);
+            patch->addProperty(PROPERTY_POSITION_BLINK);
+            patch->addProperty(PROPERTY_RED);
+            patch->addProperty(PROPERTY_GREEN);
+            patch->addProperty(PROPERTY_BLUE);
+            patch->addProperty(PROPERTY_WHITE);
             return patch;
         }
         UE_LOG(LogTemp, Warning, TEXT("Unknown patch type: %s"), *(type.ToString()));
-        FEOSPatch def(type, 1);
+        UEOSPatch *def = UEOSPatch::Create(type, 1);
         return def;
     }
 };

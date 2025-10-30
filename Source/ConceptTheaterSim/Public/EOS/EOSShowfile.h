@@ -6,17 +6,19 @@
 #include "UObject/NoExportTypes.h"
 #include "EOSShowfile.generated.h"
 
-USTRUCT()
-struct CONCEPTTHEATERSIM_API FEOSPatch
+UCLASS()
+class CONCEPTTHEATERSIM_API UEOSPatch : public UObject
 {
     GENERATED_BODY()
 
 public:
-    FEOSPatch() {}
-    FEOSPatch(FName type_, int size_)
+    UEOSPatch() {}
+    static UEOSPatch* Create(FName lightType, int dmxSize)
     {
-        type = type_;
-        size = size_;
+        UEOSPatch *patch = NewObject<UEOSPatch>();
+        patch->type = lightType;
+        patch->size = dmxSize;
+        return patch;
     }
 
     UPROPERTY()
@@ -34,10 +36,15 @@ public:
 
     UPROPERTY()
     TSet<FName> properties;
+
+    void addProperty(FName property)
+    {
+        properties.Add(property);
+    }
 };
 
-USTRUCT()
-struct CONCEPTTHEATERSIM_API FEOSPatchSet
+UCLASS()
+class CONCEPTTHEATERSIM_API UEOSPatchSet : public UObject
 {
     GENERATED_BODY()
 
@@ -46,22 +53,27 @@ public:
     int channel;
     
     UPROPERTY()
-    TArray<FEOSPatch> devices;
+    TArray<UEOSPatch*> devices;
 
-    bool canAdd(FEOSPatch device)
+    bool canAdd(UEOSPatch* device)
     {
         if(devices.Num() == 0)
             return true;
-        return devices[0].type == device.type;
+        return devices[0]->type == device->type;
     }
 };
 
-USTRUCT()
-struct CONCEPTTHEATERSIM_API FEOSPropertySet
+UCLASS()
+class CONCEPTTHEATERSIM_API UEOSPropertySet : public UObject
 {
     GENERATED_BODY()
 
 public:
+    static UEOSPropertySet* Create()
+    {
+        return NewObject<UEOSPropertySet>();
+    }
+
     UPROPERTY()
     TMap<FName, double> properties;
 
@@ -119,13 +131,13 @@ public:
     FString fileName;
 
     UPROPERTY()
-    TMap<int, FEOSPatchSet> patch;
+    TMap<int, UEOSPatchSet*> patch;
 
     UPROPERTY()
-    TMap<int, FEOSPropertySet> channels;
+    TMap<int, UEOSPropertySet*> channels;
 
     UFUNCTION()
-    bool patchLight(int ch, FEOSPatch light);
+    bool patchLight(int ch, UEOSPatch* light);
 
     UFUNCTION(BlueprintCallable)
     TArray<int> getPatchedChannels();

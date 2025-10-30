@@ -56,24 +56,24 @@ class CONCEPTTHEATERSIM_API ETCColorSourceDirect : public EOSLightOutputType
     {
         TArray<int> out;
         out.Init(0, 7);
-        out[0] = toByte(*(parameters->Find(PROPERTY_RED)));
-        out[1] = toByte(*(parameters->Find(PROPERTY_GREEN)));
-        out[2] = toByte(*(parameters->Find(PROPERTY_BLUE)));
-        out[3] = toByte(*(parameters->Find(PROPERTY_INDIGO)));
-        out[4] = toByte(*(parameters->Find(PROPERTY_LIME)));
-        out[5] = toByte(*(parameters->Find(PROPERTY_INTENSITY)));
+        out[0] = toByte(*(parameters->Find(PROPERTY_INTENSITY)));
+        out[1] = toByte(*(parameters->Find(PROPERTY_RED)));
+        out[2] = toByte(*(parameters->Find(PROPERTY_GREEN)));
+        out[3] = toByte(*(parameters->Find(PROPERTY_BLUE)));
+        out[4] = toByte(*(parameters->Find(PROPERTY_INDIGO)));
+        out[5] = toByte(*(parameters->Find(PROPERTY_LIME)));
         out[6] = 0; // strobe
         return out;
     }
 
     virtual void input(TArray<int> dmx, TMap<FName, double> *parameters) override
     {
-        parameters->Add(PROPERTY_RED, fromByte(dmx[0]));
-        parameters->Add(PROPERTY_GREEN, fromByte(dmx[1]));
-        parameters->Add(PROPERTY_BLUE, fromByte(dmx[2]));
-        parameters->Add(PROPERTY_INDIGO, fromByte(dmx[3]));
-        parameters->Add(PROPERTY_LIME, fromByte(dmx[4]));
-        parameters->Add(PROPERTY_INTENSITY, fromByte(dmx[5]));
+        parameters->Add(PROPERTY_INTENSITY, fromByte(dmx[0]));
+        parameters->Add(PROPERTY_RED, fromByte(dmx[1]));
+        parameters->Add(PROPERTY_GREEN, fromByte(dmx[2]));
+        parameters->Add(PROPERTY_BLUE, fromByte(dmx[3]));
+        parameters->Add(PROPERTY_INDIGO, fromByte(dmx[4]));
+        parameters->Add(PROPERTY_LIME, fromByte(dmx[5]));
     } 
 };
 
@@ -83,10 +83,10 @@ class CONCEPTTHEATERSIM_API MaverickMk3Profile54Ch : public EOSLightOutputType
     {
         TArray<int> out;
         out.Init(0, 54);
-        out[0] = toByteCoarse(*(parameters->Find(PROPERTY_PAN)));
-        out[1] = toByteFine(*(parameters->Find(PROPERTY_PAN)));
-        out[2] = toByteCoarse(*(parameters->Find(PROPERTY_TILT)));
-        out[3] = toByteFine(*(parameters->Find(PROPERTY_TILT)));
+        out[0] = toByteCoarseRanged(*(parameters->Find(PROPERTY_PAN)), -100, 100);
+        out[1] = toByteFineRanged(*(parameters->Find(PROPERTY_PAN)), -100, 100);
+        out[2] = toByteCoarseRanged(*(parameters->Find(PROPERTY_TILT)), -135, 135);
+        out[3] = toByteFineRanged(*(parameters->Find(PROPERTY_TILT)), -135, 135);
         out[4] = toByte(*(parameters->Find(PROPERTY_POSITION_MSPEED)));
         out[5] = toByteCoarse(*(parameters->Find(PROPERTY_INTENSITY)));
         out[6] = toByteFine(*(parameters->Find(PROPERTY_INTENSITY)));
@@ -119,13 +119,13 @@ class CONCEPTTHEATERSIM_API MaverickMk3Profile54Ch : public EOSLightOutputType
         out[33] = toByteFine(*(parameters->Find(PROPERTY_SHUTTER_4_B)));
         out[34] = toByteCoarse(*(parameters->Find(PROPERTY_SHUTTER_4_A)));
         out[35] = toByteFine(*(parameters->Find(PROPERTY_SHUTTER_4_A)));
-        out[36] = toByteCoarse(*(parameters->Find(PROPERTY_SHUTTER_FRAME_ROT)));
-        out[37] = toByteFine(*(parameters->Find(PROPERTY_SHUTTER_FRAME_ROT)));
-        out[38] = toByteCoarse(*(parameters->Find(PROPERTY_EDGE)));
-        out[39] = toByteFine(*(parameters->Find(PROPERTY_EDGE)));
+        out[36] = toByteCoarseRanged(*(parameters->Find(PROPERTY_SHUTTER_FRAME_ROT)), -1, 1);
+        out[37] = toByteFineRanged(*(parameters->Find(PROPERTY_SHUTTER_FRAME_ROT)), -1, 1);
+        out[38] = toByteCoarseRanged(*(parameters->Find(PROPERTY_EDGE)), 0, 1);
+        out[39] = toByteFineRanged(*(parameters->Find(PROPERTY_EDGE)), 0, 1);
         out[40] = (int)(*(parameters->Find(PROPERTY_EDGE_MODE)));
-        out[41] = toByteCoarse(*(parameters->Find(PROPERTY_ZOOM)));
-        out[42] = toByteFine(*(parameters->Find(PROPERTY_ZOOM)));
+        out[41] = toByteCoarseRanged(*(parameters->Find(PROPERTY_ZOOM)), 50, 10);
+        out[42] = toByteFineRanged(*(parameters->Find(PROPERTY_ZOOM)), 50, 10);
         out[43] = (int)(*(parameters->Find(PROPERTY_BEAM_FX_SELECT)));
         out[44] = (int)(*(parameters->Find(PROPERTY_BEAM_FX_INDEX_SPEED)));
         out[45] = (int)(*(parameters->Find(PROPERTY_BEAM_FX_SELECT_2)));
@@ -142,8 +142,8 @@ class CONCEPTTHEATERSIM_API MaverickMk3Profile54Ch : public EOSLightOutputType
 
     virtual void input(TArray<int> dmx, TMap<FName, double> *parameters) override
     {
-        parameters->Add(PROPERTY_PAN, fromByte16b(dmx[0], dmx[1]));
-        parameters->Add(PROPERTY_TILT, fromByte16b(dmx[2], dmx[3]));
+        parameters->Add(PROPERTY_PAN, fromByte16bRanged(dmx[0], dmx[1], -100, 100));
+        parameters->Add(PROPERTY_TILT, fromByte16bRanged(dmx[2], dmx[3], -135, 135));
         parameters->Add(PROPERTY_POSITION_MSPEED, fromByte(dmx[4]));
         parameters->Add(PROPERTY_INTENSITY, fromByte16b(dmx[5], dmx[6]));
         parameters->Add(PROPERTY_STROBE, dmx[7]);
@@ -166,10 +166,10 @@ class CONCEPTTHEATERSIM_API MaverickMk3Profile54Ch : public EOSLightOutputType
         parameters->Add(PROPERTY_SHUTTER_1_A, fromByte16b(dmx[30], dmx[31]));
         parameters->Add(PROPERTY_SHUTTER_4_B, fromByte16b(dmx[32], dmx[33]));
         parameters->Add(PROPERTY_SHUTTER_4_A, fromByte16b(dmx[34], dmx[35]));
-        parameters->Add(PROPERTY_SHUTTER_FRAME_ROT, fromByte16b(dmx[36], dmx[37]));
+        parameters->Add(PROPERTY_SHUTTER_FRAME_ROT, fromByte16bRanged(dmx[36], dmx[37], -1, 1));
         parameters->Add(PROPERTY_EDGE, fromByte16b(dmx[38], dmx[39]));
         parameters->Add(PROPERTY_EDGE_MODE, dmx[40]);
-        parameters->Add(PROPERTY_ZOOM, fromByte16b(dmx[41], dmx[42]));
+        parameters->Add(PROPERTY_ZOOM, fromByte16bRanged(dmx[41], dmx[42], 50, 10));
         parameters->Add(PROPERTY_BEAM_FX_SELECT, dmx[43]);
         parameters->Add(PROPERTY_BEAM_FX_INDEX_SPEED, dmx[44]);
         parameters->Add(PROPERTY_BEAM_FX_SELECT_2, dmx[45]);

@@ -112,6 +112,6 @@ TArray<FName> UEOSScreenBase::getChannelParameters(int ch)
         return params;
     if(!board->showfile->channels.Contains(ch))
         return params;
-    board->showfile->channels[ch].properties.GetKeys(params);
+    board->showfile->channels[ch]->properties.GetKeys(params);
     return params;
 }

@@ -11,24 +11,26 @@ UEOSShowfile::~UEOSShowfile()
 
 }
 
-bool UEOSShowfile::patchLight(int ch, FEOSPatch light)
+bool UEOSShowfile::patchLight(int ch, UEOSPatch* light)
 {
-    FEOSPatchSet *set = patch.Find(ch);
-    if(!set)
+    UEOSPatchSet **p = patch.Find(ch);
+    UEOSPatchSet *set = nullptr;
+    if(!p)
     {
-        FEOSPatchSet s;
-        s.channel = ch;
-        set = &s;
+        UEOSPatchSet *s = NewObject<UEOSPatchSet>();
+        s->channel = ch;
+        set = s;
         patch.Add(ch, s);
-        FEOSPropertySet propSet;
-        for(FName &name : light.properties)
+        UEOSPropertySet* propSet = UEOSPropertySet::Create();
+        for(FName &name : light->properties)
         {
-            propSet.add(name, 0);
+            propSet->add(name, 0);
         }
         channels.Add(ch, propSet);
     }
     else
     {
+        set = *p;
         if(!set->canAdd(light))
         {
             return false;
@@ -47,9 +49,9 @@ TArray<int> UEOSShowfile::getPatchedChannels()
 
 double UEOSShowfile::getParameter(int ch, FName parameter)
 {
-    if(FEOSPropertySet* set = channels.Find(ch))
+    if(UEOSPropertySet** set = channels.Find(ch))
     {
-        return set->get(parameter);
+        return (*set)->get(parameter);
     }
     return 0;
 }
