@@ -4,7 +4,44 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
+#include "JsonUtilities.h"
 #include "EOSShowfile.generated.h"
+
+/*
+JSON:
+
+{
+    "version": 1,
+    "patch": [
+        CHANNEL_PATCH
+    ],
+    "cues": [
+        CUE
+    ]
+}
+
+CHANNEL_PATCH: {
+    "ch": [channel number]
+    "type": "[light type]",
+    "universe": [universe],
+    "address": [address]
+}
+
+CUE: {
+    "cue": [cue number],
+    "time": [duration],
+    "timecode"?: "[timestring]",
+    "follow"?: [follow time],
+    "hang"?: [hang time],
+    "actions": [
+        { "ch": [channel], "[Property]": [value] ... },
+        ...
+    ]
+}
+
+
+*/
+
 
 UCLASS()
 class CONCEPTTHEATERSIM_API UEOSPatch : public UObject
@@ -111,6 +148,41 @@ public:
 };
 
 UCLASS(BlueprintType)
+class CONCEPTTHEATERSIM_API UEOSCue : public UObject
+{
+    GENERATED_BODY()
+
+public:
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+    double cueNumber;
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+    double time;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+    double hang = -1;
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+    double follow = -1;
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+    int timecode = -1;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+    TMap<int, UEOSPropertySet*> actions;
+
+    static inline FString JSON_CUE = TEXT("cue");
+    static inline FString JSON_TIME = TEXT("time");
+    
+    static inline FString JSON_TIMECODE = TEXT("timecode");
+    static inline FString JSON_FOLLOW = TEXT("follow");
+    static inline FString JSON_HANG = TEXT("hang");
+
+    static inline FString JSON_ACTIONS = TEXT("actions");
+
+    static inline FString JSON_ACTIONS_CH = TEXT("ch");
+
+    static UEOSCue *FromJSON(TSharedPtr<FJsonObject> cueJson);
+};
+
+UCLASS(BlueprintType)
 class CONCEPTTHEATERSIM_API UEOSShowfile : public UObject
 {
     GENERATED_BODY()
@@ -136,6 +208,9 @@ public:
     UPROPERTY()
     TMap<int, UEOSPropertySet*> channels;
 
+    UPROPERTY()
+    TArray<UEOSCue*> cues;
+
     UFUNCTION()
     bool patchLight(int ch, UEOSPatch* light);
 
@@ -144,4 +219,16 @@ public:
 
     UFUNCTION(BlueprintCallable)
     double getParameter(int ch, FName parameter);
+
+    bool loadFromJson(TSharedPtr<FJsonObject> cueJson);
+    
+    static inline FString JSON_VERSION = TEXT("version");
+
+    static inline FString JSON_PATCH = TEXT("patch");
+    static inline FString JSON_PATCH_CH = TEXT("ch");
+    static inline FString JSON_PATCH_TYPE = TEXT("type");
+    static inline FString JSON_PATCH_UNIVERSE = TEXT("universe");
+    static inline FString JSON_PATCH_ADDRESS = TEXT("address");
+
+    static inline FString JSON_CUES = TEXT("cues");
 };

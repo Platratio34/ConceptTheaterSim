@@ -124,6 +124,107 @@ public:
         return seconds;
     };
 
+    static int parseTimeStringFrames(FString timeString)
+    {
+        int frames = 0;
+        int segment = 0;
+        int lastSegment = 0;
+        int nextBase = 1;
+        for (int i = timeString.Len() - 1; i >= 0; i--)
+        {
+            TCHAR c = timeString[i];
+            switch (c)
+            {
+            case ':':
+                switch (segment)
+                {
+                case 0: // frames
+                    frames += lastSegment;
+                    break;
+                case 1: // seconds
+                    frames += lastSegment*30;
+                    break;
+                case 2: // minutes
+                    frames += lastSegment*30*60;
+                    break;
+                case 3: // hours
+                    frames += lastSegment*30*60*60;
+                    break;
+                }
+                segment++;
+                lastSegment = 0;
+                nextBase = 1;
+                break;
+
+            case '0':
+                nextBase *= 10;
+                break;
+
+            case '1':
+                lastSegment += nextBase;
+                nextBase *= 10;
+                break;
+
+            case '2':
+                lastSegment += nextBase * 2;
+                nextBase *= 10;
+                break;
+
+            case '3':
+                lastSegment += nextBase * 3;
+                nextBase *= 10;
+                break;
+
+            case '4':
+                lastSegment += nextBase * 4;
+                nextBase *= 10;
+                break;
+
+            case '5':
+                lastSegment += nextBase * 5;
+                nextBase *= 10;
+                break;
+
+            case '6':
+                lastSegment += nextBase * 6;
+                nextBase *= 10;
+                break;
+
+            case '7':
+                lastSegment += nextBase * 7;
+                nextBase *= 10;
+                break;
+
+            case '8':
+                lastSegment += nextBase * 8;
+                nextBase *= 10;
+                break;
+
+            case '9':
+                lastSegment += nextBase * 9;
+                nextBase *= 10;
+                break;
+
+            }
+        }
+        switch (segment)
+        {
+        case 0: // frames
+            frames += lastSegment;
+            break;
+        case 1: // seconds
+            frames += lastSegment*30;
+            break;
+        case 2: // minutes
+            frames += lastSegment*30*60;
+            break;
+        case 3: // hours
+            frames += lastSegment*30*60*60;
+            break;
+        }
+        return frames;
+    };
+
     static FString createTimeStringFromFrames(int frames)
     {
         int f = frames % 30;
