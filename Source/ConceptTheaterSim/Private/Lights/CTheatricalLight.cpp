@@ -263,8 +263,11 @@ void ACTheatricalLight::setShutter(int index, FShutterPosition position)
     if(USceneComponent** p = shutterHandles.Find(index))
     {
         USceneComponent *handle = *p;
-        handle->SetRelativeLocation(FVector(0, position.position*shutterHandleTravel*2.54, 0));
-        handle->SetRelativeRotation(FRotator(0, atan(position.angleOffset) / DEG_TO_RAD, 0));
+        if(handle != nullptr)
+        {
+            handle->SetRelativeLocation(FVector(0, position.position*shutterHandleTravel*2.54, 0));
+            handle->SetRelativeRotation(FRotator(0, atan(position.angleOffset) / DEG_TO_RAD, 0));
+        }
     }
 }
 
@@ -282,8 +285,11 @@ void ACTheatricalLight::updateShutters()
         if(USceneComponent** p = shutterHandles.Find(i))
         {
             USceneComponent *handle = *p;
-            handle->SetRelativeLocation(FVector(0, shutterPositions[i].position*shutterHandleTravel*2.54, 0));
-            handle->SetRelativeRotation(FRotator(0, atan(shutterPositions[i].angleOffset) / DEG_TO_RAD, 0));
+            if(handle != nullptr)
+            {
+                handle->SetRelativeLocation(FVector(0, shutterPositions[i].position*shutterHandleTravel*2.54, 0));
+                handle->SetRelativeRotation(FRotator(0, atan(shutterPositions[i].angleOffset) / DEG_TO_RAD, 0));
+            }
         }
     }
 }

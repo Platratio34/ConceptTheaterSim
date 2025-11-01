@@ -1,0 +1,28 @@
+{
+    "tracks": {
+        "Percy": {
+            "events": [
+                { "time": "00:00:00:01", "x": "35'", "y": "-17'10", "z": 0, "xRot": 0, "yRot": 0, "zRot": 90, "parent": "", "visibility": true}
+            ]
+        },
+        "Luke": {
+            "events": [
+                { "time": "00:00:00:01", "x": "36'1", "y": "-9'8", "z": 0, "xRot": 0, "yRot": 0, "zRot": 90, "parent": "", "visibility": true},
+                { "time": "00:00:09:15", "duration": "15", "x": "26'5" },
+                { "time": "00:00:10:00", "duration": "13", "z": "2'" },
+                { "time": "00:00:10:00", "duration": "2:10", "x": "0", "y": "-9'3.5" },
+                { "time": "00:00:11:08", "duration": "20", "z": "4'" },
+                { "time": "00:00:11:25", "duration": "15", "zRot": 0 }
+            ]
+        },
+        "Annabeth": {
+            "events": [
+                { "time": "00:00:00:01", "x": "36'1", "y": "-9'8", "z": 0, "xRot": 0, "yRot": 0, "zRot": 90, "parent": "", "visibility": true},
+                { "time": "00:00:14:01", "duration": "6:15", "x": "28'3"},
+                { "time": "00:00:20:16", "duration": "1:14", "x": "14'2"},
+                { "time": "00:00:20:16", "duration": "1:02", "z": "2'"},
+                { "time": "00:00:21:18", "duration": "12", "zRot": 0}
+            ]
+        }
+    }
+}

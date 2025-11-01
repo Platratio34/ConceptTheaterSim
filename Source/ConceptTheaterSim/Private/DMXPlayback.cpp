@@ -129,6 +129,8 @@ void ADMXPlayback::LoadFile(FString filename) {
 }
 
 bool ADMXPlayback::UpdateTime(int newFrames) {
+    if(!loaded)
+        return false;
     int last = cFrameNumber;
     cFrameNumber = newFrames;
 

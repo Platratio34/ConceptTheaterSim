@@ -322,10 +322,15 @@ public:
     static FAnimationFileTrackEvent CreateFrom(TSharedPtr<FJsonObject> eventJson)
     {
         FAnimationFileTrackEvent event;
-        event.time = eventJson->GetStringField(TEXT("time"));
+        event.time = eventJson->GetStringField(JSON_TIME);
         event.timeSeconds = parseTimeString(event.time);
-        if(eventJson->HasField(TEXT("duration")))
-            event.duration = eventJson->GetNumberField(TEXT("duration"));
+        if(eventJson->HasField(JSON_DURATION))
+        {
+            if(eventJson->HasTypedField(JSON_DURATION, EJson::String))
+                event.duration = parseTimeString(eventJson->GetStringField(JSON_DURATION));
+            else
+                event.duration = eventJson->GetNumberField(JSON_DURATION);
+        }
 
         if(eventJson->HasField(JSON_X))
         {
@@ -386,6 +391,9 @@ public:
         
         return event;
     }
+    
+    static inline FString JSON_TIME = TEXT("time");
+    static inline FString JSON_DURATION = TEXT("duration");
 
     static inline FString JSON_X = TEXT("x");
     static inline FString JSON_Y = TEXT("y");

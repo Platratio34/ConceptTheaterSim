@@ -113,7 +113,6 @@ void UCAnimationComponent::onEvent(FAnimationFileTrackEvent event)
             cPos.X = event.x * IN_TO_CM;
         xPosDriver->SetTarget(event.x, event.duration);
     }
-        xPosDriver->SetTarget(event.x, event.duration);
     if(event.yKey)
     {
         if(isInstant)
