@@ -26,7 +26,7 @@ void AETCLightBoard::BeginPlay()
         networkCard->addUniverse(u);
     }
 
-    if(showfile == nullptr)
+    if(showfile == nullptr && autoLoad)
     {
         if(showPatch != nullptr)
         {
@@ -132,6 +132,8 @@ void AETCLightBoard::BeginPlay()
     // setButtonColor(BUTTON_HIGH, FColor(255, 255, 255), FColor(255, 255, 0));
     
     // setButtonColor(BUTTON_CLEAR, FColor(255, 255, 255), FColor(255, 32, 32));
+
+    fades.Init(nullptr, 200);
 }
 
 // Called every frame
@@ -151,12 +153,96 @@ void AETCLightBoard::Tick(float DeltaTime)
 
     setButtonActive(BUTTON_SHIFT, shift);
 
-    for (int u = 1; u <= 10; u++)
+    if(showfile && followTime != -1)
     {
-        if(!networkCard->hasChanged(u))
+        followTime -= DeltaTime;
+        if(followTime <= 0)
+        {
+            executeCue(showfile->currentCue + 1, -1);
+        }
+    }
+
+    updateFades(DeltaTime);
+
+    if(output)
+    {
+        if(showfile != nullptr)
+            for (int u = 1; u <= 10; u++)
+            {
+                networkCard->sendData(FName(TEXT("EOS")), 128, u, outputUniverse(u));
+            }
+    }
+    else
+    {
+        for (int u = 1; u <= 10; u++)
+        {
+            if(!networkCard->hasChanged(u))
+                continue;
+            updateUniverse(u, networkCard->getData(u));
+            networkCard->clearChanged(u);
+        }
+    }
+}
+
+void AETCLightBoard::addFade(int channel, FName property, double target, double time)
+{
+    int firstNull = -1;
+    for (int i = 0; i < fades.Num(); i++)
+    {
+        UEOSFade *f = fades[i];
+        if(f == nullptr)
+        {
+            firstNull = i;
             continue;
-        updateUniverse(u, networkCard->getData(u));
-        networkCard->clearChanged(u);
+        }
+        if(f->channel == channel && f->property == property)
+        {
+            f->target = target;
+            f->time = time;
+            return;
+        }
+    }
+    UEOSFade *fade = NewObject<UEOSFade>();
+    fade->channel = channel;
+    fade->property = property;
+    fade->target = target;
+    fade->time = time;
+    if(firstNull != -1)
+    {
+        fades[firstNull] = fade;
+    }
+    else
+    {
+        fades.Add(fade);
+    }
+}
+
+void AETCLightBoard::updateFades(double deltaTime)
+{
+    if(showfile == nullptr)
+        return;
+    for (int i = 0; i < fades.Num(); i++)
+    {
+        UEOSFade *fade = fades[i];
+        if(fade == nullptr)
+            continue;
+        if(fade->update(showfile, deltaTime))
+            fades[i] = nullptr;
+    }
+}
+
+void AETCLightBoard::clearFade(int channel, FName property)
+{
+    for (int i = 0; i < fades.Num(); i++)
+    {
+        UEOSFade *fade = fades[i];
+        if(fade == nullptr)
+            continue;
+        if(fade->channel == channel && fade->property == property)
+        {
+            fades[i] = nullptr;
+            return;
+        }
     }
 }
 
@@ -179,15 +265,35 @@ void AETCLightBoard::updateUniverse(int universe, TArray<int> dmx)
             // UE_LOG(LogTemp, Display, TEXT("Updating channel %d"), ch);
             
             EOSLightOutputType* outputType = EOSLightOutputType::getType(patch->type);
-            TArray<int> d2;
-            d2.Init(0, patch->size);
-            for (int j = 0; j < patch->size; j++)
-            {
-                d2[j] = dmx[j+patch->address-1];
-            }
-            outputType->input(d2, &(showfile->channels[ch]->properties));
+            outputType->input(dmx, showfile->channels[ch], patch->address-1);
         }
     }
+}
+
+TArray<int> AETCLightBoard::outputUniverse(int universe)
+{
+    TArray<int> dmxData;
+    dmxData.Init(0, 512);
+    if(showfile == nullptr)
+        return dmxData;
+    for (auto &elem : showfile->patch)
+    {
+        UEOSPatchSet* patchSet = elem.Value;
+        int ch = elem.Key;
+        for (int i = 0; i < patchSet->devices.Num(); i++)
+        {
+            UEOSPatch *patch = patchSet->devices[i];
+            if(patch->universe != universe)
+            {
+                continue;
+            }
+            // UE_LOG(LogTemp, Display, TEXT("Outputting Ch %d at %d/%d"), ch, patch->universe, patch->address);
+
+            EOSLightOutputType* outputType = EOSLightOutputType::getType(patch->type);
+            outputType->output(showfile->channels[ch], dmxData, patch->address-1);
+        }
+    }
+    return dmxData;
 }
 
 void AETCLightBoard::setButtonColor(FName button, int r, int g, int b)
@@ -249,11 +355,19 @@ void AETCLightBoard::onInteract(UPrimitiveComponent* component)
         else if(button == BUTTON_GO)
         {
             // TODO: update when Qs are added
+            if(showfile != nullptr)
+            {
+                cueGo();
+            }
             return;
         }
         else if(button == BUTTON_BACK)
         {
             // TODO: update when Qs are added
+            if(showfile != nullptr)
+            {
+                cueBack();
+            }
             return;
         }
         
@@ -462,6 +576,17 @@ void AETCLightBoard::executeCommand()
         clearCmd = true;
         return;
     }
+    else if(command[0] == BUTTON_GO_TO_CUE)
+    {
+        FString q = getCmdNumberS(1, nullptr);
+        for (int i = 0; i < showfile->cues.Num(); i++)
+        {
+            if(showfile->cues[i]->cueNumber == q)
+            {
+                executeCue(i, 1);
+            }
+        }
+    }
     commandError = TEXT("Unknown command");
 }
 
@@ -521,6 +646,143 @@ int AETCLightBoard::getCmdNumber(int start, int* len)
     if(len != nullptr)
         *len = l;
     return c;
+}
+double AETCLightBoard::getCmdNumberD(int start, int* len)
+{
+    double c = 0;
+    int l = 0;
+    bool dec = false;
+    double nextBase = 0.1;
+    for (int i = start; i < command.Num(); i++)
+    {
+        FName n = command[i];
+        int nx = -1;
+        if(n == BUTTON_DOT)
+        {
+            dec = true;
+        }
+        else if(n == BUTTON_0)
+        {
+            nx =  0;
+        }
+        else if(n == BUTTON_1)
+        {
+            nx =  1;
+        }
+        else if(n == BUTTON_2)
+        {
+            nx =  2;
+        }
+        else if(n == BUTTON_3)
+        {
+            nx =  3;
+        }
+        else if(n == BUTTON_4)
+        {
+            nx =  4;
+        }
+        else if(n == BUTTON_5)
+        {
+            nx =  5;
+        }
+        else if(n == BUTTON_6)
+        {
+            nx =  6;
+        }
+        else if(n == BUTTON_7)
+        {
+            nx =  7;
+        }
+        else if(n == BUTTON_8)
+        {
+            nx =  8;
+        }
+        else if(n == BUTTON_9)
+        {
+            nx =  9;
+        }
+        else
+        {
+            break;
+        }
+        if(nx != -1)
+        {
+            if(dec)
+            {
+                c += (nx * nextBase);
+                nextBase /= 10;
+            }
+            else
+            {
+                c = (c * 10) + nx;
+            }
+        }
+        l++;
+    }
+    if(len != nullptr)
+        *len = l;
+    return c;
+}
+FString AETCLightBoard::getCmdNumberS(int start, int* len)
+{
+    FString out;
+    int l = 0;
+    for (int i = start; i < command.Num(); i++)
+    {
+        FName n = command[i];
+        if(n == BUTTON_DOT)
+        {
+            out += TEXT(".");
+        }
+        else if(n == BUTTON_0)
+        {
+            out += TEXT("0");
+        }
+        else if(n == BUTTON_1)
+        {
+            out += TEXT("1");
+        }
+        else if(n == BUTTON_2)
+        {
+            out += TEXT("2");
+        }
+        else if(n == BUTTON_3)
+        {
+            out += TEXT("3");
+        }
+        else if(n == BUTTON_4)
+        {
+            out += TEXT("4");
+        }
+        else if(n == BUTTON_5)
+        {
+            out += TEXT("5");
+        }
+        else if(n == BUTTON_6)
+        {
+            out += TEXT("6");
+        }
+        else if(n == BUTTON_7)
+        {
+            out += TEXT("7");
+        }
+        else if(n == BUTTON_8)
+        {
+            out += TEXT("8");
+        }
+        else if(n == BUTTON_9)
+        {
+            out += TEXT("9");
+        }
+        else
+        {
+            break;
+        }
+        l++;
+    }
+    if(len != nullptr)
+        *len = l;
+    return out;
 }
 
 FCmdSelection AETCLightBoard::getCmdSelection(int start, int *end)
@@ -645,4 +907,164 @@ FCmdSelection AETCLightBoard::getCmdSelection(int start, int *end)
 void AETCLightBoard::onNetworkPacket(UNetworkPacket *packet)
 {
     
+}
+
+bool AETCLightBoard::loadShowfile(FString filePath)
+{
+    if(filePath.Len() <= 0)
+    {
+        UE_LOG(LogTemp, Error, TEXT("Failed to load showfile: empty path"));
+        return false;
+    }
+    UE_LOG(LogTemp, Display, TEXT("Loading EOS showfile: %s"), *filePath);
+
+    FString fullPathContent = FPaths::ProjectContentDir() + "/" + filePath;
+    FString fullPathSaved = FPaths::ProjectSavedDir() + "/SavedGames/EOS/" + filePath;
+    FString fullPath = fullPathSaved;
+    FString jsonString;
+    if(!FFileHelper::LoadFileToString(jsonString, *fullPath)) // try saved first, then default from content
+    {
+        fullPath = fullPathContent;
+        if(!FFileHelper::LoadFileToString(jsonString, *fullPath))
+        {
+            UE_LOG(LogTemp, Error, TEXT("Failed to load showfile: Could not open file (%s)"), *fullPath);
+            return false;
+        }
+    }
+
+    TSharedPtr<FJsonObject> jsonObject;
+    if(!FJsonSerializer::Deserialize(TJsonReaderFactory<>::Create(jsonString), jsonObject) || !jsonObject.IsValid())
+    {
+        UE_LOG(LogTemp, Error, TEXT("Failed to load showfile: Could not parse json (%s)"), *fullPath);
+        return false;
+    }
+
+    UEOSShowfile *newShowfile = UEOSShowfile::create(filePath);
+    if(!newShowfile->loadFromJson(jsonObject))
+    {
+        return false;
+    }
+    showfile = newShowfile;
+    for (int i = 0; i <= showfile->currentCue; i++)
+    {
+        UEOSCue *cue = showfile->cues[i];
+        for(TPair<int, UEOSPropertySet*> chPair : cue->actions)
+        {
+            showfile->channels[chPair.Key]->apply(chPair.Value);
+        }
+    }
+
+    return true;
+}
+
+void AETCLightBoard::saveShowfile(FString filePath)
+{
+    if(showfile == nullptr)
+    {
+        return;
+    }
+    if(filePath.Len() <= 0)
+    {
+        UE_LOG(LogTemp, Error, TEXT("Failed to save showfile: Empty path"));
+        return;
+    }
+    FString fullPath = FPaths::ProjectSavedDir() + "/SavedGames/EOS/" + filePath;
+
+    FString jsonString;
+    TSharedPtr<FJsonObject> jsonObject = showfile->toJson();
+    if(!FJsonSerializer::Serialize(jsonObject.ToSharedRef(), TJsonWriterFactory<>::Create(&jsonString, 0)))
+    {
+        UE_LOG(LogTemp, Error, TEXT("Failed to save showfile: Could serialize json (%s)"), *fullPath);
+        return;
+    }
+
+    if(!FFileHelper::SaveStringToFile(jsonString, *fullPath))
+    {
+        UE_LOG(LogTemp, Error, TEXT("Failed to save showfile: Could not write file (%s)"), *fullPath);
+        return;
+    }
+    UE_LOG(LogTemp, Display, TEXT("Saved EOS showfile: %s"), *fullPath);
+}
+
+void AETCLightBoard::executeCue(int cueI, double time)
+{
+    if(showfile == nullptr)
+        return;
+    if(cueI >= showfile->cues.Num() || cueI < 0)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("Invalid cue index: %d"), cueI);
+        return;
+    }
+    UEOSCue *cue = showfile->cues[cueI];
+    if(time == -1)
+    {
+        time = cue->time;
+    }
+    UE_LOG(LogTemp, Display, TEXT("Executing cue %s (#%d)"), *(cue->cueNumber), cueI);
+    for(TPair<int, UEOSPropertySet*> chPair : cue->actions)
+    {
+        if(time == 0)
+        {
+            for(TPair<FName, double> paramPair : chPair.Value->properties)
+            {
+                clearFade(chPair.Key, paramPair.Key);
+                showfile->channels[chPair.Key]->set(paramPair.Key, paramPair.Value);
+            }
+        }
+        else
+        {
+            for(TPair<FName, double> paramPair : chPair.Value->properties)
+                addFade(chPair.Key, paramPair.Key, paramPair.Value, time);
+        }
+    }
+    if(cueI == showfile->currentCue + 1)
+    {
+        if(cue->follow != -1)
+        {
+            followTime = cue->follow;
+            UE_LOG(LogTemp, Display, TEXT("Follow for cue %s (#%d)"), *(cue->cueNumber), cueI);
+        }
+        else if(cue->hang != -1)
+        {
+            followTime = time + cue->hang;
+            UE_LOG(LogTemp, Display, TEXT("Hang for cue %s (#%d)"), *(cue->cueNumber), cueI);
+        }
+        else
+        {
+            followTime = -1;
+        }
+    }
+
+    showfile->currentCue = cueI;
+    if(followTime == 0)
+    {
+        executeCue(cueI + 1, -1);
+    }
+}
+
+void AETCLightBoard::cueGo()
+{
+    if(showfile == nullptr)
+        return;
+    executeCue(showfile->currentCue + 1, -1);
+}
+
+void AETCLightBoard::cueBack()
+{
+    if(showfile == nullptr)
+        return;
+    executeCue(showfile->currentCue - 1, 1);
+}
+
+void AETCLightBoard::onTimecode(int frames)
+{
+    if(showfile == nullptr)
+        return;
+    int nextI = showfile->currentCue + 1;
+    if(nextI >= showfile->cues.Num())
+        return;
+    UEOSCue *nextCue = showfile->cues[nextI];
+    if(nextCue->timecode != frames)
+        return;
+    executeCue(nextI);
 }

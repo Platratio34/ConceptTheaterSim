@@ -231,7 +231,7 @@ public:
         int s = frames / 30;
         int m = s / 60;
         int h = m / 60;
-        return FString::Printf(TEXT("%02d:%02d:%02d:%02d"), h, m, s, f);
+        return FString::Printf(TEXT("%02d:%02d:%02d:%02d"), h % 60, m % 60, s % 60, f);
     };
 
     static FString createTimeStringFromSeconds(double seconds)
@@ -240,6 +240,6 @@ public:
         int s = FMath::FloorToInt(seconds / 30.0);
         int m = s / 60;
         int h = m / 60;
-        return FString::Printf(TEXT("%02d:%02d:%02d:%02d"), h, m, s, f);
+        return FString::Printf(TEXT("%02d:%02d:%02d:%02d"), h % 60, m % 60, s, f);
     };
 };

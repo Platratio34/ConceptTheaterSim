@@ -7,11 +7,8 @@
 class CONCEPTTHEATERSIM_API EOSLightOutputType
 {
 public:
-    virtual TArray<int> output(TMap<FName, double> *parameters) {
-        TArray<int> arr;
-        return arr;
-    }
-    virtual void input(TArray<int> dmx, TMap<FName, double> *params) {}
+    virtual void output(UEOSPropertySet *parameters, TArray<int>& dmx, int start) {}
+    virtual void input(TArray<int> &dmx, UEOSPropertySet *parameters, int start) {}
 
     static EOSLightOutputType *getType(FName type);
 

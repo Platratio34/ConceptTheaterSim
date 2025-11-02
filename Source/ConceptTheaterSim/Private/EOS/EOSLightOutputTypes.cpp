@@ -4,237 +4,251 @@
 
 class CONCEPTTHEATERSIM_API Dimmer : public EOSLightOutputType
 {
-    virtual TArray<int> output(TMap<FName, double> *parameters) override
+    virtual void output(UEOSPropertySet *parameters, TArray<int>& dmx, int start) override
     {
-        TArray<int> out;
-        out.Init(0, 1);
-        out[0] = toByte(*(parameters->Find(PROPERTY_INTENSITY)));
-        return out;
+        dmx[start] = toByte(parameters->get(PROPERTY_INTENSITY));
     }
 
-    virtual void input(TArray<int> dmx, TMap<FName, double> *parameters) override
+    virtual void input(TArray<int> &dmx, UEOSPropertySet *parameters, int start) override
     {
-        parameters->Add(PROPERTY_INTENSITY, fromByte(dmx[0]));
+        parameters->set(PROPERTY_INTENSITY, fromByte(dmx[start]));
     } 
 };
 
 class CONCEPTTHEATERSIM_API ETCLustrDirect : public EOSLightOutputType
 {
-    virtual TArray<int> output(TMap<FName, double> *parameters) override
+    virtual void output(UEOSPropertySet *parameters, TArray<int>& dmx, int start) override
     {
-        TArray<int> out;
-        out.Init(0, 10);
-        out[0] = toByte(*(parameters->Find(PROPERTY_RED)));
-        out[1] = toByte(*(parameters->Find(PROPERTY_WHITE)));
-        out[2] = toByte(*(parameters->Find(PROPERTY_AMBER)));
-        out[3] = toByte(*(parameters->Find(PROPERTY_GREEN)));
-        out[4] = toByte(*(parameters->Find(PROPERTY_CYAN)));
-        out[5] = toByte(*(parameters->Find(PROPERTY_BLUE)));
-        out[6] = toByte(*(parameters->Find(PROPERTY_INDIGO)));
-        out[7] = toByte(*(parameters->Find(PROPERTY_INTENSITY)));
-        out[8] = 0; // strobe
-        out[9] = 0; // intensity
-        return out;
+        dmx[start+0] = toByte(parameters->get(PROPERTY_RED));
+        dmx[start+1] = toByte(parameters->get(PROPERTY_WHITE));
+        dmx[start+2] = toByte(parameters->get(PROPERTY_AMBER));
+        dmx[start+3] = toByte(parameters->get(PROPERTY_GREEN));
+        dmx[start+4] = toByte(parameters->get(PROPERTY_CYAN));
+        dmx[start+5] = toByte(parameters->get(PROPERTY_BLUE));
+        dmx[start+6] = toByte(parameters->get(PROPERTY_INDIGO));
+        dmx[start+7] = toByte(parameters->get(PROPERTY_INTENSITY));
+        dmx[start+8] = 0; // strobe
+        dmx[start+9] = 0; // intensity
     }
 
-    virtual void input(TArray<int> dmx, TMap<FName, double> *parameters) override
+    virtual void input(TArray<int> &dmx, UEOSPropertySet *parameters, int start) override
     {
-        parameters->Add(PROPERTY_RED, fromByte(dmx[0]));
-        parameters->Add(PROPERTY_WHITE, fromByte(dmx[1]));
-        parameters->Add(PROPERTY_AMBER, fromByte(dmx[2]));
-        parameters->Add(PROPERTY_GREEN, fromByte(dmx[3]));
-        parameters->Add(PROPERTY_CYAN, fromByte(dmx[4]));
-        parameters->Add(PROPERTY_BLUE, fromByte(dmx[5]));
-        parameters->Add(PROPERTY_INDIGO, fromByte(dmx[6]));
-        parameters->Add(PROPERTY_INTENSITY, fromByte(dmx[7]));
+        parameters->set(PROPERTY_RED, fromByte(dmx[start+0]));
+        parameters->set(PROPERTY_WHITE, fromByte(dmx[start+1]));
+        parameters->set(PROPERTY_AMBER, fromByte(dmx[start+2]));
+        parameters->set(PROPERTY_GREEN, fromByte(dmx[start+3]));
+        parameters->set(PROPERTY_CYAN, fromByte(dmx[start+4]));
+        parameters->set(PROPERTY_BLUE, fromByte(dmx[start+5]));
+        parameters->set(PROPERTY_INDIGO, fromByte(dmx[start+6]));
+        parameters->set(PROPERTY_INTENSITY, fromByte(dmx[start+7]));
+    } 
+};
+
+class CONCEPTTHEATERSIM_API ETCD60LustrDirect : public EOSLightOutputType
+{
+    virtual void output(UEOSPropertySet *parameters, TArray<int>& dmx, int start) override
+    {
+        dmx[start+0] = toByte(parameters->get(PROPERTY_RED));
+        dmx[start+1] = toByte(parameters->get(PROPERTY_WHITE));
+        dmx[start+2] = toByte(parameters->get(PROPERTY_AMBER));
+        dmx[start+3] = toByte(parameters->get(PROPERTY_GREEN));
+        dmx[start+4] = toByte(parameters->get(PROPERTY_CYAN));
+        dmx[start+5] = toByte(parameters->get(PROPERTY_BLUE));
+        dmx[start+6] = toByte(parameters->get(PROPERTY_INDIGO));
+        dmx[start+7] = toByte(parameters->get(PROPERTY_INTENSITY));
+        dmx[start+8] = 0; // strobe
+        dmx[start+9] = 0; // intensity
+    }
+
+    virtual void input(TArray<int> &dmx, UEOSPropertySet *parameters, int start) override
+    {
+        parameters->set(PROPERTY_RED, fromByte(dmx[start+0]));
+        parameters->set(PROPERTY_WHITE, fromByte(dmx[start+1]));
+        parameters->set(PROPERTY_AMBER, fromByte(dmx[start+2]));
+        parameters->set(PROPERTY_GREEN, fromByte(dmx[start+3]));
+        parameters->set(PROPERTY_CYAN, fromByte(dmx[start+4]));
+        parameters->set(PROPERTY_BLUE, fromByte(dmx[start+5]));
+        parameters->set(PROPERTY_INDIGO, fromByte(dmx[start+6]));
+        parameters->set(PROPERTY_INTENSITY, fromByte(dmx[start+7]));
     } 
 };
 
 class CONCEPTTHEATERSIM_API ETCColorSourceDirect : public EOSLightOutputType
 {
-    virtual TArray<int> output(TMap<FName, double> *parameters) override
+    virtual void output(UEOSPropertySet *parameters, TArray<int>& dmx, int start) override
     {
-        TArray<int> out;
-        out.Init(0, 7);
-        out[0] = toByte(*(parameters->Find(PROPERTY_INTENSITY)));
-        out[1] = toByte(*(parameters->Find(PROPERTY_RED)));
-        out[2] = toByte(*(parameters->Find(PROPERTY_GREEN)));
-        out[3] = toByte(*(parameters->Find(PROPERTY_BLUE)));
-        out[4] = toByte(*(parameters->Find(PROPERTY_INDIGO)));
-        out[5] = toByte(*(parameters->Find(PROPERTY_LIME)));
-        out[6] = 0; // strobe
-        return out;
+        dmx[start+0] = toByte(parameters->get(PROPERTY_INTENSITY));
+        dmx[start+1] = toByte(parameters->get(PROPERTY_RED));
+        dmx[start+2] = toByte(parameters->get(PROPERTY_GREEN));
+        dmx[start+3] = toByte(parameters->get(PROPERTY_BLUE));
+        dmx[start+4] = toByte(parameters->get(PROPERTY_INDIGO));
+        dmx[start+5] = toByte(parameters->get(PROPERTY_LIME));
+        dmx[start+6] = 0; // strobe
     }
 
-    virtual void input(TArray<int> dmx, TMap<FName, double> *parameters) override
+    virtual void input(TArray<int> &dmx, UEOSPropertySet *parameters, int start) override
     {
-        parameters->Add(PROPERTY_INTENSITY, fromByte(dmx[0]));
-        parameters->Add(PROPERTY_RED, fromByte(dmx[1]));
-        parameters->Add(PROPERTY_GREEN, fromByte(dmx[2]));
-        parameters->Add(PROPERTY_BLUE, fromByte(dmx[3]));
-        parameters->Add(PROPERTY_INDIGO, fromByte(dmx[4]));
-        parameters->Add(PROPERTY_LIME, fromByte(dmx[5]));
+        parameters->set(PROPERTY_INTENSITY, fromByte(dmx[start+0]));
+        parameters->set(PROPERTY_RED, fromByte(dmx[start+1]));
+        parameters->set(PROPERTY_GREEN, fromByte(dmx[start+2]));
+        parameters->set(PROPERTY_BLUE, fromByte(dmx[start+3]));
+        parameters->set(PROPERTY_INDIGO, fromByte(dmx[start+4]));
+        parameters->set(PROPERTY_LIME, fromByte(dmx[start+5]));
     } 
 };
 
 class CONCEPTTHEATERSIM_API MaverickMk3Profile54Ch : public EOSLightOutputType
 {
-    virtual TArray<int> output(TMap<FName, double> *parameters) override
+    virtual void output(UEOSPropertySet *parameters, TArray<int>& dmx, int start) override
     {
-        TArray<int> out;
-        out.Init(0, 54);
-        out[0] = toByteCoarseRanged(*(parameters->Find(PROPERTY_PAN)), -100, 100);
-        out[1] = toByteFineRanged(*(parameters->Find(PROPERTY_PAN)), -100, 100);
-        out[2] = toByteCoarseRanged(*(parameters->Find(PROPERTY_TILT)), -135, 135);
-        out[3] = toByteFineRanged(*(parameters->Find(PROPERTY_TILT)), -135, 135);
-        out[4] = toByte(*(parameters->Find(PROPERTY_POSITION_MSPEED)));
-        out[5] = toByteCoarse(*(parameters->Find(PROPERTY_INTENSITY)));
-        out[6] = toByteFine(*(parameters->Find(PROPERTY_INTENSITY)));
-        out[7] = (int)(*(parameters->Find(PROPERTY_STROBE)));
-        out[8] = 0; // virtual strobe
-        out[9] = toByte(*(parameters->Find(PROPERTY_CYAN)));
-        out[10] = toByte(*(parameters->Find(PROPERTY_MAGENTA)));
-        out[11] = toByte(*(parameters->Find(PROPERTY_YELLOW)));
-        out[12] = toByte(*(parameters->Find(PROPERTY_CT)));
-        out[13] = (int)*(parameters->Find(PROPERTY_COLOR_SELECT));
-        out[14] = (int)(*(parameters->Find(PROPERTY_GOBO_SELECT)));
-        out[15] = (int)(*(parameters->Find(PROPERTY_GOBO_INDEX_SPEED))) >> 8;
-        out[16] = (int)(*(parameters->Find(PROPERTY_GOBO_INDEX_SPEED))) & 0xff;
-        out[17] = (int)(*(parameters->Find(PROPERTY_GOBO_SELECT_2)));
-        out[18] = (int)(*(parameters->Find(PROPERTY_ANIMATION_SELECT)));
-        out[19] = (int)(*(parameters->Find(PROPERTY_ANIMATION_INDEX_SPEED)));
-        out[20] = toByteCoarse(*(parameters->Find(PROPERTY_SHUTTER_3_B)));
-        out[21] = toByteFine(*(parameters->Find(PROPERTY_SHUTTER_3_B)));
-        out[22] = toByteCoarse(*(parameters->Find(PROPERTY_SHUTTER_3_A)));
-        out[23] = toByteFine(*(parameters->Find(PROPERTY_SHUTTER_3_A)));
-        out[24] = toByteCoarse(*(parameters->Find(PROPERTY_SHUTTER_2_B)));
-        out[25] = toByteFine(*(parameters->Find(PROPERTY_SHUTTER_2_B)));
-        out[26] = toByteCoarse(*(parameters->Find(PROPERTY_SHUTTER_2_A)));
-        out[27] = toByteFine(*(parameters->Find(PROPERTY_SHUTTER_2_A)));
-        out[28] = toByteCoarse(*(parameters->Find(PROPERTY_SHUTTER_1_B)));
-        out[29] = toByteFine(*(parameters->Find(PROPERTY_SHUTTER_1_B)));
-        out[30] = toByteCoarse(*(parameters->Find(PROPERTY_SHUTTER_1_A)));
-        out[31] = toByteFine(*(parameters->Find(PROPERTY_SHUTTER_1_A)));
-        out[32] = toByteCoarse(*(parameters->Find(PROPERTY_SHUTTER_4_B)));
-        out[33] = toByteFine(*(parameters->Find(PROPERTY_SHUTTER_4_B)));
-        out[34] = toByteCoarse(*(parameters->Find(PROPERTY_SHUTTER_4_A)));
-        out[35] = toByteFine(*(parameters->Find(PROPERTY_SHUTTER_4_A)));
-        out[36] = toByteCoarseRanged(*(parameters->Find(PROPERTY_SHUTTER_FRAME_ROT)), -1, 1);
-        out[37] = toByteFineRanged(*(parameters->Find(PROPERTY_SHUTTER_FRAME_ROT)), -1, 1);
-        out[38] = toByteCoarseRanged(*(parameters->Find(PROPERTY_EDGE)), 0, 1);
-        out[39] = toByteFineRanged(*(parameters->Find(PROPERTY_EDGE)), 0, 1);
-        out[40] = (int)(*(parameters->Find(PROPERTY_EDGE_MODE)));
-        out[41] = toByteCoarseRanged(*(parameters->Find(PROPERTY_ZOOM)), 50, 10);
-        out[42] = toByteFineRanged(*(parameters->Find(PROPERTY_ZOOM)), 50, 10);
-        out[43] = (int)(*(parameters->Find(PROPERTY_BEAM_FX_SELECT)));
-        out[44] = (int)(*(parameters->Find(PROPERTY_BEAM_FX_INDEX_SPEED)));
-        out[45] = (int)(*(parameters->Find(PROPERTY_BEAM_FX_SELECT_2)));
-        out[46] = (int)(*(parameters->Find(PROPERTY_BEAM_FX_INDEX_SPEED_2)));
-        out[47] = (int)(*(parameters->Find(PROPERTY_IRIS)));
-        out[48] = toByte(*(parameters->Find(PROPERTY_DIFFUSION)));
-        out[49] = toByte(*(parameters->Find(PROPERTY_DIFFUSION_2)));
-        out[50] = (int)(*(parameters->Find(PROPERTY_CRI)));
-        out[51] = (int)(*(parameters->Find(PROPERTY_COLOR_MIX)));
-        out[52] = toByte(*(parameters->Find(PROPERTY_COLOR_MIX_SPEED)));
-        out[53] = 0x0; // control
-        return out;
+        dmx[start+0] = toByteCoarseRanged(parameters->get(PROPERTY_PAN), -100, 100);
+        dmx[start+1] = toByteFineRanged(parameters->get(PROPERTY_PAN), -100, 100);
+        dmx[start+2] = toByteCoarseRanged(parameters->get(PROPERTY_TILT), -135, 135);
+        dmx[start+3] = toByteFineRanged(parameters->get(PROPERTY_TILT), -135, 135);
+        dmx[start+4] = toByte(parameters->get(PROPERTY_POSITION_MSPEED));
+        dmx[start+5] = toByteCoarse(parameters->get(PROPERTY_INTENSITY));
+        dmx[start+6] = toByteFine(parameters->get(PROPERTY_INTENSITY));
+        dmx[start+7] = (int)(parameters->get(PROPERTY_STROBE));
+        dmx[start+8] = 0; // virtual strobe
+        dmx[start+9] = toByte(parameters->get(PROPERTY_CYAN));
+        dmx[start+10] = toByte(parameters->get(PROPERTY_MAGENTA));
+        dmx[start+11] = toByte(parameters->get(PROPERTY_YELLOW));
+        dmx[start+12] = toByte(parameters->get(PROPERTY_CT));
+        dmx[start+13] = (int)parameters->get(PROPERTY_COLOR_SELECT);
+        dmx[start+14] = (int)(parameters->get(PROPERTY_GOBO_SELECT));
+        dmx[start+15] = (int)(parameters->get(PROPERTY_GOBO_INDEX_SPEED)) >> 8;
+        dmx[start+16] = (int)(parameters->get(PROPERTY_GOBO_INDEX_SPEED)) & 0xff;
+        dmx[start+17] = (int)(parameters->get(PROPERTY_GOBO_SELECT_2));
+        dmx[start+18] = (int)(parameters->get(PROPERTY_ANIMATION_SELECT));
+        dmx[start+19] = (int)(parameters->get(PROPERTY_ANIMATION_INDEX_SPEED));
+        dmx[start+20] = toByteCoarse(parameters->get(PROPERTY_SHUTTER_3_B));
+        dmx[start+21] = toByteFine(parameters->get(PROPERTY_SHUTTER_3_B));
+        dmx[start+22] = toByteCoarse(parameters->get(PROPERTY_SHUTTER_3_A));
+        dmx[start+23] = toByteFine(parameters->get(PROPERTY_SHUTTER_3_A));
+        dmx[start+24] = toByteCoarse(parameters->get(PROPERTY_SHUTTER_2_B));
+        dmx[start+25] = toByteFine(parameters->get(PROPERTY_SHUTTER_2_B));
+        dmx[start+26] = toByteCoarse(parameters->get(PROPERTY_SHUTTER_2_A));
+        dmx[start+27] = toByteFine(parameters->get(PROPERTY_SHUTTER_2_A));
+        dmx[start+28] = toByteCoarse(parameters->get(PROPERTY_SHUTTER_1_B));
+        dmx[start+29] = toByteFine(parameters->get(PROPERTY_SHUTTER_1_B));
+        dmx[start+30] = toByteCoarse(parameters->get(PROPERTY_SHUTTER_1_A));
+        dmx[start+31] = toByteFine(parameters->get(PROPERTY_SHUTTER_1_A));
+        dmx[start+32] = toByteCoarse(parameters->get(PROPERTY_SHUTTER_4_B));
+        dmx[start+33] = toByteFine(parameters->get(PROPERTY_SHUTTER_4_B));
+        dmx[start+34] = toByteCoarse(parameters->get(PROPERTY_SHUTTER_4_A));
+        dmx[start+35] = toByteFine(parameters->get(PROPERTY_SHUTTER_4_A));
+        dmx[start+36] = toByteCoarseRanged(parameters->get(PROPERTY_SHUTTER_FRAME_ROT), -1, 1);
+        dmx[start+37] = toByteFineRanged(parameters->get(PROPERTY_SHUTTER_FRAME_ROT), -1, 1);
+        dmx[start+38] = toByteCoarseRanged(parameters->get(PROPERTY_EDGE), 0, 1);
+        dmx[start+39] = toByteFineRanged(parameters->get(PROPERTY_EDGE), 0, 1);
+        dmx[start+40] = (int)(parameters->get(PROPERTY_EDGE_MODE));
+        dmx[start+41] = toByteCoarseRanged(parameters->get(PROPERTY_ZOOM), 50, 10);
+        dmx[start+42] = toByteFineRanged(parameters->get(PROPERTY_ZOOM), 50, 10);
+        dmx[start+43] = (int)(parameters->get(PROPERTY_BEAM_FX_SELECT));
+        dmx[start+44] = (int)(parameters->get(PROPERTY_BEAM_FX_INDEX_SPEED));
+        dmx[start+45] = (int)(parameters->get(PROPERTY_BEAM_FX_SELECT_2));
+        dmx[start+46] = (int)(parameters->get(PROPERTY_BEAM_FX_INDEX_SPEED_2));
+        dmx[start+47] = (int)(parameters->get(PROPERTY_IRIS));
+        dmx[start+48] = toByte(parameters->get(PROPERTY_DIFFUSION));
+        dmx[start+49] = toByte(parameters->get(PROPERTY_DIFFUSION_2));
+        dmx[start+50] = (int)(parameters->get(PROPERTY_CRI));
+        dmx[start+51] = (int)(parameters->get(PROPERTY_COLOR_MIX));
+        dmx[start+52] = toByte(parameters->get(PROPERTY_COLOR_MIX_SPEED));
+        dmx[start+53] = 0x0; // control
     }
 
-    virtual void input(TArray<int> dmx, TMap<FName, double> *parameters) override
+    virtual void input(TArray<int> &dmx, UEOSPropertySet *parameters, int start) override
     {
-        parameters->Add(PROPERTY_PAN, fromByte16bRanged(dmx[0], dmx[1], -100, 100));
-        parameters->Add(PROPERTY_TILT, fromByte16bRanged(dmx[2], dmx[3], -135, 135));
-        parameters->Add(PROPERTY_POSITION_MSPEED, fromByte(dmx[4]));
-        parameters->Add(PROPERTY_INTENSITY, fromByte16b(dmx[5], dmx[6]));
-        parameters->Add(PROPERTY_STROBE, dmx[7]);
-        // parameters->Add(PROPERTY_STROBE, dmx[8]); // virtual strobe
-        parameters->Add(PROPERTY_CYAN, fromByte(dmx[9]));
-        parameters->Add(PROPERTY_MAGENTA, fromByte(dmx[10]));
-        parameters->Add(PROPERTY_YELLOW, fromByte(dmx[11]));
-        parameters->Add(PROPERTY_CT, fromByte(dmx[12]));
-        parameters->Add(PROPERTY_COLOR_SELECT, dmx[13]);
-        parameters->Add(PROPERTY_GOBO_SELECT, dmx[14]);
-        parameters->Add(PROPERTY_GOBO_INDEX_SPEED, (dmx[15] << 8) | dmx[16]);
-        parameters->Add(PROPERTY_GOBO_SELECT_2, dmx[17]);
-        parameters->Add(PROPERTY_ANIMATION_SELECT, dmx[18]);
-        parameters->Add(PROPERTY_ANIMATION_INDEX_SPEED, dmx[19]);
-        parameters->Add(PROPERTY_SHUTTER_3_B, fromByte16b(dmx[20], dmx[21]));
-        parameters->Add(PROPERTY_SHUTTER_3_A, fromByte16b(dmx[22], dmx[23]));
-        parameters->Add(PROPERTY_SHUTTER_2_B, fromByte16b(dmx[24], dmx[25]));
-        parameters->Add(PROPERTY_SHUTTER_2_A, fromByte16b(dmx[26], dmx[27]));
-        parameters->Add(PROPERTY_SHUTTER_1_B, fromByte16b(dmx[28], dmx[29]));
-        parameters->Add(PROPERTY_SHUTTER_1_A, fromByte16b(dmx[30], dmx[31]));
-        parameters->Add(PROPERTY_SHUTTER_4_B, fromByte16b(dmx[32], dmx[33]));
-        parameters->Add(PROPERTY_SHUTTER_4_A, fromByte16b(dmx[34], dmx[35]));
-        parameters->Add(PROPERTY_SHUTTER_FRAME_ROT, fromByte16bRanged(dmx[36], dmx[37], -1, 1));
-        parameters->Add(PROPERTY_EDGE, fromByte16b(dmx[38], dmx[39]));
-        parameters->Add(PROPERTY_EDGE_MODE, dmx[40]);
-        parameters->Add(PROPERTY_ZOOM, fromByte16bRanged(dmx[41], dmx[42], 50, 10));
-        parameters->Add(PROPERTY_BEAM_FX_SELECT, dmx[43]);
-        parameters->Add(PROPERTY_BEAM_FX_INDEX_SPEED, dmx[44]);
-        parameters->Add(PROPERTY_BEAM_FX_SELECT_2, dmx[45]);
-        parameters->Add(PROPERTY_BEAM_FX_INDEX_SPEED_2, dmx[46]);
-        parameters->Add(PROPERTY_IRIS, dmx[47]);
-        parameters->Add(PROPERTY_DIFFUSION, fromByte(dmx[48]));
-        parameters->Add(PROPERTY_DIFFUSION_2, fromByte(dmx[49]));
-        parameters->Add(PROPERTY_CRI, dmx[50]);
-        parameters->Add(PROPERTY_COLOR_MIX, dmx[51]);
-        parameters->Add(PROPERTY_COLOR_MIX_SPEED, fromByte(dmx[52]));
-        // out[53] = 0x0; // control
+        parameters->set(PROPERTY_PAN, fromByte16bRanged(dmx[start+0], dmx[start+1], -100, 100));
+        parameters->set(PROPERTY_TILT, fromByte16bRanged(dmx[start+2], dmx[start+3], -135, 135));
+        parameters->set(PROPERTY_POSITION_MSPEED, fromByte(dmx[start+4]));
+        parameters->set(PROPERTY_INTENSITY, fromByte16b(dmx[start+5], dmx[start+6]));
+        parameters->set(PROPERTY_STROBE, dmx[start+7]);
+        // parameters->set(PROPERTY_STROBE, dmx[start+8]); // virtual strobe
+        parameters->set(PROPERTY_CYAN, fromByte(dmx[start+9]));
+        parameters->set(PROPERTY_MAGENTA, fromByte(dmx[start+10]));
+        parameters->set(PROPERTY_YELLOW, fromByte(dmx[start+11]));
+        parameters->set(PROPERTY_CT, fromByte(dmx[start+12]));
+        parameters->set(PROPERTY_COLOR_SELECT, dmx[start+13]);
+        parameters->set(PROPERTY_GOBO_SELECT, dmx[start+14]);
+        parameters->set(PROPERTY_GOBO_INDEX_SPEED, (dmx[start+15] << 8) | dmx[start+16]);
+        parameters->set(PROPERTY_GOBO_SELECT_2, dmx[start+17]);
+        parameters->set(PROPERTY_ANIMATION_SELECT, dmx[start+18]);
+        parameters->set(PROPERTY_ANIMATION_INDEX_SPEED, dmx[start+19]);
+        parameters->set(PROPERTY_SHUTTER_3_B, fromByte16b(dmx[start+20], dmx[start+21]));
+        parameters->set(PROPERTY_SHUTTER_3_A, fromByte16b(dmx[start+22], dmx[start+23]));
+        parameters->set(PROPERTY_SHUTTER_2_B, fromByte16b(dmx[start+24], dmx[start+25]));
+        parameters->set(PROPERTY_SHUTTER_2_A, fromByte16b(dmx[start+26], dmx[start+27]));
+        parameters->set(PROPERTY_SHUTTER_1_B, fromByte16b(dmx[start+28], dmx[start+29]));
+        parameters->set(PROPERTY_SHUTTER_1_A, fromByte16b(dmx[start+30], dmx[start+31]));
+        parameters->set(PROPERTY_SHUTTER_4_B, fromByte16b(dmx[start+32], dmx[start+33]));
+        parameters->set(PROPERTY_SHUTTER_4_A, fromByte16b(dmx[start+34], dmx[start+35]));
+        parameters->set(PROPERTY_SHUTTER_FRAME_ROT, fromByte16bRanged(dmx[start+36], dmx[start+37], -1, 1));
+        parameters->set(PROPERTY_EDGE, fromByte16b(dmx[start+38], dmx[start+39]));
+        parameters->set(PROPERTY_EDGE_MODE, dmx[start+40]);
+        parameters->set(PROPERTY_ZOOM, fromByte16bRanged(dmx[start+41], dmx[start+42], 50, 10));
+        parameters->set(PROPERTY_BEAM_FX_SELECT, dmx[start+43]);
+        parameters->set(PROPERTY_BEAM_FX_INDEX_SPEED, dmx[start+44]);
+        parameters->set(PROPERTY_BEAM_FX_SELECT_2, dmx[start+45]);
+        parameters->set(PROPERTY_BEAM_FX_INDEX_SPEED_2, dmx[start+46]);
+        parameters->set(PROPERTY_IRIS, dmx[start+47]);
+        parameters->set(PROPERTY_DIFFUSION, fromByte(dmx[start+48]));
+        parameters->set(PROPERTY_DIFFUSION_2, fromByte(dmx[start+49]));
+        parameters->set(PROPERTY_CRI, dmx[start+50]);
+        parameters->set(PROPERTY_COLOR_MIX, dmx[start+51]);
+        parameters->set(PROPERTY_COLOR_MIX_SPEED, fromByte(dmx[start+52]));
+        // dmx[start+53] = 0x0; // control
     } 
 };
 
 class CONCEPTTHEATERSIM_API MaverickMk3WashBasic : public EOSLightOutputType
 {
-    virtual TArray<int> output(TMap<FName, double> *parameters) override
+    virtual void output(UEOSPropertySet *parameters, TArray<int>& dmx, int start) override
     {
-        TArray<int> out;
-        out.Init(0, 21);
-        out[0] = toByteCoarse(*(parameters->Find(PROPERTY_PAN)));
-        out[1] = toByteFine(*(parameters->Find(PROPERTY_PAN)));
-        out[2] = toByteCoarse(*(parameters->Find(PROPERTY_TILT)));
-        out[3] = toByteFine(*(parameters->Find(PROPERTY_TILT)));
-        out[4] = toByte(*(parameters->Find(PROPERTY_POSITION_MSPEED)));
-        out[5] = (int)(*(parameters->Find(PROPERTY_CT)));
-        out[6] = (int)(*(parameters->Find(PROPERTY_COLOR_MIX)));
-        out[7] = (int)(*(parameters->Find(PROPERTY_GOBO_SELECT)));
-        out[8] = (int)(*(parameters->Find(PROPERTY_PIXEL_MASK_2)));
-        out[9] = (int)(*(parameters->Find(PROPERTY_PIXEL_MASK_EFFECT_TIME)));
-        out[10] = (int)(*(parameters->Find(PROPERTY_PIXEL_MASK_EFFECT_STEP_TIME)));
-        out[11] = (int)(*(parameters->Find(PROPERTY_BACKGROUND_COLOR_MIX)));
-        out[12] = toByte(*(parameters->Find(PROPERTY_BACKGROUND_INTENSITY)));
-        out[13] = toByte(*(parameters->Find(PROPERTY_INTENSITY)));
-        out[14] = (int)(*(parameters->Find(PROPERTY_STROBE)));
-        out[15] = toByte(*(parameters->Find(PROPERTY_ZOOM)));
-        out[16] = 0x0; // control
-        out[17] = toByte(*(parameters->Find(PROPERTY_RED)));
-        out[18] = toByte(*(parameters->Find(PROPERTY_GREEN)));
-        out[19] = toByte(*(parameters->Find(PROPERTY_BLUE)));
-        out[20] = toByte(*(parameters->Find(PROPERTY_WHITE)));
-        return out;
+        dmx[start+0] = toByteCoarse(parameters->get(PROPERTY_PAN));
+        dmx[start+1] = toByteFine(parameters->get(PROPERTY_PAN));
+        dmx[start+2] = toByteCoarse(parameters->get(PROPERTY_TILT));
+        dmx[start+3] = toByteFine(parameters->get(PROPERTY_TILT));
+        dmx[start+4] = toByte(parameters->get(PROPERTY_POSITION_MSPEED));
+        dmx[start+5] = (int)(parameters->get(PROPERTY_CT));
+        dmx[start+6] = (int)(parameters->get(PROPERTY_COLOR_MIX));
+        dmx[start+7] = (int)(parameters->get(PROPERTY_GOBO_SELECT));
+        dmx[start+8] = (int)(parameters->get(PROPERTY_PIXEL_MASK_2));
+        dmx[start+9] = (int)(parameters->get(PROPERTY_PIXEL_MASK_EFFECT_TIME));
+        dmx[start+10] = (int)(parameters->get(PROPERTY_PIXEL_MASK_EFFECT_STEP_TIME));
+        dmx[start+11] = (int)(parameters->get(PROPERTY_BACKGROUND_COLOR_MIX));
+        dmx[start+12] = toByte(parameters->get(PROPERTY_BACKGROUND_INTENSITY));
+        dmx[start+13] = toByte(parameters->get(PROPERTY_INTENSITY));
+        dmx[start+14] = (int)(parameters->get(PROPERTY_STROBE));
+        dmx[start+15] = toByte(parameters->get(PROPERTY_ZOOM));
+        dmx[start+16] = 0x0; // control
+        dmx[start+17] = toByte(parameters->get(PROPERTY_RED));
+        dmx[start+18] = toByte(parameters->get(PROPERTY_GREEN));
+        dmx[start+19] = toByte(parameters->get(PROPERTY_BLUE));
+        dmx[start+20] = toByte(parameters->get(PROPERTY_WHITE));
     }
 
-    virtual void input(TArray<int> dmx, TMap<FName, double> *parameters) override
+    virtual void input(TArray<int> &dmx, UEOSPropertySet *parameters, int start) override
     {
-        parameters->Add(PROPERTY_PAN, fromByte16b(dmx[0], dmx[1]));
-        parameters->Add(PROPERTY_TILT, fromByte16b(dmx[2], dmx[3]));
-        parameters->Add(PROPERTY_POSITION_MSPEED, fromByte(dmx[4]));
-        parameters->Add(PROPERTY_CT, dmx[5]);
-        parameters->Add(PROPERTY_COLOR_MIX, dmx[6]);
-        parameters->Add(PROPERTY_GOBO_SELECT, dmx[7]);
-        parameters->Add(PROPERTY_PIXEL_MASK_2, dmx[8]);
-        parameters->Add(PROPERTY_PIXEL_MASK_EFFECT_TIME, dmx[9]);
-        parameters->Add(PROPERTY_PIXEL_MASK_EFFECT_STEP_TIME, dmx[10]);
-        parameters->Add(PROPERTY_BACKGROUND_COLOR_MIX, dmx[11]);
-        parameters->Add(PROPERTY_BACKGROUND_INTENSITY, fromByte(dmx[12]));
-        parameters->Add(PROPERTY_INTENSITY, fromByte(dmx[13]));
-        parameters->Add(PROPERTY_STROBE, dmx[14]);
-        parameters->Add(PROPERTY_ZOOM, fromByte(dmx[15]));
-        // out[16] = 0x0; // control
-        parameters->Add(PROPERTY_RED, fromByte(dmx[17]));
-        parameters->Add(PROPERTY_GREEN, fromByte(dmx[18]));
-        parameters->Add(PROPERTY_BLUE, fromByte(dmx[19]));
-        parameters->Add(PROPERTY_WHITE, fromByte(dmx[20]));
+        parameters->set(PROPERTY_PAN, fromByte16b(dmx[start+0], dmx[start+1]));
+        parameters->set(PROPERTY_TILT, fromByte16b(dmx[start+2], dmx[start+3]));
+        parameters->set(PROPERTY_POSITION_MSPEED, fromByte(dmx[start+4]));
+        parameters->set(PROPERTY_CT, dmx[start+5]);
+        parameters->set(PROPERTY_COLOR_MIX, dmx[start+6]);
+        parameters->set(PROPERTY_GOBO_SELECT, dmx[start+7]);
+        parameters->set(PROPERTY_PIXEL_MASK_2, dmx[start+8]);
+        parameters->set(PROPERTY_PIXEL_MASK_EFFECT_TIME, dmx[start+9]);
+        parameters->set(PROPERTY_PIXEL_MASK_EFFECT_STEP_TIME, dmx[start+10]);
+        parameters->set(PROPERTY_BACKGROUND_COLOR_MIX, dmx[start+11]);
+        parameters->set(PROPERTY_BACKGROUND_INTENSITY, fromByte(dmx[start+12]));
+        parameters->set(PROPERTY_INTENSITY, fromByte(dmx[start+13]));
+        parameters->set(PROPERTY_STROBE, dmx[start+14]);
+        parameters->set(PROPERTY_ZOOM, fromByte(dmx[start+15]));
+        // dmx[start+16] = 0x0; // control
+        parameters->set(PROPERTY_RED, fromByte(dmx[start+17]));
+        parameters->set(PROPERTY_GREEN, fromByte(dmx[start+18]));
+        parameters->set(PROPERTY_BLUE, fromByte(dmx[start+19]));
+        parameters->set(PROPERTY_WHITE, fromByte(dmx[start+20]));
     } 
 };
 
@@ -250,9 +264,13 @@ EOSLightOutputType* EOSLightOutputType::getType(FName type)
     {
         typeI = new Dimmer();
     }
-    else if(type == LIGHT_TYPE_ETC_S4_LUSTR_P_DIRECT || type == LIGHT_TYPE_ETC_D60_DIRECT)
+    else if(type == LIGHT_TYPE_ETC_S4_LUSTR_P_DIRECT)
     {
         typeI = new ETCLustrDirect();
+    }
+    else if(type == LIGHT_TYPE_ETC_D60_DIRECT)
+    {
+        typeI = new ETCD60LustrDirect();
     }
     else if(type == LIGHT_TYPE_ETC_COLOR_SOURCE_CYC_DIRECT)
     {

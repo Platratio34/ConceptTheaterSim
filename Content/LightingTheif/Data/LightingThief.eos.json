@@ -5,8 +5,8 @@
         { "ch": 2, "type": "ETC_S4_Lustr+_Direct", "universe": 5, "address": 16 },
         { "ch": 3, "type": "ETC_S4_Lustr+_Direct", "universe": 5, "address": 31 },
 
-        { "ch": 5, "type": "ETC_S4_Lustr+_Direct", "universe": 5, "address": 61 },
         { "ch": 4, "type": "ETC_S4_Lustr+_Direct", "universe": 5, "address": 46 },
+        { "ch": 5, "type": "ETC_S4_Lustr+_Direct", "universe": 5, "address": 61 },
         { "ch": 6, "type": "ETC_S4_Lustr+_Direct", "universe": 5, "address": 76 },
         { "ch": 7, "type": "ETC_S4_Lustr+_Direct", "universe": 5, "address": 91 },
 
@@ -60,9 +60,9 @@
         { "ch": 65, "type": "ETC_D60_Direct", "universe": 2, "address": 141 },
         { "ch": 66, "type": "ETC_D60_Direct", "universe": 2, "address": 151 },
         
-        { "ch": 88, "type": "Dimmer", "universe": 10, "address": 1 },
-        { "ch": 89, "type": "Dimmer", "universe": 10, "address": 1 },
-        { "ch": 90, "type": "Dimmer", "universe": 10, "address": 1 },
+        { "ch": 88, "type": "Dimmer", "universe": 10, "address": 13 },
+        { "ch": 89, "type": "Dimmer", "universe": 10, "address": 9 },
+        { "ch": 90, "type": "Dimmer", "universe": 10, "address": 17 },
 
         { "ch": 91, "type": "ETC_S4_Lustr+_Direct", "universe": 4, "address": 166 },
         { "ch": 92, "type": "ETC_S4_Lustr+_Direct", "universe": 4, "address": 181 },
@@ -72,22 +72,22 @@
         { "ch": 95, "type": "ETC_S4_Lustr+_Direct", "universe": 4, "address": 226 },
         { "ch": 96, "type": "ETC_S4_Lustr+_Direct", "universe": 4, "address": 241 },
         { "ch": 97, "type": "ETC_S4_Lustr+_Direct", "universe": 4, "address": 256 },
-        { "ch": 98, "type": "ETC_S4_Lustr+_Direct", "universe": 4, "address": 266 },
+        { "ch": 98, "type": "ETC_S4_Lustr+_Direct", "universe": 4, "address": 271 },
         
-        { "ch": 101, "type": "ETC_ColorSource_CYC_Direct", "universe": 4, "address": 281 },
-        { "ch": 102, "type": "ETC_ColorSource_CYC_Direct", "universe": 4, "address": 296 },
-        { "ch": 103, "type": "ETC_ColorSource_CYC_Direct", "universe": 4, "address": 311 },
-        { "ch": 104, "type": "ETC_ColorSource_CYC_Direct", "universe": 4, "address": 326 },
-        { "ch": 105, "type": "ETC_ColorSource_CYC_Direct", "universe": 4, "address": 341 },
-        { "ch": 106, "type": "ETC_ColorSource_CYC_Direct", "universe": 4, "address": 456 },
+        { "ch": 101, "type": "ETC_ColorSource_CYC_Direct", "universe": 4, "address": 286 },
+        { "ch": 102, "type": "ETC_ColorSource_CYC_Direct", "universe": 4, "address": 301 },
+        { "ch": 103, "type": "ETC_ColorSource_CYC_Direct", "universe": 4, "address": 316 },
+        { "ch": 104, "type": "ETC_ColorSource_CYC_Direct", "universe": 4, "address": 331 },
+        { "ch": 105, "type": "ETC_ColorSource_CYC_Direct", "universe": 4, "address": 346 },
+        { "ch": 106, "type": "ETC_ColorSource_CYC_Direct", "universe": 4, "address": 461 },
 
-        { "ch": 111, "type": "ETC_S4_Lustr+_Direct", "universe": 4, "address": 471 },
+        { "ch": 111, "type": "ETC_S4_Lustr+_Direct", "universe": 4, "address": 476 },
         { "ch": 112, "type": "ETC_S4_Lustr+_Direct", "universe": 4, "address": 486 },
-        { "ch": 113, "type": "ETC_S4_Lustr+_Direct", "universe": 4, "address": 501 },
+        { "ch": 113, "type": "ETC_S4_Lustr+_Direct", "universe": 4, "address": 496 },
         
-        { "ch": 121, "type": "ETC_D60_Direct", "universe": 2, "address": 65 },
-        { "ch": 122, "type": "ETC_D60_Direct", "universe": 2, "address": 73 },
-        { "ch": 123, "type": "ETC_D60_Direct", "universe": 2, "address": 81 },
+        { "ch": 121, "type": "ETC_D60_Direct", "universe": 2, "address": 161 },
+        { "ch": 122, "type": "ETC_D60_Direct", "universe": 2, "address": 171 },
+        { "ch": 123, "type": "ETC_D60_Direct", "universe": 2, "address": 181 },
 
         { "ch": 201, "type": "MaverickMk3Profile_54ch", "universe": 3, "address": 1 },
         { "ch": 202, "type": "MaverickMk3Profile_54ch", "universe": 3, "address": 56 },
@@ -256,11 +256,11 @@
             { "ch":122, "Intensity": 1.0, "Red": 0.0, "Green": 0.0, "Blue": 1.0},
             { "ch":123, "Intensity": 0.0, "Red": 1.0, "Green": 1.0, "Blue": 1.0},
             
-            { "ch":202, "Intensity": 1.0, "Tilt": 40, "Pan": 70, "Cyan": 1.0, "Yellow": 0.0, "Magenta": 0.2, "GoboSelect": 3, "GoboIndex/Speed": 0.0,"Zoom": 50, "Edge": 50},
-            { "ch":201, "Intensity": 1.0, "Tilt": 40, "Pan": -70, "Cyan": 1.0, "Yellow": 0.0, "Magenta": 0.2, "GoboSelect": 3, "GoboIndex/Speed": 0.0,"Zoom": 50, "Edge": 50},
+            { "ch":202, "Intensity": 1.0, "Tilt": 40, "Pan": -70, "Cyan": 1.0, "Yellow": 0.0, "Magenta": 1.0, "GoboSelect": 50, "GoboIndex/Speed": 32,"Zoom": 50, "Edge": 128},
+            { "ch":201, "Intensity": 1.0, "Tilt": 40, "Pan": 70, "Cyan": 1.0, "Yellow": 0.0, "Magenta": 1.0, "GoboSelect": 50, "GoboIndex/Speed": 32,"Zoom": 50, "Edge": 128},
             { "ch":203, "Intensity": 0.0, "Tilt": 0, "Pan": 0, "Cyan": 0.0, "Yellow": 0.0, "Magenta": 0.0}
         ]},
-        { "cue": 2, "time": 5, "timecode": "00:00:01:00", "hang": 0, "actions": [
+        { "cue": "2", "time": 5, "timecode": "00:00:01:00", "hang": 0, "actions": [
             { "ch":1, "Intensity": 0.0 },
             { "ch":2, "Intensity": 0.0 },
             { "ch":3, "Intensity": 0.0 },
@@ -339,34 +339,34 @@
             { "ch":201, "Intensity": 0.5 },
             { "ch":203, "Intensity": 0.0 }
         ]},
-        { "cue": 2.1, "time": 2, "hang": 0, "actions": [
+        { "cue": "2.1", "time": 2, "hang": 0, "actions": [
             { "ch":121, "Intensity": 0.0 },
             { "ch":122, "Intensity": 0.0 },
             
             { "ch":202, "Intensity": 0.0 },
             { "ch":201, "Intensity": 0.0 }
         ]},
-        { "cue": 2.3, "time": 1, "actions": [
+        { "cue": "2.2", "time": 1, "actions": [
             { "ch":121, "Red": 1.0, "Green": 1.0, "Blue": 1.0 },
             { "ch":122, "Red": 1.0, "Green": 1.0, "Blue": 1.0 }
         ]},
-        { "cue": 3, "time": 0.1, "timecode": "00:00:10:00", "hang": 0, "actions": [
+        { "cue": "3", "time": 0.1, "timecode": "00:00:10:00", "hang": 0, "actions": [
             { "ch":122, "Intensity": 1.0 },
             { "ch":101, "Intensity": 1.0 }
         ]},
-        { "cue": 3.1, "time": 0.5, "actions": [
+        { "cue": "3.1", "time": 0.5, "actions": [
             { "ch":122, "Intensity": 0.0 },
             { "ch":101, "Intensity": 0.0 }
         ]},
-        { "cue": 3.5, "time": 0.1, "timecode": "00:00:10:25", "hang": 0, "actions": [
+        { "cue": "3.5", "time": 0.1, "timecode": "00:00:10:25", "hang": 0, "actions": [
             { "ch":121, "Intensity": 1.0 },
             { "ch":106, "Intensity": 1.0 }
         ]},
-        { "cue": 3.6, "time": 0.5, "hang": 0, "actions": [
+        { "cue": "3.6", "time": 0.5, "actions": [
             { "ch":121, "Intensity": 0.0 },
             { "ch":106, "Intensity": 0.0 }
         ]},
-        { "cue": 4, "time": 3, "timecode": "00:00:15:15", "actions": [
+        { "cue": "4", "time": 3, "timecode": "00:00:15:15", "actions": [
             { "ch": 8, "Intensity": 1.0 },
             { "ch": 28, "Intensity": 1.0 },
             { "ch": 58, "Intensity": 0.5 },
@@ -375,13 +375,13 @@
             { "ch":121, "Red": 1.0, "Green": 1.0, "Blue": 0.0 },
             { "ch":122, "Red": 1.0, "Green": 1.0, "Blue": 0.0 }
         ]},
-        { "cue": 5, "time": 2, "timecode": "00:00:21:00", "actions": [
+        { "cue": "5", "time": 2, "timecode": "00:00:21:00", "actions": [
             { "ch": 9, "Intensity": 1.0 },
             { "ch": 29, "Intensity": 1.0 },
             { "ch": 59, "Intensity": 0.5 },
             { "ch": 94, "Intensity": 0.65 }
         ]},
-        { "cue": 6, "time": 3, "timecode": "00:00:28:00", "actions": [
+        { "cue": "6", "time": 3, "timecode": "00:00:28:00", "actions": [
             { "ch": 1, "Intensity": 1.0 },
             { "ch": 2, "Intensity": 1.0 },
             { "ch": 3, "Intensity": 1.0 },
@@ -416,7 +416,7 @@
             { "ch": 97, "Intensity": 0.7 },
             { "ch": 98, "Intensity": 0.7 }
         ]},
-        { "cue": 7, "time": 4, "timecode": "00:00:37:00", "actions": [
+        { "cue": "7", "time": 4, "timecode": "00:00:37:00", "actions": [
             { "ch": 9, "Intensity": 0.0 },
             { "ch": 11, "Intensity": 0.0 },
             
@@ -426,7 +426,7 @@
             { "ch": 59, "Intensity": 0.0 },
             { "ch": 60, "Intensity": 0.0 }
         ]},
-        { "cue": 8, "time": 0.167, "timecode": "00:00:46:10", "hang": 0, "actions": [
+        { "cue": "8", "time": 0.167, "timecode": "00:00:46:10", "hang": 0, "actions": [
             { "ch": 102, "Intensity": 1.0 },
             { "ch": 103, "Intensity": 1.0 },
             { "ch": 104, "Intensity": 1.0 },
@@ -435,7 +435,7 @@
             { "ch": 121, "Intensity": 1.0 },
             { "ch": 122, "Intensity": 1.0 }
         ]},
-        { "cue": 8.01, "time": 1.3, "actions": [
+        { "cue": "8.01", "time": 1.3, "actions": [
             { "ch": 102, "Intensity": 0.0 },
             { "ch": 103, "Intensity": 0.0 },
             { "ch": 104, "Intensity": 0.0 },
@@ -444,7 +444,7 @@
             { "ch": 121, "Intensity": 0.0 },
             { "ch": 122, "Intensity": 0.0 }
         ]},
-        { "cue": 8.1, "time": 0.167, "timecode": "00:00:47:25", "hang": 0, "actions": [
+        { "cue": "8.1", "time": 0.167, "timecode": "00:00:47:25", "hang": 0, "actions": [
             { "ch": 102, "Intensity": 1.0 },
             { "ch": 103, "Intensity": 1.0 },
             { "ch": 104, "Intensity": 1.0 },
@@ -453,7 +453,7 @@
             { "ch": 121, "Intensity": 1.0 },
             { "ch": 122, "Intensity": 1.0 }
         ]},
-        { "cue": 8.11, "time": 1.3, "actions": [
+        { "cue": "8.11", "time": 1.3, "actions": [
             { "ch": 102, "Intensity": 0.0 },
             { "ch": 103, "Intensity": 0.0 },
             { "ch": 104, "Intensity": 0.0 },
@@ -462,7 +462,7 @@
             { "ch": 121, "Intensity": 0.0 },
             { "ch": 122, "Intensity": 0.0 }
         ]},
-        { "cue": 8.2, "time": 0.167, "timecode": "00:00:49:15", "hang": 0, "actions": [
+        { "cue": "8.2", "time": 0.167, "timecode": "00:00:49:15", "hang": 0, "actions": [
             { "ch": 102, "Intensity": 1.0 },
             { "ch": 103, "Intensity": 1.0 },
             { "ch": 104, "Intensity": 1.0 },
@@ -471,7 +471,7 @@
             { "ch": 121, "Intensity": 1.0 },
             { "ch": 122, "Intensity": 1.0 }
         ]},
-        { "cue": 8.21, "time": 1.3, "actions": [
+        { "cue": "8.21", "time": 1.3, "actions": [
             { "ch": 102, "Intensity": 0.0 },
             { "ch": 103, "Intensity": 0.0 },
             { "ch": 104, "Intensity": 0.0 },
@@ -480,7 +480,7 @@
             { "ch": 121, "Intensity": 0.0 },
             { "ch": 122, "Intensity": 0.0 }
         ]},
-        { "cue": 8.3, "time": 0.167, "timecode": "00:00:51:00", "hang": 0, "actions": [
+        { "cue": "8.3", "time": 0.167, "timecode": "00:00:51:00", "hang": 0, "actions": [
             { "ch": 102, "Intensity": 1.0 },
             { "ch": 103, "Intensity": 1.0 },
             { "ch": 104, "Intensity": 1.0 },
@@ -489,31 +489,34 @@
             { "ch": 121, "Intensity": 1.0 },
             { "ch": 122, "Intensity": 1.0 }
         ]},
-        { "cue": 8.31, "time": 3, "actions": [
-            { "ch": 102, "Intensity": 0.0 },
-            { "ch": 103, "Intensity": 0.0 },
-            { "ch": 104, "Intensity": 0.0 },
-            { "ch": 105, "Intensity": 0.0 }
-        ]},
-        { "cue": 8.4, "time": 0.167, "timecode": "00:00:54:05", "hang": 0, "actions": [
-            { "ch": 102, "Intensity": 1.0 },
-            { "ch": 103, "Intensity": 1.0 },
-            { "ch": 104, "Intensity": 1.0 },
-            { "ch": 105, "Intensity": 1.0 },
-
-            { "ch": 121, "Intensity": 0.0 },
-            { "ch": 122, "Intensity": 0.0 }
-        ]},
-        { "cue": 8.41, "time": 3, "actions": [
+        { "cue": "8.31", "time": 3, "actions": [
             { "ch": 102, "Intensity": 0.0 },
             { "ch": 103, "Intensity": 0.0 },
             { "ch": 104, "Intensity": 0.0 },
             { "ch": 105, "Intensity": 0.0 },
 
+            { "ch": 121, "Intensity": 0.0 },
+            { "ch": 122, "Intensity": 0.0 }
+        ]},
+        { "cue": "8.4", "time": 0.167, "timecode": "00:00:54:05", "hang": 0, "actions": [
+            { "ch": 102, "Intensity": 1.0 },
+            { "ch": 103, "Intensity": 1.0 },
+            { "ch": 104, "Intensity": 1.0 },
+            { "ch": 105, "Intensity": 1.0 },
+
             { "ch": 121, "Intensity": 1.0 },
             { "ch": 122, "Intensity": 1.0 }
         ]},
-        { "cue": 9, "time": 3, "timecode": "00:00:55:20", "actions": [
+        { "cue": "8.41", "time": 3, "actions": [
+            { "ch": 102, "Intensity": 0.0 },
+            { "ch": 103, "Intensity": 0.0 },
+            { "ch": 104, "Intensity": 0.0 },
+            { "ch": 105, "Intensity": 0.0 },
+
+            { "ch": 121, "Intensity": 0.0 },
+            { "ch": 122, "Intensity": 0.0 }
+        ]},
+        { "cue": "9", "time": 3, "timecode": "00:00:55:20", "actions": [
             { "ch": 8, "Intensity": 0.0 },
             { "ch": 28, "Intensity": 0.0 },
             { "ch": 58, "Intensity": 0.0 },
@@ -523,10 +526,86 @@
             { "ch": 96, "Intensity": 0.0 },
             { "ch": 98, "Intensity": 0.0 }
         ]},
-        { "cue": 10, "time": 6, "timecode": "00:01:18:28", "actions": [
+        { "cue": "10", "time": 6, "timecode": "00:01:18:28", "hang": 0, "actions": [
             { "ch": 121, "Intensity": 1.0 },
             { "ch": 122, "Intensity": 1.0 }
+        ]},
+        { "cue": "10.1", "time": 0, "timecode": "00:01:26:10", "actions": [
+            { "ch": 102, "Red": 0.0, "Green": 0.0, "Blue": 1.0 },
+            { "ch": 103, "Red": 0.0, "Green": 0.0, "Blue": 1.0 },
+            { "ch": 104, "Red": 0.0, "Green": 0.0, "Blue": 1.0 },
+            { "ch": 105, "Red": 0.0, "Green": 0.0, "Blue": 1.0 }
+        ]},
+        { "cue": "11", "time": 0.233, "timecode": "00:01:26:03", "actions": [
+            { "ch": 121, "Intensity": 0.0 },
+            { "ch": 122, "Intensity": 0.0 }
+        ]},
+        { "cue": "12", "time": 0.167, "timecode": "00:01:26:10", "follow": 0, "actions": [
+            { "ch": 102, "Intensity": 1.0 },
+            { "ch": 103, "Intensity": 1.0 },
+            { "ch": 104, "Intensity": 1.0 },
+            { "ch": 105, "Intensity": 1.0 },
+            
+            { "ch": 41, "Intensity": 1.0 },
+            { "ch": 65, "Intensity": 1.0 },
+            { "ch": 112, "Intensity": 1.0 }
+        ]},
+        { "cue": "12.1", "time": 0.33, "follow": 1, "actions": [
+            { "ch": 1, "Intensity": 0.25 },
+            { "ch": 2, "Intensity": 0.25 },
+            { "ch": 3, "Intensity": 0.25 },
+            { "ch": 5, "Intensity": 0.25 },
+            { "ch": 6, "Intensity": 0.25 },
+            { "ch": 7, "Intensity": 0.25 },
+
+            { "ch": 22, "Intensity": 0.25 },
+            { "ch": 23, "Intensity": 0.25 },
+            { "ch": 24, "Intensity": 0.25 },
+            { "ch": 25, "Intensity": 0.25 },
+            { "ch": 26, "Intensity": 0.25 },
+            { "ch": 27, "Intensity": 0.25 },
+
+            { "ch": 53, "Intensity": 0.25 },
+            { "ch": 52, "Intensity": 0.25 },
+            { "ch": 55, "Intensity": 0.25 },
+            { "ch": 56, "Intensity": 0.25 },
+            { "ch": 57, "Intensity": 0.25 },
+
+            { "ch": 91, "Intensity": 0.25 },
+            { "ch": 93, "Intensity": 0.25 },
+            { "ch": 95, "Intensity": 0.25 },
+            { "ch": 97, "Intensity": 0.25 }
+        ]},
+        { "cue": "12.2", "time": 1, "actions": [
+            { "ch": 102, "Intensity": 0.75 },
+            { "ch": 103, "Intensity": 0.75 },
+            { "ch": 104, "Intensity": 0.75 },
+            { "ch": 105, "Intensity": 0.75 }
+        ]},
+        { "cue": "13", "time": 2.5, "timecode": "00:01:29:15", "follow": 0, "actions": [
+            { "ch": 102, "Intensity": 0.5 },
+            { "ch": 103, "Intensity": 0.5 },
+            { "ch": 104, "Intensity": 0.5 },
+            { "ch": 105, "Intensity": 0.5 }
+        ]},
+        { "cue": "13.1", "time": 5, "follow": 1, "actions": [
+            { "ch": 12, "Intensity": 0.5 },
+            { "ch": 13, "Intensity": 0.5 },
+
+            { "ch": 32, "Intensity": 0.5 },
+            { "ch": 33, "Intensity": 0.5 },
+            
+            { "ch": 61, "Intensity": 0.5 },
+            { "ch": 62, "Intensity": 0.5 },
+            
+            { "ch": 92, "Intensity": 0.5 },
+            { "ch": 98, "Intensity": 0.5 }
+        ]},
+        { "cue": "13.2", "time": 4, "actions": [
+            { "ch": 41, "Intensity": 0.0 },
+            { "ch": 112, "Intensity": 0.0 }
         ]}
         
-    ]
+    ],
+    "currentCue": 1
 }

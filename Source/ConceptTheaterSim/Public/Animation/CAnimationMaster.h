@@ -331,6 +331,11 @@ public:
             else
                 event.duration = eventJson->GetNumberField(JSON_DURATION);
         }
+        if(eventJson->HasField(JSON_END))
+        {
+            double end = parseTimeString(eventJson->GetStringField(JSON_END));
+            event.duration = end - event.timeSeconds;
+        }
 
         if(eventJson->HasField(JSON_X))
         {
@@ -394,6 +399,7 @@ public:
     
     static inline FString JSON_TIME = TEXT("time");
     static inline FString JSON_DURATION = TEXT("duration");
+    static inline FString JSON_END = TEXT("end");
 
     static inline FString JSON_X = TEXT("x");
     static inline FString JSON_Y = TEXT("y");

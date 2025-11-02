@@ -136,6 +136,16 @@ public:
         }
     }
 
+    void apply(UEOSPropertySet* set)
+    {
+        for(TPair<FName, double> pair : set->properties)
+        {
+            if(!properties.Contains(pair.Key))
+                continue;
+            properties.Add(pair.Key, pair.Value);
+        }
+    }
+
     void add(FName property, double value)
     {
         properties.Add(property, value);
@@ -154,7 +164,7 @@ class CONCEPTTHEATERSIM_API UEOSCue : public UObject
 
 public:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-    double cueNumber;
+    FString cueNumber;
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
     double time;
 
@@ -180,6 +190,8 @@ public:
     static inline FString JSON_ACTIONS_CH = TEXT("ch");
 
     static UEOSCue *FromJSON(TSharedPtr<FJsonObject> cueJson);
+
+    TSharedPtr<FJsonObject> toJson();
 };
 
 UCLASS(BlueprintType)
@@ -211,6 +223,9 @@ public:
     UPROPERTY()
     TArray<UEOSCue*> cues;
 
+    UPROPERTY()
+    int currentCue;
+
     UFUNCTION()
     bool patchLight(int ch, UEOSPatch* light);
 
@@ -221,6 +236,8 @@ public:
     double getParameter(int ch, FName parameter);
 
     bool loadFromJson(TSharedPtr<FJsonObject> cueJson);
+
+    TSharedPtr<FJsonObject> toJson();
     
     static inline FString JSON_VERSION = TEXT("version");
 
@@ -231,4 +248,6 @@ public:
     static inline FString JSON_PATCH_ADDRESS = TEXT("address");
 
     static inline FString JSON_CUES = TEXT("cues");
+
+    static inline FString JSON_CURRENT_CUE = TEXT("currentCue");
 };

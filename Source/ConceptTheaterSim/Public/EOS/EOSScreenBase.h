@@ -35,6 +35,9 @@ protected:
     UFUNCTION(BlueprintCallable)
     TArray<FName> getChannelParameters(int ch);
 
+    UFUNCTION(BlueprintCallable)
+    FString getCurrentCue();
+
     static TMap<FName, FString> getNamesToDisplay()
     {
         static bool namesToDisplayInit = false;

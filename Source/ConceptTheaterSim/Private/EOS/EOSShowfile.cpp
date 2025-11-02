@@ -100,7 +100,7 @@ bool UEOSShowfile::loadFromJson(TSharedPtr<FJsonObject> showJson)
                 UE_LOG(LogTemp, Error, TEXT("Invalid show file: Invalid patch: Missing DMX address (Chan %d)"), ch);
                 return false;
             }
-            p->address = (int)lightJson->GetNumberField(JSON_PATCH_UNIVERSE);
+            p->address = (int)lightJson->GetNumberField(JSON_PATCH_ADDRESS);
             if(!patchLight(ch, p))
             {
                 UE_LOG(LogTemp, Error, TEXT("Invalid show file: Invalid patch: Could not patch light (Chan %d)"), ch);
@@ -119,7 +119,40 @@ bool UEOSShowfile::loadFromJson(TSharedPtr<FJsonObject> showJson)
             cues.Add(cue);
         }
     }
+    if(showJson->HasField(JSON_CURRENT_CUE))
+        currentCue = showJson->GetNumberField(JSON_CURRENT_CUE);
     return true;
+}
+
+TSharedPtr<FJsonObject> UEOSShowfile::toJson()
+{
+    TSharedPtr<FJsonObject> showJson = MakeShared<FJsonObject>();
+    showJson->SetNumberField(JSON_VERSION, 1);
+
+    TArray<TSharedPtr<FJsonValue>> patchJson;
+    for(TPair<int, UEOSPatchSet*> patchPair : patch)
+    {
+        int ch = patchPair.Key;
+        for (UEOSPatch *device : patchPair.Value->devices)
+        {
+            TSharedPtr<FJsonObject> deviceJson = MakeShared<FJsonObject>();
+            deviceJson->SetNumberField(JSON_PATCH_CH, ch);
+            deviceJson->SetStringField(JSON_PATCH_TYPE, device->type.ToString());
+            deviceJson->SetNumberField(JSON_PATCH_UNIVERSE, device->universe);
+            deviceJson->SetNumberField(JSON_PATCH_ADDRESS, device->address);
+            patchJson.Add(MakeShared<FJsonValueObject>(deviceJson));
+        }
+    }
+    showJson->SetArrayField(JSON_PATCH, patchJson);
+
+    TArray<TSharedPtr<FJsonValue>> cuesJson;
+    for(UEOSCue* cue : cues)
+    {
+        cuesJson.Add(MakeShared<FJsonValueObject>(cue->toJson()));
+    }
+    showJson->SetArrayField(JSON_CUES, cuesJson);
+
+    return showJson;
 }
 
 UEOSCue* UEOSCue::FromJSON(TSharedPtr<FJsonObject> cueJson)
@@ -130,22 +163,22 @@ UEOSCue* UEOSCue::FromJSON(TSharedPtr<FJsonObject> cueJson)
         UE_LOG(LogTemp, Error, TEXT("Invalid show file: Invalid Cue: Missing cue number"));
         return nullptr;
     }
-    cue->cueNumber = cueJson->GetNumberField(JSON_CUE);
+    cue->cueNumber = cueJson->GetStringField(JSON_CUE);
     if(!cueJson->HasField(JSON_TIME))
     {
-        UE_LOG(LogTemp, Error, TEXT("Invalid show file: Invalid Cue: Missing cue time; (Cue %f)"), cue->cueNumber);
+        UE_LOG(LogTemp, Error, TEXT("Invalid show file: Invalid Cue: Missing cue time; (Cue %s)"), *(cue->cueNumber));
         return nullptr;
     }
     cue->time = cueJson->GetNumberField(JSON_TIME);
     if(cueJson->HasField(JSON_TIMECODE))
         cue->timecode = UTimeUtil::parseTimeStringFrames(cueJson->GetStringField(JSON_TIMECODE));
     if(cueJson->HasField(JSON_FOLLOW))
-        cue->timecode = cueJson->GetNumberField(JSON_FOLLOW);
+        cue->follow = cueJson->GetNumberField(JSON_FOLLOW);
     if(cueJson->HasField(JSON_HANG))
-        cue->timecode = cueJson->GetNumberField(JSON_HANG);
+        cue->hang = cueJson->GetNumberField(JSON_HANG);
     if(!cueJson->HasField(JSON_TIME))
     {
-        UE_LOG(LogTemp, Error, TEXT("Invalid show file: Invalid Cue: Missing cue actions; (Cue %f)"), cue->cueNumber);
+        UE_LOG(LogTemp, Error, TEXT("Invalid show file: Invalid Cue: Missing cue actions; (Cue %s)"), *(cue->cueNumber));
         return nullptr;
     }
     TArray<TSharedPtr<FJsonValue>> actionsJson = cueJson->GetArrayField(JSON_ACTIONS);
@@ -163,4 +196,29 @@ UEOSCue* UEOSCue::FromJSON(TSharedPtr<FJsonObject> cueJson)
         cue->actions.Add(ch, action);
     }
     return cue;
+}
+
+TSharedPtr<FJsonObject> UEOSCue::toJson()
+{
+    TSharedPtr<FJsonObject> cueJson = MakeShared<FJsonObject>();
+    cueJson->SetStringField(JSON_CUE, cueNumber);
+    cueJson->SetNumberField(JSON_TIME, time);
+    if(hang >= 0)
+        cueJson->SetNumberField(JSON_HANG, hang);
+    if(follow >= 0)
+        cueJson->SetNumberField(JSON_FOLLOW, follow);
+    if(timecode >= 0)
+        cueJson->SetStringField(JSON_TIMECODE, UTimeUtil::createTimeStringFromFrames(timecode));
+    TArray<TSharedPtr<FJsonObject>> actionsJson;
+    for(TPair<int, UEOSPropertySet*> pair : actions)
+    {
+        TSharedPtr<FJsonObject> chJson = MakeShared<FJsonObject>();
+        chJson->SetNumberField(JSON_ACTIONS_CH, pair.Key);
+        for(TPair<FName, double> propertyPair : pair.Value->properties)
+        {
+            chJson->SetNumberField(propertyPair.Key.ToString(), propertyPair.Value);
+        }
+        actionsJson.Add(chJson);
+    }
+    return cueJson;
 }
