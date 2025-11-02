@@ -344,10 +344,7 @@ void ACTheatricalLight::setGobo(UTexture2D* newGobo)
             activeLightFunction->SetScalarParameterValue(FName("Gobo Rotation"), goboRotation);
             activeLightFunction->SetScalarParameterValue(FName("Frame Rotate"), shutterFrame);
         }
-        else
-        {
-            lightFunctionInstance->SetScalarParameterValue(FName("Gobo Active"), 1);
-        }
+        lightFunctionInstance->SetScalarParameterValue(FName("Gobo Active"), 1);
         lightFunctionInstance->SetTextureParameterValue(FName("Gobo"), gobo);
     }
 }

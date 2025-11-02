@@ -91,7 +91,23 @@
 
         { "ch": 201, "type": "MaverickMk3Profile_54ch", "universe": 3, "address": 1 },
         { "ch": 202, "type": "MaverickMk3Profile_54ch", "universe": 3, "address": 56 },
-        { "ch": 203, "type": "MaverickMk3Profile_54ch", "universe": 3, "address": 111 }
+        { "ch": 203, "type": "MaverickMk3Profile_54ch", "universe": 3, "address": 111 },
+        
+        { "ch": 301, "type": "Dimmer", "universe": 10, "address": 83 },
+        { "ch": 302, "type": "Dimmer", "universe": 10, "address": 84 },
+        { "ch": 303, "type": "Dimmer", "universe": 10, "address": 85 },
+        { "ch": 304, "type": "Dimmer", "universe": 10, "address": 86 },
+        { "ch": 305, "type": "Dimmer", "universe": 10, "address": 87 },
+        { "ch": 306, "type": "Dimmer", "universe": 10, "address": 88 },
+        { "ch": 307, "type": "Dimmer", "universe": 10, "address": 89 },
+        { "ch": 308, "type": "Dimmer", "universe": 10, "address": 90 },
+        { "ch": 309, "type": "Dimmer", "universe": 10, "address": 91 },
+        { "ch": 310, "type": "Dimmer", "universe": 10, "address": 92 },
+        
+        { "ch": 321, "type": "Dimmer", "universe": 10, "address": 93 },
+        { "ch": 322, "type": "Dimmer", "universe": 10, "address": 94 },
+        { "ch": 323, "type": "Dimmer", "universe": 10, "address": 95 },
+        { "ch": 324, "type": "Dimmer", "universe": 10, "address": 96 }
     ],
     "cues": [
         { "cue": "0.5", "time": 0, "actions": [
@@ -175,7 +191,23 @@
             
             { "ch":201, "Intensity": 0},
             { "ch":202, "Intensity": 0},
-            { "ch":203, "Intensity": 0}
+            { "ch":203, "Intensity": 0},
+
+            { "ch": 301, "Intensity": 0.0 },
+            { "ch": 302, "Intensity": 0.0 },
+            { "ch": 303, "Intensity": 0.0 },
+            { "ch": 304, "Intensity": 0.0 },
+            { "ch": 305, "Intensity": 0.0 },
+            { "ch": 306, "Intensity": 0.0 },
+            { "ch": 307, "Intensity": 0.0 },
+            { "ch": 308, "Intensity": 0.0 },
+            { "ch": 309, "Intensity": 0.0 },
+            { "ch": 310, "Intensity": 0.0 },
+
+            { "ch": 321, "Intensity": 0.0 },
+            { "ch": 322, "Intensity": 0.0 },
+            { "ch": 323, "Intensity": 0.0 },
+            { "ch": 324, "Intensity": 0.0 }
         ]},
         { "cue": "1", "time": 0.5, "actions": [
             { "ch":1, "Intensity": 0.75, "Red": 0.896, "Green": 0.896, "Blue": 1.0},
@@ -256,9 +288,25 @@
             { "ch":122, "Intensity": 1.0, "Red": 0.0, "Green": 0.0, "Blue": 1.0},
             { "ch":123, "Intensity": 0.0, "Red": 1.0, "Green": 1.0, "Blue": 1.0},
             
-            { "ch":202, "Intensity": 1.0, "Tilt": 40, "Pan": -70, "Cyan": 1.0, "Yellow": 0.0, "Magenta": 1.0, "GoboSelect": 50, "GoboIndex/Speed": 32,"Zoom": 50, "Edge": 128},
-            { "ch":201, "Intensity": 1.0, "Tilt": 40, "Pan": 70, "Cyan": 1.0, "Yellow": 0.0, "Magenta": 1.0, "GoboSelect": 50, "GoboIndex/Speed": 32,"Zoom": 50, "Edge": 128},
-            { "ch":203, "Intensity": 0.0, "Tilt": 0, "Pan": 0, "Cyan": 0.0, "Yellow": 0.0, "Magenta": 0.0}
+            { "ch":202, "Intensity": 1.0, "Tilt": 40, "Pan": -70, "Cyan": 1.0, "Yellow": 0.0, "Magenta": 1.0, "GoboSelect": 50, "GoboIndex/Speed": 32,"Zoom": 50, "Edge": 0.5},
+            { "ch":201, "Intensity": 1.0, "Tilt": 40, "Pan": 70, "Cyan": 1.0, "Yellow": 0.0, "Magenta": 1.0, "GoboSelect": 50, "GoboIndex/Speed": 32,"Zoom": 50, "Edge": 0.5},
+            { "ch":203, "Intensity": 0.0, "Tilt": 0, "Pan": 0, "Cyan": 0.0, "Yellow": 0.0, "Magenta": 0.0},
+
+            { "ch": 301, "Intensity": 0.75 },
+            { "ch": 302, "Intensity": 0.75 },
+            { "ch": 303, "Intensity": 0.75 },
+            { "ch": 304, "Intensity": 0.75 },
+            { "ch": 305, "Intensity": 0.75 },
+            { "ch": 306, "Intensity": 0.75 },
+            { "ch": 307, "Intensity": 0.75 },
+            { "ch": 308, "Intensity": 0.75 },
+            { "ch": 309, "Intensity": 0.75 },
+            { "ch": 310, "Intensity": 0.75 },
+
+            { "ch": 321, "Intensity": 1.0 },
+            { "ch": 322, "Intensity": 1.0 },
+            { "ch": 323, "Intensity": 1.0 },
+            { "ch": 324, "Intensity": 1.0 }
         ]},
         { "cue": "2", "time": 5, "timecode": "00:00:01:00", "hang": 0, "actions": [
             { "ch":1, "Intensity": 0.0 },
@@ -337,7 +385,23 @@
             
             { "ch":202, "Intensity": 0.5 },
             { "ch":201, "Intensity": 0.5 },
-            { "ch":203, "Intensity": 0.0 }
+            { "ch":203, "Intensity": 0.0 },
+
+            { "ch": 301, "Intensity": 0.0 },
+            { "ch": 302, "Intensity": 0.0 },
+            { "ch": 303, "Intensity": 0.0 },
+            { "ch": 304, "Intensity": 0.0 },
+            { "ch": 305, "Intensity": 0.0 },
+            { "ch": 306, "Intensity": 0.0 },
+            { "ch": 307, "Intensity": 0.0 },
+            { "ch": 308, "Intensity": 0.0 },
+            { "ch": 309, "Intensity": 0.0 },
+            { "ch": 310, "Intensity": 0.0 },
+
+            { "ch": 321, "Intensity": 0.5 },
+            { "ch": 322, "Intensity": 0.5 },
+            { "ch": 323, "Intensity": 0.5 },
+            { "ch": 324, "Intensity": 0.5 }
         ]},
         { "cue": "2.1", "time": 2, "hang": 0, "actions": [
             { "ch":121, "Intensity": 0.0 },
@@ -554,10 +618,12 @@
             { "ch": 1, "Intensity": 0.25 },
             { "ch": 2, "Intensity": 0.25 },
             { "ch": 3, "Intensity": 0.25 },
+            { "ch": 4, "Intensity": 0.25 },
             { "ch": 5, "Intensity": 0.25 },
             { "ch": 6, "Intensity": 0.25 },
             { "ch": 7, "Intensity": 0.25 },
 
+            { "ch": 21, "Intensity": 0.25 },
             { "ch": 22, "Intensity": 0.25 },
             { "ch": 23, "Intensity": 0.25 },
             { "ch": 24, "Intensity": 0.25 },
