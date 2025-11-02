@@ -11,7 +11,8 @@ UENUM(BlueprintType)
 enum class EPersonBodyType : uint8
 {
     MALE UMETA(DisplayName="Male"),
-    FEMALE UMETA(DisplayName="Female")
+    FEMALE UMETA(DisplayName="Female"),
+    FEMALE_2 UMETA(DisplayName="Female 2")
 };
 
 UENUM(BlueprintType)
@@ -160,6 +161,20 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Optimization", Meta = (Bitmask, BitmaskEnum = "/Script/ConceptTheaterSim.ELegCoverage"))
     uint8 legCoverage;
 
+    UStaticMesh* getMesh(EPersonBodyType bodyType)
+    {
+        UStaticMesh **p = meshes.Find(bodyType);
+        if(p)
+        {
+            return *p;
+        }
+        if(bodyType == EPersonBodyType::FEMALE_2 && (p = meshes.Find(EPersonBodyType::FEMALE)))
+        {
+            return *p;
+        }
+        return nullptr;
+    }
+
     UMaterialInterface* getMaterial(int index, TArray<UMaterialInterface*> materialOverrides, UMaterialInterface* skinMaterial)
     {
         if(index == skinMaterialIndex)
@@ -262,7 +277,7 @@ protected:
     UMaterialInstanceDynamic *hairMaterialInstance;
 
     // Meshes
-    UPROPERTY(EditDefaultsOnly, Category="Meshes")
+    UPROPERTY(EditAnywhere, Category="Meshes")
     TMap<EPersonBodyType, FPersonMeshSet> bodyMeshes;
 
     UPROPERTY(EditDefaultsOnly, Category="Meshes")

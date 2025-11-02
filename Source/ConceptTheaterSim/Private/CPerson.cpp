@@ -90,6 +90,8 @@ EPersonLegType ACPerson::getLegType()
         return EPersonLegType::MALE;
     case EPersonBodyType::FEMALE:
         return EPersonLegType::FEMALE;
+    case EPersonBodyType::FEMALE_2:
+        return EPersonLegType::FEMALE;
 
     default:
         return EPersonLegType::MALE;
@@ -286,8 +288,7 @@ void ACPerson::updateMeshes()
         }
         else
         {
-            if(clothingAsset->meshes.Contains(bodyType))
-                mesh = clothingAsset->meshes[bodyType];
+            mesh = clothingAsset->getMesh(bodyType);
         }
         if(mesh != nullptr)
         {
