@@ -144,7 +144,8 @@
             "pointers": "cpp",
             "*.inc": "cpp",
             "execution": "cpp",
-            "adolcforward": "cpp"
+            "adolcforward": "cpp",
+            "span_ext": "cpp"
         },
         "cSpell.words": [
             "AETC",
