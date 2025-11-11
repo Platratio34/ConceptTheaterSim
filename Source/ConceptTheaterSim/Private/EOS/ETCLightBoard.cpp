@@ -132,8 +132,6 @@ void AETCLightBoard::BeginPlay()
     // setButtonColor(BUTTON_HIGH, FColor(255, 255, 255), FColor(255, 255, 0));
     
     // setButtonColor(BUTTON_CLEAR, FColor(255, 255, 255), FColor(255, 32, 32));
-
-    fades.Init(nullptr, 200);
 }
 
 // Called every frame
@@ -162,7 +160,8 @@ void AETCLightBoard::Tick(float DeltaTime)
         }
     }
 
-    updateFades(DeltaTime);
+    if(showfile)
+        showfile->updateFades(DeltaTime);
 
     if(output)
     {
@@ -180,68 +179,6 @@ void AETCLightBoard::Tick(float DeltaTime)
                 continue;
             updateUniverse(u, networkCard->getData(u));
             networkCard->clearChanged(u);
-        }
-    }
-}
-
-void AETCLightBoard::addFade(int channel, FName property, double target, double time)
-{
-    int firstNull = -1;
-    for (int i = 0; i < fades.Num(); i++)
-    {
-        UEOSFade *f = fades[i];
-        if(f == nullptr)
-        {
-            firstNull = i;
-            continue;
-        }
-        if(f->channel == channel && f->property == property)
-        {
-            f->target = target;
-            f->time = time;
-            return;
-        }
-    }
-    UEOSFade *fade = NewObject<UEOSFade>();
-    fade->channel = channel;
-    fade->property = property;
-    fade->target = target;
-    fade->time = time;
-    if(firstNull != -1)
-    {
-        fades[firstNull] = fade;
-    }
-    else
-    {
-        fades.Add(fade);
-    }
-}
-
-void AETCLightBoard::updateFades(double deltaTime)
-{
-    if(showfile == nullptr)
-        return;
-    for (int i = 0; i < fades.Num(); i++)
-    {
-        UEOSFade *fade = fades[i];
-        if(fade == nullptr)
-            continue;
-        if(fade->update(showfile, deltaTime))
-            fades[i] = nullptr;
-    }
-}
-
-void AETCLightBoard::clearFade(int channel, FName property)
-{
-    for (int i = 0; i < fades.Num(); i++)
-    {
-        UEOSFade *fade = fades[i];
-        if(fade == nullptr)
-            continue;
-        if(fade->channel == channel && fade->property == property)
-        {
-            fades[i] = nullptr;
-            return;
         }
     }
 }
@@ -265,7 +202,7 @@ void AETCLightBoard::updateUniverse(int universe, TArray<int> dmx)
             // UE_LOG(LogTemp, Display, TEXT("Updating channel %d"), ch);
             
             EOSLightOutputType* outputType = EOSLightOutputType::getType(patch->type);
-            outputType->input(dmx, showfile->channels[ch], patch->address-1);
+            outputType->input(dmx, showfile->getCueChannel(ch), patch->address-1);
         }
     }
 }
@@ -290,7 +227,7 @@ TArray<int> AETCLightBoard::outputUniverse(int universe)
             // UE_LOG(LogTemp, Display, TEXT("Outputting Ch %d at %d/%d"), ch, patch->universe, patch->address);
 
             EOSLightOutputType* outputType = EOSLightOutputType::getType(patch->type);
-            outputType->output(showfile->channels[ch], dmxData, patch->address-1);
+            outputType->output(showfile->getChannel(ch), dmxData, patch->address-1);
         }
     }
     return dmxData;
@@ -397,6 +334,13 @@ void AETCLightBoard::onInteract(UPrimitiveComponent* component)
         else if(button == BUTTON_SHIFT)
         {
             shift = !shift;
+            return;
+        }
+        if(shift && button == BUTTON_UPDATE)
+        {
+            if(showfile == nullptr)
+                return;
+            saveShowfile(showfile->fileName);
             return;
         }
         
@@ -541,10 +485,11 @@ void AETCLightBoard::executeCommand()
             int c = selection.values[i];
             if(parkedChannels.Contains(c))
                 continue;
-            if(UEOSPropertySet **set = showfile->channels.Find(c))
-            {
-                (*set)->set(PROPERTY_INTENSITY, v);
-            }
+            showfile->setManualProperty(c, PROPERTY_INTENSITY, v);
+            // if(UEOSPropertySet **set = showfile->manualChannels.Find(c))
+            // {
+            //     (*set)->set(PROPERTY_INTENSITY, v);
+            // }
         }
         clearCmd = true;
         return;
@@ -568,10 +513,11 @@ void AETCLightBoard::executeCommand()
             int c = selection.values[i];
             if(parkedChannels.Contains(c))
                 continue;
-            if(UEOSPropertySet **set = showfile->channels.Find(c))
-            {
-                (*set)->set(PROPERTY_INTENSITY, v);
-            }
+            showfile->setManualProperty(c, PROPERTY_INTENSITY, v);
+            // if(UEOSPropertySet **set = showfile->manualChannels.Find(c))
+            // {
+            //     (*set)->set(PROPERTY_INTENSITY, v);
+            // }
         }
         clearCmd = true;
         return;
@@ -585,6 +531,13 @@ void AETCLightBoard::executeCommand()
             {
                 executeCue(i, 1);
             }
+        }
+    }
+    for (int i = 0; i < command.Num(); i++)
+    {
+        if(command[i] == BUTTON_RECORD_ONLY)
+        {
+
         }
     }
     commandError = TEXT("Unknown command");
@@ -950,7 +903,7 @@ bool AETCLightBoard::loadShowfile(FString filePath)
         UEOSCue *cue = showfile->cues[i];
         for(TPair<int, UEOSPropertySet*> chPair : cue->actions)
         {
-            showfile->channels[chPair.Key]->apply(chPair.Value);
+            showfile->setCueProperties(chPair.Key, chPair.Value);
         }
     }
 
@@ -1005,16 +958,12 @@ void AETCLightBoard::executeCue(int cueI, double time)
     {
         if(time == 0)
         {
-            for(TPair<FName, double> paramPair : chPair.Value->properties)
-            {
-                clearFade(chPair.Key, paramPair.Key);
-                showfile->channels[chPair.Key]->set(paramPair.Key, paramPair.Value);
-            }
+            showfile->setCueProperties(chPair.Key, chPair.Value);
         }
         else
         {
             for(TPair<FName, double> paramPair : chPair.Value->properties)
-                addFade(chPair.Key, paramPair.Key, paramPair.Value, time);
+                showfile->addFade(chPair.Key, paramPair.Key, paramPair.Value, time, false, false);
         }
     }
     if(cueI == showfile->currentCue + 1)

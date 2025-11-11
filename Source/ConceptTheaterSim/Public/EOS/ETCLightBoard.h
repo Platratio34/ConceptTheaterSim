@@ -41,35 +41,6 @@ public:
 };
 
 UCLASS()
-class CONCEPTTHEATERSIM_API UEOSFade : public UObject
-{
-	GENERATED_BODY()
-	
-public:
-    int channel;
-    FName property;
-    double target;
-    double time;
-
-    bool update(UEOSShowfile* showfile, double deltaTime)
-    {
-        double value = showfile->channels[channel]->get(property);
-        double diff = target - value;
-        if(time < deltaTime)
-            time = deltaTime;
-        double delta = (diff / time) * deltaTime;
-        time -= deltaTime;
-        if(abs(diff) < abs(delta) || time <= 0.01)
-        {
-            showfile->channels[channel]->set(property, target);
-            return true;
-        }
-        showfile->channels[channel]->set(property, value + delta);
-        return false;
-    }
-};
-
-UCLASS()
 class CONCEPTTHEATERSIM_API AETCLightBoard : public AActor
 {
 	GENERATED_BODY()
@@ -108,15 +79,6 @@ protected:
 
     UFUNCTION()
     void executeCue(int cueI, double time = -1);
-
-    UFUNCTION()
-    void addFade(int channel, FName property, double target, double time);
-
-    UFUNCTION()
-    void clearFade(int channel, FName property);
-
-    UFUNCTION()
-    void updateFades(double deltaTime);
 
     UFUNCTION(BlueprintCallable)
     void onTimecode(int frames);
@@ -174,9 +136,7 @@ private:
 
     UPROPERTY(VisibleInstanceOnly, Category="EOS", AdvancedDisplay)
     TSet<int> parkedChannels;
-
-    UPROPERTY()
-    TArray<UEOSFade *> fades;
+    
     double followTime = -1;
 
     UPROPERTY(VisibleInstanceOnly, Category="Buttons", AdvancedDisplay)

@@ -3,11 +3,12 @@
 #pragma once
 
 #include "EOS/EOSPatchTypes.h"
+#include "EOS/EOSShowfile.h"
 
 class CONCEPTTHEATERSIM_API EOSLightOutputType
 {
 public:
-    virtual void output(UEOSPropertySet *parameters, TArray<int>& dmx, int start) {}
+    virtual void output(UEOSChannelView *channel, TArray<int>& dmx, int start) {}
     virtual void input(TArray<int> &dmx, UEOSPropertySet *parameters, int start) {}
 
     static EOSLightOutputType *getType(FName type);

@@ -42,6 +42,7 @@ CUE: {
 
 */
 
+class CONCEPTTHEATERSIM_API UEOSShowfile;
 
 UCLASS()
 class CONCEPTTHEATERSIM_API UEOSPatch : public UObject
@@ -125,15 +126,15 @@ public:
         {
             return *v;
         }
+        UE_LOG(LogTemp, Warning, TEXT("Tried to get property %s from set, but it was not present"), *property.ToString());
         return 0;
     }
 
     void set(FName property, double value)
     {
-        if(double* v = properties.Find(property))
-        {
-            properties.Add(property, value);
-        }
+        if(!properties.Contains(property))
+            return;
+        properties.Add(property, value);
     }
 
     void apply(UEOSPropertySet* set)
@@ -149,6 +150,11 @@ public:
     void add(FName property, double value)
     {
         properties.Add(property, value);
+    }
+
+    void remove(FName property)
+    {
+        properties.Remove(property);
     }
 
     double operator[](FName property)
@@ -195,6 +201,50 @@ public:
 };
 
 UCLASS(BlueprintType)
+class CONCEPTTHEATERSIM_API UEOSChannelView : public UObject
+{
+    GENERATED_BODY()
+
+public:
+
+    UFUNCTION(BlueprintCallable)
+    float getProperty(FName property);
+    
+    UFUNCTION(BlueprintCallable)
+    FName propertySource(FName property);
+
+    static UEOSChannelView* create(UEOSShowfile *showfile, int channel)
+    {
+        UEOSChannelView *view = NewObject<UEOSChannelView>();
+        view->showfile = showfile;
+        view->channel = channel;
+        return view;
+    }
+
+    void getKeys(TArray<FName> outKeys);
+
+protected:
+    UEOSShowfile *showfile;
+    int channel;
+};
+
+UCLASS()
+class CONCEPTTHEATERSIM_API UEOSFade : public UObject
+{
+	GENERATED_BODY()
+	
+public:
+    int channel;
+    FName property;
+    double target;
+    double time;
+    bool manual;
+    bool sneak;
+
+    bool update(UEOSShowfile *showfile, double deltaTime);
+};
+
+UCLASS(BlueprintType)
 class CONCEPTTHEATERSIM_API UEOSShowfile : public UObject
 {
     GENERATED_BODY()
@@ -218,9 +268,6 @@ public:
     TMap<int, UEOSPatchSet*> patch;
 
     UPROPERTY()
-    TMap<int, UEOSPropertySet*> channels;
-
-    UPROPERTY()
     TArray<UEOSCue*> cues;
 
     UPROPERTY()
@@ -234,6 +281,18 @@ public:
 
     UFUNCTION(BlueprintCallable)
     double getParameter(int ch, FName parameter);
+
+    UFUNCTION(BlueprintCallable)
+    UEOSChannelView *getChannel(int ch);
+
+    UFUNCTION()
+    void addFade(int channel, FName property, double target, double time, bool manual, bool sneak);
+
+    UFUNCTION()
+    void clearFade(int channel, FName property, bool manual);
+
+    UFUNCTION()
+    void updateFades(double deltaTime);
 
     bool loadFromJson(TSharedPtr<FJsonObject> cueJson);
 
@@ -250,4 +309,27 @@ public:
     static inline FString JSON_CUES = TEXT("cues");
 
     static inline FString JSON_CURRENT_CUE = TEXT("currentCue");
+
+    void setManualProperty(int ch, FName property, float value);
+    void setManualProperties(int ch, UEOSPropertySet* properties);
+    void clearManualProperty(int ch, FName property, bool sneak);
+
+    void setCueProperty(int ch, FName property, float value);
+    void setCueProperties(int ch, UEOSPropertySet* properties);
+    
+    UEOSPropertySet *getManualChannel(int ch);
+    UEOSPropertySet *getCueChannel(int ch);
+
+protected:
+    UPROPERTY()
+    TMap<int, UEOSPropertySet*> channels;
+
+    UPROPERTY()
+    TMap<int, UEOSPropertySet*> manualChannels;
+    
+    UPROPERTY()
+    TMap<int, UEOSChannelView*> channelViews;
+
+    UPROPERTY()
+    TArray<UEOSFade *> fades;
 };

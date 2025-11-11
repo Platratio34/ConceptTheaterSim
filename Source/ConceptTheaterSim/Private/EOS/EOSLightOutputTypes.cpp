@@ -4,9 +4,9 @@
 
 class CONCEPTTHEATERSIM_API Dimmer : public EOSLightOutputType
 {
-    virtual void output(UEOSPropertySet *parameters, TArray<int>& dmx, int start) override
+    virtual void output(UEOSChannelView *channel, TArray<int>& dmx, int start) override
     {
-        dmx[start] = toByte(parameters->get(PROPERTY_INTENSITY));
+        dmx[start] = toByte(channel->getProperty(PROPERTY_INTENSITY));
     }
 
     virtual void input(TArray<int> &dmx, UEOSPropertySet *parameters, int start) override
@@ -17,16 +17,16 @@ class CONCEPTTHEATERSIM_API Dimmer : public EOSLightOutputType
 
 class CONCEPTTHEATERSIM_API ETCLustrDirect : public EOSLightOutputType
 {
-    virtual void output(UEOSPropertySet *parameters, TArray<int>& dmx, int start) override
+    virtual void output(UEOSChannelView *channel, TArray<int>& dmx, int start) override
     {
-        dmx[start+0] = toByte(parameters->get(PROPERTY_RED));
-        dmx[start+1] = toByte(parameters->get(PROPERTY_WHITE));
-        dmx[start+2] = toByte(parameters->get(PROPERTY_AMBER));
-        dmx[start+3] = toByte(parameters->get(PROPERTY_GREEN));
-        dmx[start+4] = toByte(parameters->get(PROPERTY_CYAN));
-        dmx[start+5] = toByte(parameters->get(PROPERTY_BLUE));
-        dmx[start+6] = toByte(parameters->get(PROPERTY_INDIGO));
-        dmx[start+7] = toByte(parameters->get(PROPERTY_INTENSITY));
+        dmx[start+0] = toByte(channel->getProperty(PROPERTY_RED));
+        dmx[start+1] = toByte(channel->getProperty(PROPERTY_WHITE));
+        dmx[start+2] = toByte(channel->getProperty(PROPERTY_AMBER));
+        dmx[start+3] = toByte(channel->getProperty(PROPERTY_GREEN));
+        dmx[start+4] = toByte(channel->getProperty(PROPERTY_CYAN));
+        dmx[start+5] = toByte(channel->getProperty(PROPERTY_BLUE));
+        dmx[start+6] = toByte(channel->getProperty(PROPERTY_INDIGO));
+        dmx[start+7] = toByte(channel->getProperty(PROPERTY_INTENSITY));
         dmx[start+8] = 0; // strobe
         dmx[start+9] = 0; // intensity
     }
@@ -46,16 +46,16 @@ class CONCEPTTHEATERSIM_API ETCLustrDirect : public EOSLightOutputType
 
 class CONCEPTTHEATERSIM_API ETCD60LustrDirect : public EOSLightOutputType
 {
-    virtual void output(UEOSPropertySet *parameters, TArray<int>& dmx, int start) override
+    virtual void output(UEOSChannelView *channel, TArray<int>& dmx, int start) override
     {
-        dmx[start+0] = toByte(parameters->get(PROPERTY_RED));
-        dmx[start+1] = toByte(parameters->get(PROPERTY_WHITE));
-        dmx[start+2] = toByte(parameters->get(PROPERTY_AMBER));
-        dmx[start+3] = toByte(parameters->get(PROPERTY_GREEN));
-        dmx[start+4] = toByte(parameters->get(PROPERTY_CYAN));
-        dmx[start+5] = toByte(parameters->get(PROPERTY_BLUE));
-        dmx[start+6] = toByte(parameters->get(PROPERTY_INDIGO));
-        dmx[start+7] = toByte(parameters->get(PROPERTY_INTENSITY));
+        dmx[start+0] = toByte(channel->getProperty(PROPERTY_RED));
+        dmx[start+1] = toByte(channel->getProperty(PROPERTY_WHITE));
+        dmx[start+2] = toByte(channel->getProperty(PROPERTY_AMBER));
+        dmx[start+3] = toByte(channel->getProperty(PROPERTY_GREEN));
+        dmx[start+4] = toByte(channel->getProperty(PROPERTY_CYAN));
+        dmx[start+5] = toByte(channel->getProperty(PROPERTY_BLUE));
+        dmx[start+6] = toByte(channel->getProperty(PROPERTY_INDIGO));
+        dmx[start+7] = toByte(channel->getProperty(PROPERTY_INTENSITY));
         dmx[start+8] = 0; // strobe
         dmx[start+9] = 0; // intensity
     }
@@ -75,14 +75,14 @@ class CONCEPTTHEATERSIM_API ETCD60LustrDirect : public EOSLightOutputType
 
 class CONCEPTTHEATERSIM_API ETCColorSourceDirect : public EOSLightOutputType
 {
-    virtual void output(UEOSPropertySet *parameters, TArray<int>& dmx, int start) override
+    virtual void output(UEOSChannelView *channel, TArray<int>& dmx, int start) override
     {
-        dmx[start+0] = toByte(parameters->get(PROPERTY_INTENSITY));
-        dmx[start+1] = toByte(parameters->get(PROPERTY_RED));
-        dmx[start+2] = toByte(parameters->get(PROPERTY_GREEN));
-        dmx[start+3] = toByte(parameters->get(PROPERTY_BLUE));
-        dmx[start+4] = toByte(parameters->get(PROPERTY_INDIGO));
-        dmx[start+5] = toByte(parameters->get(PROPERTY_LIME));
+        dmx[start+0] = toByte(channel->getProperty(PROPERTY_INTENSITY));
+        dmx[start+1] = toByte(channel->getProperty(PROPERTY_RED));
+        dmx[start+2] = toByte(channel->getProperty(PROPERTY_GREEN));
+        dmx[start+3] = toByte(channel->getProperty(PROPERTY_BLUE));
+        dmx[start+4] = toByte(channel->getProperty(PROPERTY_INDIGO));
+        dmx[start+5] = toByte(channel->getProperty(PROPERTY_LIME));
         dmx[start+6] = 0; // strobe
     }
 
@@ -99,61 +99,61 @@ class CONCEPTTHEATERSIM_API ETCColorSourceDirect : public EOSLightOutputType
 
 class CONCEPTTHEATERSIM_API MaverickMk3Profile54Ch : public EOSLightOutputType
 {
-    virtual void output(UEOSPropertySet *parameters, TArray<int>& dmx, int start) override
+    virtual void output(UEOSChannelView *channel, TArray<int>& dmx, int start) override
     {
-        dmx[start+0] = toByteCoarseRanged(parameters->get(PROPERTY_PAN), -100, 100);
-        dmx[start+1] = toByteFineRanged(parameters->get(PROPERTY_PAN), -100, 100);
-        dmx[start+2] = toByteCoarseRanged(parameters->get(PROPERTY_TILT), -135, 135);
-        dmx[start+3] = toByteFineRanged(parameters->get(PROPERTY_TILT), -135, 135);
-        dmx[start+4] = toByte(parameters->get(PROPERTY_POSITION_MSPEED));
-        dmx[start+5] = toByteCoarse(parameters->get(PROPERTY_INTENSITY));
-        dmx[start+6] = toByteFine(parameters->get(PROPERTY_INTENSITY));
-        dmx[start+7] = (int)(parameters->get(PROPERTY_STROBE));
+        dmx[start+0] = toByteCoarseRanged(channel->getProperty(PROPERTY_PAN), -100, 100);
+        dmx[start+1] = toByteFineRanged(channel->getProperty(PROPERTY_PAN), -100, 100);
+        dmx[start+2] = toByteCoarseRanged(channel->getProperty(PROPERTY_TILT), -135, 135);
+        dmx[start+3] = toByteFineRanged(channel->getProperty(PROPERTY_TILT), -135, 135);
+        dmx[start+4] = toByte(channel->getProperty(PROPERTY_POSITION_MSPEED));
+        dmx[start+5] = toByteCoarse(channel->getProperty(PROPERTY_INTENSITY));
+        dmx[start+6] = toByteFine(channel->getProperty(PROPERTY_INTENSITY));
+        dmx[start+7] = (int)(channel->getProperty(PROPERTY_STROBE));
         dmx[start+8] = 0; // virtual strobe
-        dmx[start+9] = toByte(parameters->get(PROPERTY_CYAN));
-        dmx[start+10] = toByte(parameters->get(PROPERTY_MAGENTA));
-        dmx[start+11] = toByte(parameters->get(PROPERTY_YELLOW));
-        dmx[start+12] = toByte(parameters->get(PROPERTY_CT));
-        dmx[start+13] = (int)parameters->get(PROPERTY_COLOR_SELECT);
-        dmx[start+14] = (int)(parameters->get(PROPERTY_GOBO_SELECT));
-        dmx[start+15] = (int)(parameters->get(PROPERTY_GOBO_INDEX_SPEED)) >> 8;
-        dmx[start+16] = (int)(parameters->get(PROPERTY_GOBO_INDEX_SPEED)) & 0xff;
-        dmx[start+17] = (int)(parameters->get(PROPERTY_GOBO_SELECT_2));
-        dmx[start+18] = (int)(parameters->get(PROPERTY_ANIMATION_SELECT));
-        dmx[start+19] = (int)(parameters->get(PROPERTY_ANIMATION_INDEX_SPEED));
-        dmx[start+20] = toByteCoarse(parameters->get(PROPERTY_SHUTTER_3_B));
-        dmx[start+21] = toByteFine(parameters->get(PROPERTY_SHUTTER_3_B));
-        dmx[start+22] = toByteCoarse(parameters->get(PROPERTY_SHUTTER_3_A));
-        dmx[start+23] = toByteFine(parameters->get(PROPERTY_SHUTTER_3_A));
-        dmx[start+24] = toByteCoarse(parameters->get(PROPERTY_SHUTTER_2_B));
-        dmx[start+25] = toByteFine(parameters->get(PROPERTY_SHUTTER_2_B));
-        dmx[start+26] = toByteCoarse(parameters->get(PROPERTY_SHUTTER_2_A));
-        dmx[start+27] = toByteFine(parameters->get(PROPERTY_SHUTTER_2_A));
-        dmx[start+28] = toByteCoarse(parameters->get(PROPERTY_SHUTTER_1_B));
-        dmx[start+29] = toByteFine(parameters->get(PROPERTY_SHUTTER_1_B));
-        dmx[start+30] = toByteCoarse(parameters->get(PROPERTY_SHUTTER_1_A));
-        dmx[start+31] = toByteFine(parameters->get(PROPERTY_SHUTTER_1_A));
-        dmx[start+32] = toByteCoarse(parameters->get(PROPERTY_SHUTTER_4_B));
-        dmx[start+33] = toByteFine(parameters->get(PROPERTY_SHUTTER_4_B));
-        dmx[start+34] = toByteCoarse(parameters->get(PROPERTY_SHUTTER_4_A));
-        dmx[start+35] = toByteFine(parameters->get(PROPERTY_SHUTTER_4_A));
-        dmx[start+36] = toByteCoarseRanged(parameters->get(PROPERTY_SHUTTER_FRAME_ROT), -1, 1);
-        dmx[start+37] = toByteFineRanged(parameters->get(PROPERTY_SHUTTER_FRAME_ROT), -1, 1);
-        dmx[start+38] = toByteCoarseRanged(parameters->get(PROPERTY_EDGE), 0, 1);
-        dmx[start+39] = toByteFineRanged(parameters->get(PROPERTY_EDGE), 0, 1);
-        dmx[start+40] = (int)(parameters->get(PROPERTY_EDGE_MODE));
-        dmx[start+41] = toByteCoarseRanged(parameters->get(PROPERTY_ZOOM), 50, 10);
-        dmx[start+42] = toByteFineRanged(parameters->get(PROPERTY_ZOOM), 50, 10);
-        dmx[start+43] = (int)(parameters->get(PROPERTY_BEAM_FX_SELECT));
-        dmx[start+44] = (int)(parameters->get(PROPERTY_BEAM_FX_INDEX_SPEED));
-        dmx[start+45] = (int)(parameters->get(PROPERTY_BEAM_FX_SELECT_2));
-        dmx[start+46] = (int)(parameters->get(PROPERTY_BEAM_FX_INDEX_SPEED_2));
-        dmx[start+47] = (int)(parameters->get(PROPERTY_IRIS));
-        dmx[start+48] = toByte(parameters->get(PROPERTY_DIFFUSION));
-        dmx[start+49] = toByte(parameters->get(PROPERTY_DIFFUSION_2));
-        dmx[start+50] = (int)(parameters->get(PROPERTY_CRI));
-        dmx[start+51] = (int)(parameters->get(PROPERTY_COLOR_MIX));
-        dmx[start+52] = toByte(parameters->get(PROPERTY_COLOR_MIX_SPEED));
+        dmx[start+9] = toByte(channel->getProperty(PROPERTY_CYAN));
+        dmx[start+10] = toByte(channel->getProperty(PROPERTY_MAGENTA));
+        dmx[start+11] = toByte(channel->getProperty(PROPERTY_YELLOW));
+        dmx[start+12] = toByte(channel->getProperty(PROPERTY_CT));
+        dmx[start+13] = (int)channel->getProperty(PROPERTY_COLOR_SELECT);
+        dmx[start+14] = (int)(channel->getProperty(PROPERTY_GOBO_SELECT));
+        dmx[start+15] = (int)(channel->getProperty(PROPERTY_GOBO_INDEX_SPEED)) >> 8;
+        dmx[start+16] = (int)(channel->getProperty(PROPERTY_GOBO_INDEX_SPEED)) & 0xff;
+        dmx[start+17] = (int)(channel->getProperty(PROPERTY_GOBO_SELECT_2));
+        dmx[start+18] = (int)(channel->getProperty(PROPERTY_ANIMATION_SELECT));
+        dmx[start+19] = (int)(channel->getProperty(PROPERTY_ANIMATION_INDEX_SPEED));
+        dmx[start+20] = toByteCoarse(channel->getProperty(PROPERTY_SHUTTER_3_B));
+        dmx[start+21] = toByteFine(channel->getProperty(PROPERTY_SHUTTER_3_B));
+        dmx[start+22] = toByteCoarse(channel->getProperty(PROPERTY_SHUTTER_3_A));
+        dmx[start+23] = toByteFine(channel->getProperty(PROPERTY_SHUTTER_3_A));
+        dmx[start+24] = toByteCoarse(channel->getProperty(PROPERTY_SHUTTER_2_B));
+        dmx[start+25] = toByteFine(channel->getProperty(PROPERTY_SHUTTER_2_B));
+        dmx[start+26] = toByteCoarse(channel->getProperty(PROPERTY_SHUTTER_2_A));
+        dmx[start+27] = toByteFine(channel->getProperty(PROPERTY_SHUTTER_2_A));
+        dmx[start+28] = toByteCoarse(channel->getProperty(PROPERTY_SHUTTER_1_B));
+        dmx[start+29] = toByteFine(channel->getProperty(PROPERTY_SHUTTER_1_B));
+        dmx[start+30] = toByteCoarse(channel->getProperty(PROPERTY_SHUTTER_1_A));
+        dmx[start+31] = toByteFine(channel->getProperty(PROPERTY_SHUTTER_1_A));
+        dmx[start+32] = toByteCoarse(channel->getProperty(PROPERTY_SHUTTER_4_B));
+        dmx[start+33] = toByteFine(channel->getProperty(PROPERTY_SHUTTER_4_B));
+        dmx[start+34] = toByteCoarse(channel->getProperty(PROPERTY_SHUTTER_4_A));
+        dmx[start+35] = toByteFine(channel->getProperty(PROPERTY_SHUTTER_4_A));
+        dmx[start+36] = toByteCoarseRanged(channel->getProperty(PROPERTY_SHUTTER_FRAME_ROT), -1, 1);
+        dmx[start+37] = toByteFineRanged(channel->getProperty(PROPERTY_SHUTTER_FRAME_ROT), -1, 1);
+        dmx[start+38] = toByteCoarseRanged(channel->getProperty(PROPERTY_EDGE), 0, 1);
+        dmx[start+39] = toByteFineRanged(channel->getProperty(PROPERTY_EDGE), 0, 1);
+        dmx[start+40] = (int)(channel->getProperty(PROPERTY_EDGE_MODE));
+        dmx[start+41] = toByteCoarseRanged(channel->getProperty(PROPERTY_ZOOM), 50, 10);
+        dmx[start+42] = toByteFineRanged(channel->getProperty(PROPERTY_ZOOM), 50, 10);
+        dmx[start+43] = (int)(channel->getProperty(PROPERTY_BEAM_FX_SELECT));
+        dmx[start+44] = (int)(channel->getProperty(PROPERTY_BEAM_FX_INDEX_SPEED));
+        dmx[start+45] = (int)(channel->getProperty(PROPERTY_BEAM_FX_SELECT_2));
+        dmx[start+46] = (int)(channel->getProperty(PROPERTY_BEAM_FX_INDEX_SPEED_2));
+        dmx[start+47] = (int)(channel->getProperty(PROPERTY_IRIS));
+        dmx[start+48] = toByte(channel->getProperty(PROPERTY_DIFFUSION));
+        dmx[start+49] = toByte(channel->getProperty(PROPERTY_DIFFUSION_2));
+        dmx[start+50] = (int)(channel->getProperty(PROPERTY_CRI));
+        dmx[start+51] = (int)(channel->getProperty(PROPERTY_COLOR_MIX));
+        dmx[start+52] = toByte(channel->getProperty(PROPERTY_COLOR_MIX_SPEED));
         dmx[start+53] = 0x0; // control
     }
 
@@ -203,29 +203,29 @@ class CONCEPTTHEATERSIM_API MaverickMk3Profile54Ch : public EOSLightOutputType
 
 class CONCEPTTHEATERSIM_API MaverickMk3WashBasic : public EOSLightOutputType
 {
-    virtual void output(UEOSPropertySet *parameters, TArray<int>& dmx, int start) override
+    virtual void output(UEOSChannelView *channel, TArray<int>& dmx, int start) override
     {
-        dmx[start+0] = toByteCoarse(parameters->get(PROPERTY_PAN));
-        dmx[start+1] = toByteFine(parameters->get(PROPERTY_PAN));
-        dmx[start+2] = toByteCoarse(parameters->get(PROPERTY_TILT));
-        dmx[start+3] = toByteFine(parameters->get(PROPERTY_TILT));
-        dmx[start+4] = toByte(parameters->get(PROPERTY_POSITION_MSPEED));
-        dmx[start+5] = (int)(parameters->get(PROPERTY_CT));
-        dmx[start+6] = (int)(parameters->get(PROPERTY_COLOR_MIX));
-        dmx[start+7] = (int)(parameters->get(PROPERTY_GOBO_SELECT));
-        dmx[start+8] = (int)(parameters->get(PROPERTY_PIXEL_MASK_2));
-        dmx[start+9] = (int)(parameters->get(PROPERTY_PIXEL_MASK_EFFECT_TIME));
-        dmx[start+10] = (int)(parameters->get(PROPERTY_PIXEL_MASK_EFFECT_STEP_TIME));
-        dmx[start+11] = (int)(parameters->get(PROPERTY_BACKGROUND_COLOR_MIX));
-        dmx[start+12] = toByte(parameters->get(PROPERTY_BACKGROUND_INTENSITY));
-        dmx[start+13] = toByte(parameters->get(PROPERTY_INTENSITY));
-        dmx[start+14] = (int)(parameters->get(PROPERTY_STROBE));
-        dmx[start+15] = toByte(parameters->get(PROPERTY_ZOOM));
+        dmx[start+0] = toByteCoarse(channel->getProperty(PROPERTY_PAN));
+        dmx[start+1] = toByteFine(channel->getProperty(PROPERTY_PAN));
+        dmx[start+2] = toByteCoarse(channel->getProperty(PROPERTY_TILT));
+        dmx[start+3] = toByteFine(channel->getProperty(PROPERTY_TILT));
+        dmx[start+4] = toByte(channel->getProperty(PROPERTY_POSITION_MSPEED));
+        dmx[start+5] = (int)(channel->getProperty(PROPERTY_CT));
+        dmx[start+6] = (int)(channel->getProperty(PROPERTY_COLOR_MIX));
+        dmx[start+7] = (int)(channel->getProperty(PROPERTY_GOBO_SELECT));
+        dmx[start+8] = (int)(channel->getProperty(PROPERTY_PIXEL_MASK_2));
+        dmx[start+9] = (int)(channel->getProperty(PROPERTY_PIXEL_MASK_EFFECT_TIME));
+        dmx[start+10] = (int)(channel->getProperty(PROPERTY_PIXEL_MASK_EFFECT_STEP_TIME));
+        dmx[start+11] = (int)(channel->getProperty(PROPERTY_BACKGROUND_COLOR_MIX));
+        dmx[start+12] = toByte(channel->getProperty(PROPERTY_BACKGROUND_INTENSITY));
+        dmx[start+13] = toByte(channel->getProperty(PROPERTY_INTENSITY));
+        dmx[start+14] = (int)(channel->getProperty(PROPERTY_STROBE));
+        dmx[start+15] = toByte(channel->getProperty(PROPERTY_ZOOM));
         dmx[start+16] = 0x0; // control
-        dmx[start+17] = toByte(parameters->get(PROPERTY_RED));
-        dmx[start+18] = toByte(parameters->get(PROPERTY_GREEN));
-        dmx[start+19] = toByte(parameters->get(PROPERTY_BLUE));
-        dmx[start+20] = toByte(parameters->get(PROPERTY_WHITE));
+        dmx[start+17] = toByte(channel->getProperty(PROPERTY_RED));
+        dmx[start+18] = toByte(channel->getProperty(PROPERTY_GREEN));
+        dmx[start+19] = toByte(channel->getProperty(PROPERTY_BLUE));
+        dmx[start+20] = toByte(channel->getProperty(PROPERTY_WHITE));
     }
 
     virtual void input(TArray<int> &dmx, UEOSPropertySet *parameters, int start) override

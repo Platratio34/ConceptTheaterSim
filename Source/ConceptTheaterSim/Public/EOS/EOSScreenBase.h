@@ -36,6 +36,9 @@ protected:
     TArray<FName> getChannelParameters(int ch);
 
     UFUNCTION(BlueprintCallable)
+    UEOSChannelView *getChannelView(int ch);
+
+    UFUNCTION(BlueprintCallable)
     FString getCurrentCue();
 
     static TMap<FName, FString> getNamesToDisplay()

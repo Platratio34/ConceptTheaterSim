@@ -151,8 +151,190 @@ TSharedPtr<FJsonObject> UEOSShowfile::toJson()
         cuesJson.Add(MakeShared<FJsonValueObject>(cue->toJson()));
     }
     showJson->SetArrayField(JSON_CUES, cuesJson);
+    showJson->SetNumberField(JSON_CURRENT_CUE, currentCue);
 
     return showJson;
+}
+
+void UEOSShowfile::addFade(int channel, FName property, double target, double time, bool manual, bool sneak)
+{
+    if(fades.Num() < 200) // first time init to prevent repeat allocation
+        fades.Init(nullptr, 200);
+    int firstNull = -1;
+    for (int i = 0; i < fades.Num(); i++)
+    {
+        UEOSFade *f = fades[i];
+        if(f == nullptr)
+        {
+            firstNull = i;
+            continue;
+        }
+        if(f->channel == channel && f->property == property && f->manual == manual)
+        {
+            f->target = target;
+            f->time = time;
+            f->sneak = sneak;
+            return;
+        }
+    }
+    UEOSFade *fade = NewObject<UEOSFade>();
+    fade->channel = channel;
+    fade->property = property;
+    fade->target = target;
+    fade->time = time;
+    fade->manual = manual;
+    fade->sneak = sneak;
+    if(firstNull != -1)
+    {
+        fades[firstNull] = fade;
+    }
+    else
+    {
+        fades.Add(fade);
+    }
+}
+
+void UEOSShowfile::updateFades(double deltaTime)
+{
+    for (int i = 0; i < fades.Num(); i++)
+    {
+        UEOSFade *fade = fades[i];
+        if(fade == nullptr)
+            continue;
+        if(fade->update(this, deltaTime))
+            fades[i] = nullptr;
+    }
+}
+
+void UEOSShowfile::clearFade(int channel, FName property, bool manual)
+{
+    for (int i = 0; i < fades.Num(); i++)
+    {
+        UEOSFade *fade = fades[i];
+        if(fade == nullptr)
+            continue;
+        if(fade->channel == channel && fade->property == property && fade->manual == manual)
+        {
+            fades[i] = nullptr;
+            return;
+        }
+    }
+}
+
+UEOSChannelView* UEOSShowfile::getChannel(int ch)
+{
+    if(!patch.Contains(ch))
+        return nullptr;
+    if(UEOSChannelView** p = channelViews.Find(ch))
+    {
+        return *p;
+    }
+    UEOSChannelView *view = UEOSChannelView::create(this, ch);
+    channelViews.Add(ch, view);
+    return view;
+}
+
+void UEOSShowfile::setManualProperty(int ch, FName property, float value)
+{
+    if(!manualChannels.Contains(ch))
+        manualChannels.Add(ch, UEOSPropertySet::Create());
+    manualChannels[ch]->add(property, value);
+    clearFade(ch, property, true);
+}
+void UEOSShowfile::setManualProperties(int ch, UEOSPropertySet* properties)
+{
+    if(!manualChannels.Contains(ch))
+        manualChannels.Add(ch, UEOSPropertySet::Create());
+    for(TPair<FName, float> pair : properties->properties)
+    {
+        manualChannels[ch]->add(pair.Key, pair.Value);
+    }
+    for (int i = 0; i < fades.Num(); i++)
+    {
+        UEOSFade *fade = fades[i];
+        if(fade != nullptr && fade->channel == ch && fade->manual)
+        {
+            if(properties->has(fade->property))
+                fades[i] = nullptr;
+        }
+    }
+}
+void UEOSShowfile::clearManualProperty(int ch, FName property, bool sneak)
+{
+    if(!manualChannels.Contains(ch))
+        return;
+    manualChannels[ch]->remove(property);
+    if(sneak)
+    {
+        addFade(ch, property, 0, 5, true, true);
+    }
+    else
+    {
+        clearFade(ch, property, true);
+    }
+}
+void UEOSShowfile::setCueProperty(int ch, FName property, float value)
+{
+    if(!channels.Contains(ch))
+        return;
+    channels[ch]->set(property, value);
+    clearFade(ch, property, false);
+}
+void UEOSShowfile::setCueProperties(int ch, UEOSPropertySet* properties)
+{
+    if(!channels.Contains(ch))
+        channels.Add(ch, UEOSPropertySet::Create());
+    for(TPair<FName, float> pair : properties->properties)
+    {
+        channels[ch]->set(pair.Key, pair.Value);
+    }
+    for (int i = 0; i < fades.Num(); i++)
+    {
+        UEOSFade *fade = fades[i];
+        if(fade != nullptr && fade->channel == ch && !fade->manual)
+        {
+            if(properties->has(fade->property))
+                fades[i] = nullptr;
+        }
+    }
+}
+
+UEOSPropertySet *UEOSShowfile::getCueChannel(int ch)
+{
+    return channels[ch];
+}
+UEOSPropertySet *UEOSShowfile::getManualChannel(int ch)
+{
+    if(!manualChannels.Contains(ch))
+        return nullptr;
+    return manualChannels[ch];
+}
+
+float UEOSChannelView::getProperty(FName property)
+{
+    if(UEOSPropertySet* set = showfile->getManualChannel(channel))
+    {
+        if(set->has(property))
+        {
+            return set->get(property);
+        }
+    }
+    return showfile->getCueChannel(channel)->get(property);
+}
+FName UEOSChannelView::propertySource(FName property)
+{
+    if(UEOSPropertySet* set = showfile->getManualChannel(channel))
+    {
+        if(set->has(property))
+        {
+            return FName("Manual");
+        }
+    }
+    return FName("Cue");
+}
+void UEOSChannelView::getKeys(TArray<FName> outKeys)
+{
+    showfile->getCueChannel(channel)->properties.GetKeys(outKeys);
 }
 
 UEOSCue* UEOSCue::FromJSON(TSharedPtr<FJsonObject> cueJson)
@@ -209,7 +391,7 @@ TSharedPtr<FJsonObject> UEOSCue::toJson()
         cueJson->SetNumberField(JSON_FOLLOW, follow);
     if(timecode >= 0)
         cueJson->SetStringField(JSON_TIMECODE, UTimeUtil::createTimeStringFromFrames(timecode));
-    TArray<TSharedPtr<FJsonObject>> actionsJson;
+    TArray<TSharedPtr<FJsonValue>> actionsJson;
     for(TPair<int, UEOSPropertySet*> pair : actions)
     {
         TSharedPtr<FJsonObject> chJson = MakeShared<FJsonObject>();
@@ -218,7 +400,39 @@ TSharedPtr<FJsonObject> UEOSCue::toJson()
         {
             chJson->SetNumberField(propertyPair.Key.ToString(), propertyPair.Value);
         }
-        actionsJson.Add(chJson);
+        actionsJson.Add(MakeShared<FJsonValueObject>(chJson));
     }
+    cueJson->SetArrayField(JSON_ACTIONS, actionsJson);
     return cueJson;
+}
+
+bool UEOSFade::update(UEOSShowfile* showfile, double deltaTime)
+{
+    UEOSPropertySet *set = showfile->getCueChannel(channel);
+    if(manual)
+    {
+        if(sneak)
+            target = set->get(property);
+        set = showfile->getManualChannel(channel);
+    }
+    double value = set->get(property);
+    double diff = target - value;
+    if(time < deltaTime)
+        time = deltaTime;
+    double delta = (diff / time) * deltaTime;
+    time -= deltaTime;
+    if(abs(diff) < abs(delta) || time <= 0.01)
+    {
+        if(manual && sneak)
+        {
+            set->remove(property);
+        }
+        else
+        {
+            set->set(property, target);
+        }
+        return true;
+    }
+    set->set(property, value + delta);
+    return false;
 }

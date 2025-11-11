@@ -113,10 +113,18 @@ TArray<FName> UEOSScreenBase::getChannelParameters(int ch)
     TArray<FName> params;
     if(board == nullptr || board->showfile == nullptr)
         return params;
-    if(!board->showfile->channels.Contains(ch))
+    UEOSChannelView *channel = board->showfile->getChannel(ch);
+    if(channel == nullptr)
         return params;
-    board->showfile->channels[ch]->properties.GetKeys(params);
+    channel->getKeys(params);
     return params;
+}
+
+UEOSChannelView* UEOSScreenBase::getChannelView(int ch)
+{
+    if(board == nullptr || board->showfile == nullptr)
+        return nullptr;
+    return board->showfile->getChannel(ch);
 }
 
 FString UEOSScreenBase::getCurrentCue()
