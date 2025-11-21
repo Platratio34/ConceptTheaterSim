@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/GameUserSettings.h"
+#include "UserSettings/EnhancedInputUserSettings.h"
 #include "TheaterSimUserSettings.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class CONCEPTTHEATERSIM_API UTheaterSimUserSettings : public UGameUserSettings
+class CONCEPTTHEATERSIM_API UTheaterSimUserSettings : public UEnhancedInputUserSettings
 {
 	GENERATED_BODY()
 public:
