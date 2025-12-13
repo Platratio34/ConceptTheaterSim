@@ -33,7 +33,7 @@ void ADMXDimmer::BeginPlay()
 void ADMXDimmer::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
-    if(config != nullptr)
+    if(config == nullptr)
         return;
     if(networkCard->hasChanged(config->universe))
     {

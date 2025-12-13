@@ -8,10 +8,12 @@
 #include "CVisibilityBlocker.h"
 #include "Engine/Engine.h"
 
-// #define DEBUG_PRINT
+#define DEBUG_PRINT
 
 ACCullVolume::ACCullVolume()
 {
+    PrimaryActorTick.bCanEverTick = true;
+
     rootObj = CreateDefaultSubobject<USceneComponent>("Root");
     SetRootComponent(rootObj);
 
