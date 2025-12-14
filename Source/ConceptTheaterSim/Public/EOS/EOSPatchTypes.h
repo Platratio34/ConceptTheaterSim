@@ -180,6 +180,7 @@ public:
             patch->addProperty(PROPERTY_DIFFUSION_2);
             patch->addProperty(PROPERTY_CRI);
             patch->addProperty(PROPERTY_COLOR_MIX);
+            patch->addProperty(PROPERTY_COLOR_MIX_SPEED);
             patch->addProperty(PROPERTY_POSITION_BLINK);
             return patch;
         }
@@ -209,6 +210,7 @@ public:
         }
         UE_LOG(LogTemp, Warning, TEXT("Unknown patch type: %s"), *(type.ToString()));
         UEOSPatch *def = UEOSPatch::Create(type, 1);
+        def->addProperty(PROPERTY_INTENSITY);
         return def;
     }
 };

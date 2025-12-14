@@ -158,6 +158,11 @@ TSharedPtr<FJsonObject> UEOSShowfile::toJson()
 
 void UEOSShowfile::addFade(int channel, FName property, double target, double time, bool manual, bool sneak)
 {
+    if(!channels.Contains(channel))
+    {
+        UE_LOG(LogTemp, Warning, TEXT("Invalid channel %d in fade add, skipping"), channel);
+        return;
+    }
     if(fades.Num() < 200) // first time init to prevent repeat allocation
         fades.Init(nullptr, 200);
     int firstNull = -1;
@@ -273,6 +278,41 @@ void UEOSShowfile::clearManualProperty(int ch, FName property, bool sneak)
         clearFade(ch, property, true);
     }
 }
+
+void UEOSShowfile::recordOnly(int cueI, TArray<int> *sel)
+{
+    UEOSCue *cue = cues[cueI];
+    if(sel != nullptr)
+    {
+        for (int ch : *sel)
+        {
+            if(!manualChannels.Contains(ch))
+                continue;
+            UEOSPropertySet *set = nullptr;
+            if(cue->actions.Contains(ch))
+                set = cue->actions[ch];
+            else
+                set = UEOSPropertySet::Create();
+            
+            set->addSet(manualChannels[ch]);
+            manualChannels.Remove(ch);
+        }
+    }
+    else
+    {
+        for (TPair<int, UEOSPropertySet *> pair : manualChannels)
+        {
+            UEOSPropertySet *set = nullptr;
+            if(cue->actions.Contains(pair.Key))
+                set = cue->actions[pair.Key];
+            else
+                set = UEOSPropertySet::Create();
+            set->addSet(pair.Value);
+            manualChannels.Remove(pair.Key);
+        }
+    }
+}
+
 void UEOSShowfile::setCueProperty(int ch, FName property, float value)
 {
     if(!channels.Contains(ch))
@@ -301,6 +341,8 @@ void UEOSShowfile::setCueProperties(int ch, UEOSPropertySet* properties)
 
 UEOSPropertySet *UEOSShowfile::getCueChannel(int ch)
 {
+    if(!channels.Contains(ch))
+        return nullptr;
     return channels[ch];
 }
 UEOSPropertySet *UEOSShowfile::getManualChannel(int ch)

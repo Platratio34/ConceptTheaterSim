@@ -159,6 +159,12 @@ void AETCLightBoard::Tick(float DeltaTime)
             executeCue(showfile->currentCue + 1, -1);
         }
     }
+    if(cueTime > 0)
+    {
+        cueTime -= DeltaTime;
+        if(cueTime < 0)
+            cueTime = 0;
+    }
 
     if(showfile)
         showfile->updateFades(DeltaTime);
@@ -532,12 +538,65 @@ void AETCLightBoard::executeCommand()
                 executeCue(i, 1);
             }
         }
+        clearCmd = true;
+        return;
     }
     for (int i = 0; i < command.Num(); i++)
     {
-        if(command[i] == BUTTON_RECORD_ONLY)
+        if(command[i] == BUTTON_RECORD_ONLY) 
         {
+            if(showfile == nullptr)
+            {
+                commandError = TEXT("No showfile exists");
+                return;
+            }
+            int targetCue = -1;
+            FCmdSelection *sel = nullptr;
+            if(i > 0)
+            {
+                FCmdSelection selection = getCmdSelection(0, nullptr);
+                sel = &selection;
+            }
 
+            if(command.Num() == i+1)
+            {
+                command.Add(BUTTON_CUE);
+                UEOSButton::addNumberString(showfile->cues[showfile->currentCue]->cueNumber, &command);
+                confirmCmd = true;
+                return;
+            }
+            else if(command.Num() == i+3 && command[i+1] == BUTTON_CUE)
+            {
+                UEOSButton::addNumberString(showfile->cues[showfile->currentCue]->cueNumber, &command);
+                confirmCmd = true;
+                return;
+            }
+            else if(command.Num() < i+4)
+            {
+                commandError = TEXT("Invalid record command");
+                return;
+            }
+            else if(command[i+1] != BUTTON_CUE)
+            {
+                commandError = TEXT("Invalid record target (only Cue supported)");
+                return;
+            }
+            FString q = getCmdNumberS(i+2, nullptr);
+            for (int j = 0; j < showfile->cues.Num(); j++)
+            {
+                if(showfile->cues[j]->cueNumber == q)
+                {
+                    targetCue, j;
+                    break;
+                }
+            }
+
+            if(targetCue == -1)
+            {
+                commandError = TEXT("Invalid record target: no such cue");
+                return;
+            }
+            showfile->recordOnly(targetCue, (sel == nullptr) ? nullptr : &(sel->values));
         }
     }
     commandError = TEXT("Unknown command");
@@ -954,6 +1013,27 @@ void AETCLightBoard::executeCue(int cueI, double time)
         time = cue->time;
     }
     UE_LOG(LogTemp, Display, TEXT("Executing cue %s (#%d)"), *(cue->cueNumber), cueI);
+    if(cueI < showfile->currentCue) // we went back, so make sure we deal with tracking
+    {
+        for (int i = 0; i < cueI; i++)
+        {
+            UEOSCue *cueB = showfile->cues[i];
+            for(TPair<int, UEOSPropertySet*> chPair : cueB->actions)
+            {
+                if(cue->actions.Contains(chPair.Key))
+                    continue;
+                if(time == 0)
+                {
+                    showfile->setCueProperties(chPair.Key, chPair.Value);
+                }
+                else
+                {
+                    for(TPair<FName, double> paramPair : chPair.Value->properties)
+                        showfile->addFade(chPair.Key, paramPair.Key, paramPair.Value, time, false, false);
+                }
+            }
+        }
+    }
     for(TPair<int, UEOSPropertySet*> chPair : cue->actions)
     {
         if(time == 0)
@@ -985,6 +1065,8 @@ void AETCLightBoard::executeCue(int cueI, double time)
     }
 
     showfile->currentCue = cueI;
+    cueTime = time;
+
     if(followTime == 0)
     {
         executeCue(cueI + 1, -1);

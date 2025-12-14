@@ -152,6 +152,14 @@ public:
         properties.Add(property, value);
     }
 
+    void addSet(UEOSPropertySet* set)
+    {
+        for(TPair<FName, double> pair : set->properties)
+        {
+            properties.Add(pair.Key, pair.Value);
+        }
+    }
+
     void remove(FName property)
     {
         properties.Remove(property);
@@ -313,6 +321,8 @@ public:
     void setManualProperty(int ch, FName property, float value);
     void setManualProperties(int ch, UEOSPropertySet* properties);
     void clearManualProperty(int ch, FName property, bool sneak);
+
+    void recordOnly(int cueI, TArray<int> *sel);
 
     void setCueProperty(int ch, FName property, float value);
     void setCueProperties(int ch, UEOSPropertySet* properties);

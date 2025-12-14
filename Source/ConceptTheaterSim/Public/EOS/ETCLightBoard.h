@@ -130,6 +130,12 @@ public:
     UFUNCTION(BlueprintCallable)
     void cueBack();
 
+    UFUNCTION(BlueprintCallable)
+    double getFollowTime() { return followTime; }
+
+    UFUNCTION(BlueprintCallable)
+    double getCueTime() { return cueTime; }
+
 private:
     UPROPERTY(VisibleInstanceOnly, Category="EOS", AdvancedDisplay)
     bool shift = false;
@@ -138,6 +144,7 @@ private:
     TSet<int> parkedChannels;
     
     double followTime = -1;
+    double cueTime = 0;
 
     UPROPERTY(VisibleInstanceOnly, Category="Buttons", AdvancedDisplay)
     TMap<FName, UStaticMeshComponent*> buttonsByName;

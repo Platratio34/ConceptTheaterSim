@@ -361,6 +361,52 @@ public:
         return button == BUTTON_0 || button == BUTTON_1 || button == BUTTON_2 || button == BUTTON_3 || button == BUTTON_4 || button == BUTTON_5 || button == BUTTON_6 || button == BUTTON_7 || button == BUTTON_8 || button == BUTTON_9 || button == BUTTON_DOT || button == BUTTON_SLASH;
     }
 
+    static void addNumberString(FString number, TArray<FName> *list)
+    {
+        for(TCHAR c : number)
+        {
+            switch (c)
+            {
+            case '0':
+                list->Add(BUTTON_0);
+                break;
+            case '1':
+                list->Add(BUTTON_1);
+                break;
+            case '2':
+                list->Add(BUTTON_2);
+                break;
+            case '3':
+                list->Add(BUTTON_3);
+                break;
+            case '4':
+                list->Add(BUTTON_4);
+                break;
+            case '5':
+                list->Add(BUTTON_5);
+                break;
+            case '6':
+                list->Add(BUTTON_6);
+                break;
+            case '7':
+                list->Add(BUTTON_7);
+                break;
+            case '8':
+                list->Add(BUTTON_8);
+                break;
+            case '9':
+                list->Add(BUTTON_9);
+                break;
+            case '.':
+                list->Add(BUTTON_DOT);
+                break;
+            
+            default:
+                break;
+            }
+        }
+    }
+
 protected:
     bool lastActive = false;
 
