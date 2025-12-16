@@ -133,7 +133,7 @@ protected:
     bool updateActive();
 
     UFUNCTION()
-    void updateConnection(FCCullVolumeConnection connection);
+    void updateConnection(const FCCullVolumeConnection &connection);
 
     UFUNCTION(BlueprintCallable)
     void setConnectionIn(FName other, bool connectionActive);
@@ -169,6 +169,6 @@ private:
     bool skippedTick = false;
 
     UPROPERTY()
-    bool firstTick = true;
+    bool firstTick = true; // this is just to make sure we update state and broadcast on the first tick
 
 };

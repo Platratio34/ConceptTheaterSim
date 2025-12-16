@@ -102,14 +102,14 @@ void ACCullVolume::Tick(float DeltaTime)
     }
     if(hasPawn) // else update all outbound connections
     {
-        for(FCCullVolumeConnection connection : connections)
+        for (const FCCullVolumeConnection &connection : connections)
         {
             if(connection.disabled)
                 continue;
             updateConnection(connection);
         }
     }
-    if(!updateActive() && firstTick) // finally update our active status
+    if(!updateActive() || firstTick) // finally update our active status
     {
         // just this once, make sure we broadcast the active state even if it didn't change
         onActiveChange.Broadcast(name, active);
@@ -253,13 +253,15 @@ void ACCullVolume::setConnectionIn(FName other, bool connectionActive)
     }
 }
 
-void ACCullVolume::updateConnection(FCCullVolumeConnection connection)
+void ACCullVolume::updateConnection(const FCCullVolumeConnection &connection)
 {
-    if(connection.other == nullptr)
+    if(connection.other == nullptr) {
+        UE_LOG(LogTemp, Warning, TEXT("Null connection from %s"), *(name.ToString()));
         return;
+    }
     bool open = connection.blockers.IsEmpty();
     FName otherName = connection.other->name;
-    for(FCVisiblityBlockerSet set : connection.blockers)
+    for (const FCVisiblityBlockerSet &set : connection.blockers)
     {
         for(AActor* actor : set.blockers)
         {
