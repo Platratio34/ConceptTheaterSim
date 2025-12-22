@@ -13,6 +13,21 @@ AChain::AChain()
     SetRootComponent(root);
 }
 
+UStaticMeshComponent* AChain::createLinkMesh(int i)
+{
+    UStaticMeshComponent *mesh = NewObject<UStaticMeshComponent>(this);
+    mesh->RegisterComponent();
+    mesh->CreationMethod = EComponentCreationMethod::Instance;
+
+    mesh->AttachToComponent(root, FAttachmentTransformRules::KeepRelativeTransform);
+    mesh->SetRelativeLocation(FVector(0, 0, 2.54 * i * linkLength));
+    if(rotateLinks)
+        mesh->SetRelativeRotation(FRotator(0, (i % 2 == 1) ? 90 : 0, 0));
+    mesh->SetStaticMesh(linkMesh);
+
+    return mesh;
+}
+
 void AChain::OnConstruction(const FTransform &Transform)
 {
     if(length < 0)
@@ -26,9 +41,7 @@ void AChain::OnConstruction(const FTransform &Transform)
         UStaticMeshComponent *mesh = nullptr;
         if(links.Num() <= linkI)
         {
-            mesh = NewObject<UStaticMeshComponent>(this);
-            mesh->RegisterComponent();
-            mesh->CreationMethod = EComponentCreationMethod::Instance;
+            mesh = createLinkMesh(linkI);
             links.Add(mesh);
         }
         else
@@ -36,17 +49,20 @@ void AChain::OnConstruction(const FTransform &Transform)
             mesh = links[linkI];
             if(mesh == nullptr || !IsValid(mesh))
             {
-                mesh = NewObject<UStaticMeshComponent>(this);
+                mesh = createLinkMesh(linkI);
                 links[linkI] = mesh;
-                mesh->RegisterComponent();
-                mesh->CreationMethod = EComponentCreationMethod::Instance;
+            }
+            else
+            {
+                mesh->AttachToComponent(root, FAttachmentTransformRules::KeepRelativeTransform);
+                mesh->SetRelativeLocation(FVector(0, 0, 2.54 * linkI * linkLength));
+                if (rotateLinks)
+                    mesh->SetRelativeRotation(FRotator(0, (linkI % 2 == 1) ? 90 : 0, 0));
+                else
+                    mesh->SetRelativeRotation(FRotator(0, 0, 0));
+                mesh->SetStaticMesh(linkMesh);
             }
         }
-
-        mesh->AttachToComponent(root, FAttachmentTransformRules::KeepRelativeTransform);
-        mesh->SetRelativeLocation(FVector(0, 0, 2.54 * l));
-        mesh->SetRelativeRotation(FRotator(0, (linkI % 2 == 1) ? 90 : 0, 0));
-        mesh->SetStaticMesh(linkMesh);
 
         l += linkLength;
         linkI++;
@@ -87,9 +103,7 @@ void AChain::setLength(float newLength)
         UStaticMeshComponent *mesh = nullptr;
         if(links.Num() <= linkI)
         {
-            mesh = NewObject<UStaticMeshComponent>(this);
-            mesh->RegisterComponent();
-            mesh->CreationMethod = EComponentCreationMethod::Instance;
+            mesh = createLinkMesh(linkI);
             links.Add(mesh);
         }
         else
@@ -97,17 +111,10 @@ void AChain::setLength(float newLength)
             mesh = links[linkI];
             if(mesh == nullptr || !IsValid(mesh))
             {
-                mesh = NewObject<UStaticMeshComponent>(this);
+                mesh = createLinkMesh(linkI);
                 links[linkI] = mesh;
-                mesh->RegisterComponent();
-                mesh->CreationMethod = EComponentCreationMethod::Instance;
             }
         }
-
-        mesh->AttachToComponent(root, FAttachmentTransformRules::KeepRelativeTransform);
-        mesh->SetRelativeLocation(FVector(0, 0, 2.54 * l));
-        mesh->SetRelativeRotation(FRotator(0, (linkI % 2 == 1) ? 90 : 0, 0));
-        mesh->SetStaticMesh(linkMesh);
 
         l += linkLength;
         linkI++;

@@ -33,8 +33,14 @@ protected:
     UPROPERTY(EditDefaultsOnly)
     float linkLength = 1.25;
 
+    UPROPERTY(EditDefaultsOnly)
+    bool rotateLinks = true;
+
     UPROPERTY(EditAnywhere, Category="Default")
     float length = 144;
+
+private:
+    UStaticMeshComponent* createLinkMesh(int i);
 
 public:	
 	// Called every frame
