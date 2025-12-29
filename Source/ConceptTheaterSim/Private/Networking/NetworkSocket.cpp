@@ -55,15 +55,15 @@ void UNetworkSocket::onPacket(UNetworkPacket *packet)
     USocketPacket *socketPacket = Cast<USocketPacket>(packet);
     if(!closing) // don't re-mark connected on closing
         connected = true;
-    if(tgtIP == 0 && !closing)
+    if(tgtIP == 0 && !closing) // non-connected socket
     {
         tgtIP = packet->source;
         networkCard->send(USocketPacket::Packet(this));
     }
-    if(socketPacket->keepAlive != 0)
+    if(socketPacket->keepAlive == 1)
     {
-        if(socketPacket->keepAlive == 1)
-            networkCard->send(USocketPacket::KeepAlivePacket(this, true));
+        keepAlive = true; // we'll set this to true to ensure both sides agree on this
+        networkCard->send(USocketPacket::KeepAlivePacket(this, true));
     }
     else if(socketPacket->close)
     {
@@ -80,9 +80,10 @@ void UNetworkSocket::onPacket(UNetworkPacket *packet)
             connected = false;
         }
     }
-    else if(socketPacket->hasData)
+    if(socketPacket->hasData)
     {
         // on data packet;
+        onDataPacket.Broadcast(socketPacket->data);
     }
 }
 

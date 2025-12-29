@@ -86,7 +86,7 @@ void UNetworkCard::onPacket(UNetworkPacket *packet)
     {
         UNetworkSocket *socket = *p;
         int tgtIP = socket->getIP();
-        if(socket->getType() == packet->type && (tgtIP == 0 || tgtIP == packet->dest))
+        if(socket->getType() == packet->type && (tgtIP == 0 || tgtIP == packet->source))
         {
             socket->onPacket(packet);
             return; // comsume socket packets as well
