@@ -143,7 +143,13 @@ private:
     UPROPERTY(VisibleInstanceOnly, Category="EOS", AdvancedDisplay)
     TSet<int> parkedChannels;
     
+    UPROPERTY(VisibleInstanceOnly, Category="EOS", AdvancedDisplay)
+    FCmdSelection activeSelection;
+
+    UPROPERTY(VisibleInstanceOnly, Category="EOS", AdvancedDisplay)
     double followTime = -1;
+    
+    UPROPERTY(VisibleInstanceOnly, Category="EOS", AdvancedDisplay)
     double cueTime = 0;
 
     UPROPERTY(VisibleInstanceOnly, Category="Buttons", AdvancedDisplay)
@@ -158,6 +164,17 @@ private:
 
     UPROPERTY()
     TMap<FName, UEOSButton*> buttonByName;
+
+    UPROPERTY()
+    UStaticMeshComponent *scrollWheel;
+    UPROPERTY()
+    TMap<int, UStaticMeshComponent *> wheels;
+    UPROPERTY()
+    TMap<int, UStaticMeshComponent *> dials;
+    UPROPERTY()
+    TMap<UStaticMeshComponent*, int> wheelsByMesh;
+    UPROPERTY()
+    TMap<UStaticMeshComponent*, int> dialsByMesh;
 
     void setButtonColor(FName button, int r, int g, int b);
     void setButtonColor(FName button, FColor buttonColor, FColor activeColor);

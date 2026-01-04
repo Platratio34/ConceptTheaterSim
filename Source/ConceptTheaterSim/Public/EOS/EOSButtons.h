@@ -63,6 +63,8 @@ const FName BUTTON_FULL = FName(TEXT("Full"));
 const FName BUTTON_OUT = FName(TEXT("Out"));
 const FName BUTTON_PLUS_PERCENT = FName(TEXT("PlusPercent"));
 const FName BUTTON_MINUS_PERCENT = FName(TEXT("MinusPercent"));
+const FName BUTTON_SNEAK = FName(TEXT("Sneak"));
+const FName BUTTON_HOME = FName(TEXT("Home"));
 
 const FName BUTTON_REM_DIM = FName(TEXT("RemDim"));
 const FName BUTTON_SLASH = FName(TEXT("Slash"));

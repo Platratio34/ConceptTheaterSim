@@ -90,6 +90,27 @@ void AETCLightBoard::BeginPlay()
 
             UE_LOG(LogTemp, Display, TEXT("EOS Button Indicator: `%s`"), *buttonName.ToString());
         }
+        else if (compName == "Wheel-Scroll")
+        {
+            scrollWheel = comp;
+            setButtonInteractionText(comp, FName("Intensity"));
+        }
+        else if (compName.Contains(TEXT("Wheel-")))
+        {
+            FString str = compName.Mid(6, compName.Len() - 6);
+            setButtonInteractionText(comp, FName("Wheel "+str));
+            int id = FCString::Atoi(*str);
+            wheels.Add(id, comp);
+            wheelsByMesh.Add(comp, id);
+        }
+        else if (compName.Contains(TEXT("Dial-")))
+        {
+            FString str = compName.Mid(5, compName.Len() - 5);
+            setButtonInteractionText(comp, FName("Dial "+str));
+            int id = FCString::Atoi(*str);
+            dials.Add(id, comp);
+            dialsByMesh.Add(comp, id);
+        }
     }
 
     TArray<UTextRenderComponent*> textRendererComponents;
@@ -409,6 +430,25 @@ void AETCLightBoard::onInteractScroll(UPrimitiveComponent* component, double dir
     UStaticMeshComponent *mesh = (UStaticMeshComponent *)component;
     if(!mesh)
         return;
+    if(mesh == scrollWheel)
+    {
+        if(!activeSelection.chan)
+            return;
+        
+        for (int i = 0; i < activeSelection.values.Num(); i++)
+        {
+            int ch = activeSelection.values[i];
+            UEOSChannelView *chView = showfile->getChannel(ch);
+            if(chView == nullptr)
+                continue;
+            double val = chView->getProperty(PROPERTY_INTENSITY) + (direction * 0.01);
+            if(val < 0)
+                val = 0;
+            else if (val > 1)
+                val = 1;
+            showfile->setManualProperty(ch, PROPERTY_INTENSITY, val);
+        }
+    }
 }
 
 void AETCLightBoard::setButtonInteractionText_Implementation(UPrimitiveComponent *component, FName button)
@@ -418,9 +458,19 @@ void AETCLightBoard::setButtonInteractionText_Implementation(UPrimitiveComponent
 
 void AETCLightBoard::executeCommand()
 {
+
+    activeSelection = FCmdSelection();
     if(command.Num() == 0)
         return;
-    else if(command.Num() == 1 && command[0] == BUTTON_HIGH)
+    
+    FString cmdStr = command[0].ToString();
+    for(int i = 1; i < command.Num(); i++)
+    {
+        cmdStr += TEXT(" ") + command[i].ToString();
+    }
+    UE_LOG(LogTemp, Display, TEXT("Cmd execution: `%s`"), *cmdStr);
+
+    if(command.Num() == 1 && command[0] == BUTTON_HIGH)
     {
         highlightMode = !highlightMode;
         clearCmd = true;
@@ -446,84 +496,110 @@ void AETCLightBoard::executeCommand()
         parkedChannels.Empty();
         return;
     }
-    else if(command[command.Num()-1] == BUTTON_PARK)
-    {
-        if(command[0] != CMD_CHAN)
+
+    if(command[0] == CMD_CHAN) {
+        int next = 0;
+        activeSelection = getCmdSelection(0, &next);
+        if(next == 0)
         {
-            commandError = TEXT("Can only park channels");
+            commandError = TEXT("Invalid selection: ") + activeSelection.error;
             return;
         }
-        int c = getCmdNumber(1, nullptr);
-        if(parkedChannels.Contains(c))
+        next++;
+        UE_LOG(LogTemp, Display, TEXT("- Channel selection start"));
+        UE_LOG(LogTemp, Display, TEXT("- next is %d (of %d)"), next, command.Num());
+        if(next == command.Num())
         {
-            command.RemoveAt(command.Num() - 1);
-            command.Add(CMD_UNPARK);
-            confirmCmd = true;
             return;
         }
-        parkedChannels.Add(c);
-        clearCmd = true;
-        return;
+
+        if(command[next] == BUTTON_PARK)
+        {
+            bool unpark = true;
+            for (int i = 0; i < activeSelection.values.Num(); i++)
+            {
+                if(!parkedChannels.Contains(activeSelection.values[i])) {
+                    unpark = false;
+                    break;
+                }
+            }
+            if(unpark)
+            {
+                command.RemoveAt(command.Num() - 1);
+                command.Add(CMD_UNPARK);
+                confirmCmd = true;
+                return;
+            }
+            for (int i = 0; i < activeSelection.values.Num(); i++)
+            {
+                parkedChannels.Add(activeSelection.values[i]);
+            }
+            clearCmd = true;
+            return;
+        }
+        else if(command[next] == CMD_UNPARK)
+        {
+            for (int i = 0; i < activeSelection.values.Num(); i++)
+            {
+                parkedChannels.Remove(activeSelection.values[i]);
+            }
+            clearCmd = true;
+            return;
+        }
+        else if(command[next] == BUTTON_FULL || command[next] == BUTTON_OUT)
+        {
+            double v = (command[next] == BUTTON_FULL) ? 1 : 0;
+            for (int i = 0; i < activeSelection.values.Num(); i++)
+            {
+                showfile->setManualProperty(activeSelection.values[i], PROPERTY_INTENSITY, v);
+            }
+            clearCmd = true;
+            return;
+        }
+        else if(command[next] == BUTTON_AT)
+        {
+            double val = getCmdNumberD(next+1, &next);
+            if(val < 0 || val > 100)
+            {
+                commandError = TEXT("Value must be between 0-100");
+                return;
+            }
+            val /= 100.0;
+            UE_LOG(LogTemp, Display, TEXT("- At: %f"), val);
+            for (int i = 0; i < activeSelection.values.Num(); i++)
+            {
+                int ch = activeSelection.values[i];
+                UE_LOG(LogTemp, Display, TEXT("- Chan %d"), ch);
+                showfile->setManualProperty(ch, PROPERTY_INTENSITY, val);
+            }
+            clearCmd = true;
+            return;
+        }
+        else if (command[next] == BUTTON_SNEAK)
+        {
+            UE_LOG(LogTemp, Display, TEXT("- Sneak"));
+            for (int i = 0; i < activeSelection.values.Num(); i++)
+            {
+                int ch = activeSelection.values[i];
+                UE_LOG(LogTemp, Display, TEXT("- Chan %d"), ch);
+                showfile->addFade(ch, PROPERTY_INTENSITY, 0, 5, true, true);
+            }
+            clearCmd = true;
+            return;
+        }
     }
-    else if(command[command.Num()-1] == CMD_UNPARK)
+    else if (command[0] == BUTTON_SNEAK)
     {
-        int c = getCmdNumber(1, nullptr);
-        parkedChannels.Remove(c);
-        clearCmd = true;
-        confirmCmd = false;
-        return;
-    }
-    else if(command[command.Num()-1] == BUTTON_FULL || command[command.Num()-1] == BUTTON_OUT)
-    {
-        int p;
-        FCmdSelection selection = getCmdSelection(0, &p);
-        if(p == 0 || selection.cue)
+        for(const TPair<int, UEOSPatchSet*>& pair : showfile->patch)
         {
-            if(selection.cue)
-                commandError = TEXT("Invalid selection: Can not set intensity of cue");
-            else
-                commandError = TEXT("Invalid selection: ") + selection.error;
-            return;
-        }
-        double v = command[command.Num() - 1] == BUTTON_FULL ? 1.0 : 0.0;
-        for (int i = 0; i < selection.values.Num(); i++)
-        {
-            int c = selection.values[i];
-            if(parkedChannels.Contains(c))
+            const int& ch = pair.Key;
+            UEOSPropertySet *set = showfile->getManualChannel(ch);
+            if(set == nullptr)
                 continue;
-            showfile->setManualProperty(c, PROPERTY_INTENSITY, v);
-            // if(UEOSPropertySet **set = showfile->manualChannels.Find(c))
-            // {
-            //     (*set)->set(PROPERTY_INTENSITY, v);
-            // }
-        }
-        clearCmd = true;
-        return;
-    }
-    else if(command.Num() > 1 && command[command.Num()-2] == BUTTON_AT)
-    {
-        int p;
-        FCmdSelection selection = getCmdSelection(0, &p);
-        if(p == 0 || selection.cue)
-        {
-            if(selection.cue)
-                commandError = TEXT("Invalid selection: Can not set intensity of cue");
-            else
-                commandError = TEXT("Invalid selection: ") + selection.error;
-            return;
-        }
-        int n = getCmdNumber(p, nullptr);
-        double v = (double)n / 100.0;
-        for (int i = 0; i < selection.values.Num(); i++)
-        {
-            int c = selection.values[i];
-            if(parkedChannels.Contains(c))
-                continue;
-            showfile->setManualProperty(c, PROPERTY_INTENSITY, v);
-            // if(UEOSPropertySet **set = showfile->manualChannels.Find(c))
-            // {
-            //     (*set)->set(PROPERTY_INTENSITY, v);
-            // }
+            for (const TPair<FName, double> p2 : set->properties)
+            {
+                showfile->addFade(ch, p2.Key, 0, 5, true, true);
+            }
         }
         clearCmd = true;
         return;
@@ -541,6 +617,7 @@ void AETCLightBoard::executeCommand()
         clearCmd = true;
         return;
     }
+    
     for (int i = 0; i < command.Num(); i++)
     {
         if(command[i] == BUTTON_RECORD_ONLY) 

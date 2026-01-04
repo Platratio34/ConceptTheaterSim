@@ -51,9 +51,10 @@ TArray<int> UEOSShowfile::getPatchedChannels()
 
 double UEOSShowfile::getParameter(int ch, FName parameter)
 {
-    if(UEOSPropertySet** set = channels.Find(ch))
+    UEOSChannelView *view = getChannel(ch);
+    if(view != nullptr)
     {
-        return (*set)->get(parameter);
+        return view->getProperty(parameter);
     }
     return 0;
 }
@@ -241,6 +242,8 @@ UEOSChannelView* UEOSShowfile::getChannel(int ch)
 
 void UEOSShowfile::setManualProperty(int ch, FName property, float value)
 {
+    if(!patch.Contains(ch))
+        return;
     if(!manualChannels.Contains(ch))
         manualChannels.Add(ch, UEOSPropertySet::Create());
     manualChannels[ch]->add(property, value);
@@ -248,6 +251,8 @@ void UEOSShowfile::setManualProperty(int ch, FName property, float value)
 }
 void UEOSShowfile::setManualProperties(int ch, UEOSPropertySet* properties)
 {
+    if(!patch.Contains(ch))
+        return;
     if(!manualChannels.Contains(ch))
         manualChannels.Add(ch, UEOSPropertySet::Create());
     for(TPair<FName, float> pair : properties->properties)
