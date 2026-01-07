@@ -22,7 +22,7 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-    virtual void onLightUpdate() override;
+    virtual void onLightUpdate_Implementation() override;
 
     virtual void updateCull(FName volume, bool active) override;
 

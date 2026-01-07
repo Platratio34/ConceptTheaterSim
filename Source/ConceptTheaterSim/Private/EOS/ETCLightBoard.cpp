@@ -497,7 +497,8 @@ void AETCLightBoard::executeCommand()
         return;
     }
 
-    if(command[0] == CMD_CHAN) {
+    if(command[0] == CMD_CHAN)
+    {
         int next = 0;
         activeSelection = getCmdSelection(0, &next);
         if(next == 0)
@@ -546,43 +547,66 @@ void AETCLightBoard::executeCommand()
             clearCmd = true;
             return;
         }
-        else if(command[next] == BUTTON_FULL || command[next] == BUTTON_OUT)
+        else if(command[next] == BUTTON_FULL || command[next] == BUTTON_OUT || command[next] == BUTTON_AT)
         {
-            double v = (command[next] == BUTTON_FULL) ? 1 : 0;
-            for (int i = 0; i < activeSelection.values.Num(); i++)
+            FName action = command[next++];
+            double v = (action == BUTTON_FULL) ? 1 : 0;
+            if(action == BUTTON_AT)
             {
-                showfile->setManualProperty(activeSelection.values[i], PROPERTY_INTENSITY, v);
+                v = getCmdNumberD(next, &next);
+                next++;
+                if(v < 0 || v > 100)
+                {
+                    commandError = TEXT("Value must be between 0-100");
+                    return;
+                }
+                UE_LOG(LogTemp, Display, TEXT("- At: %f"), v);
             }
-            clearCmd = true;
-            return;
-        }
-        else if(command[next] == BUTTON_AT)
-        {
-            double val = getCmdNumberD(next+1, &next);
-            if(val < 0 || val > 100)
+            float sneakTime = 0;
+            if(command.Num() >= next && command[next] == BUTTON_SNEAK)
             {
-                commandError = TEXT("Value must be between 0-100");
-                return;
+                sneakTime = 5;
+                next++;
+                if(command.Num() >= next)
+                {
+                    sneakTime = getCmdNumberD(next, &next);
+                    next++;
+                    if (sneakTime == 0)
+                    {
+                        commandError = TEXT("Invalid sneak time");
+                        return;
+                    }
+                }
             }
-            val /= 100.0;
-            UE_LOG(LogTemp, Display, TEXT("- At: %f"), val);
             for (int i = 0; i < activeSelection.values.Num(); i++)
             {
                 int ch = activeSelection.values[i];
-                UE_LOG(LogTemp, Display, TEXT("- Chan %d"), ch);
-                showfile->setManualProperty(ch, PROPERTY_INTENSITY, val);
+                if(sneakTime == 0)
+                    showfile->setManualProperty(ch, PROPERTY_INTENSITY, v);
+                else
+                    showfile->addFade(ch, PROPERTY_INTENSITY, v, sneakTime, true, false);
             }
             clearCmd = true;
             return;
         }
         else if (command[next] == BUTTON_SNEAK)
         {
+            double time = 5;
+            if(command.Num() > next)
+            {
+                time = getCmdNumberD(next, &next);
+                if (time == 0)
+                {
+                    commandError = TEXT("Invalid sneak time");
+                    return;
+                }
+            }
             UE_LOG(LogTemp, Display, TEXT("- Sneak"));
             for (int i = 0; i < activeSelection.values.Num(); i++)
             {
                 int ch = activeSelection.values[i];
                 UE_LOG(LogTemp, Display, TEXT("- Chan %d"), ch);
-                showfile->addFade(ch, PROPERTY_INTENSITY, 0, 5, true, true);
+                showfile->addFade(ch, PROPERTY_INTENSITY, 0, time, true, true);
             }
             clearCmd = true;
             return;
@@ -590,6 +614,17 @@ void AETCLightBoard::executeCommand()
     }
     else if (command[0] == BUTTON_SNEAK)
     {
+        int next = 1;
+        double time = 5;
+        if(command.Num() > next)
+        {
+            time = getCmdNumberD(next, &next);
+            if (time == 0)
+            {
+                commandError = TEXT("Invalid sneak time");
+                return;
+            }
+        }
         for(const TPair<int, UEOSPatchSet*>& pair : showfile->patch)
         {
             const int& ch = pair.Key;
@@ -598,7 +633,7 @@ void AETCLightBoard::executeCommand()
                 continue;
             for (const TPair<FName, double> p2 : set->properties)
             {
-                showfile->addFade(ch, p2.Key, 0, 5, true, true);
+                showfile->addFade(ch, p2.Key, 0, time, true, true);
             }
         }
         clearCmd = true;

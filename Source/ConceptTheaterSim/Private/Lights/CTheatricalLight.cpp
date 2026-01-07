@@ -70,14 +70,16 @@ void ACTheatricalLight::OnConstruction(const FTransform &Transform)
 
     if(focusMode)
     {
+        FLinearColor tColor = focusModeColor ? color : FLinearColor(1.0, 1.0, 1.0, 1.0);
+        if(lenseMaterialInstance != nullptr)
+        {
+            lenseMaterialInstance->SetScalarParameterValue(FName("Intensity"), lenseIntensityScalar);
+            lenseMaterialInstance->SetVectorParameterValue(FName("Color"), tColor);
+        }
         if(light != nullptr)
         {
             light->SetIntensity(maxIntensity);
-            if(lenseMaterialInstance != nullptr)
-                lenseMaterialInstance->SetScalarParameterValue(FName("Intensity"), 10);
-            light->SetLightColor(FLinearColor(1.0, 1.0, 1.0, 1.0));
-            if(lenseMaterialInstance != nullptr)
-                lenseMaterialInstance->SetVectorParameterValue(FName("Color"), FLinearColor(1.0, 1.0, 1.0, 1.0));
+            light->SetLightColor(tColor);
         }
         actualIntensity = 1;
     }
@@ -182,7 +184,7 @@ void ACTheatricalLight::setIntensity(double newIntensity)
     if(light != nullptr && !dummy)
         light->SetIntensity(actualIntensity * maxIntensity);
     if(lenseMaterialInstance != nullptr)
-        lenseMaterialInstance->SetScalarParameterValue(FName("Intensity"), actualIntensity * 10);
+        lenseMaterialInstance->SetScalarParameterValue(FName("Intensity"), actualIntensity * lenseIntensityScalar);
     onLightUpdate();
 }
 

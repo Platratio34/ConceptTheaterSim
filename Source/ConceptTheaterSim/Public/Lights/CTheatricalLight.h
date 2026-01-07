@@ -51,16 +51,16 @@ public:
     
 	ACTheatricalLight();
 
-    UPROPERTY(EditAnywhere, Category="Light")
+    UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Light")
     double intensity = 0;
 
-    UPROPERTY(EditDefaultsOnly, Category="Light")
+    UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category="Light")
     double maxIntensity = 1000;
 
-    UPROPERTY(EditAnywhere, Category="Light")
+    UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Light")
     FLinearColor color = FColor(255, 255, 255);
 
-    UPROPERTY(EditDefaultsOnly, Category="Light")
+    UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category="Light")
     UCurveFloat* intensityCurve = nullptr;
 
     UPROPERTY(EditDefaultsOnly, Category="Light")
@@ -77,10 +77,10 @@ public:
     UPROPERTY(VisibleInstanceOnly, Category="Light")
     UMaterialInstanceDynamic *lightFunctionNGInstance = nullptr;
 
-    UPROPERTY(VisibleInstanceOnly, Category="Light")
+    UPROPERTY(BlueprintReadOnly, VisibleInstanceOnly, Category="Light")
     UMaterialInstanceDynamic *activeLightFunction = nullptr;
 
-    UPROPERTY(EditAnywhere, Category="Light")
+    UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Light")
     bool dummy = false;
 
     UPROPERTY(EditDefaultsOnly, Category="Lense")
@@ -88,32 +88,35 @@ public:
 
     UPROPERTY(EditDefaultsOnly, Category="Lense")
     int lenseMaterialIndex = 0;
+
+    UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category="Lense")
+    float lenseIntensityScalar = 10;
     
     UPROPERTY(EditDefaultsOnly, Category="Lense")
     UStaticMeshComponent* lenseMesh = nullptr;
 
-    UPROPERTY(VisibleInstanceOnly, Category="Lense")
+    UPROPERTY(BlueprintReadOnly, VisibleInstanceOnly, Category="Lense")
     UMaterialInstanceDynamic *lenseMaterialInstance = nullptr;
 
-    UPROPERTY(EditAnywhere, Category="Zoom & Focus")
+    UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Zoom & Focus")
     double pan = 0;
 
-    UPROPERTY(EditAnywhere, Category="Zoom & Focus")
+    UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Zoom & Focus")
     double tilt = 0;
     
-    UPROPERTY(EditAnywhere, Category="Zoom & Focus")
+    UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Zoom & Focus")
     double edge = 1;
     
-    UPROPERTY(EditAnywhere, Category="Zoom & Focus")
+    UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Zoom & Focus")
     double zoom = 20;
     
-    UPROPERTY(EditAnywhere, Category="Zoom & Focus")
+    UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Zoom & Focus")
     bool simpleEdge = false;
 
-    UPROPERTY(EditAnywhere, Category="Shutters")
+    UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Shutters")
     TArray<FShutterPosition> shutterPositions;
     
-    UPROPERTY(EditAnywhere, Category="Zoom & Focus")
+    UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Zoom & Focus")
     double shutterFrame = 0;
 
     UPROPERTY(EditDefaultsOnly, Category="Shutters")
@@ -125,14 +128,17 @@ public:
     UPROPERTY(EditInstanceOnly, Category="Default")
     TSoftObjectPtr<AActor> parentActor = nullptr;
     
-    UPROPERTY(EditAnywhere, Category="Image")
+    UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Image")
     UTexture2D* gobo = nullptr;
 
-    UPROPERTY(EditAnywhere, Category="Image")
+    UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Image")
     double goboRotation = 0;
 
-    UPROPERTY(EditInstanceOnly, Category="Default")
+    UPROPERTY(BlueprintReadOnly, EditInstanceOnly, Category="Default")
     bool focusMode = false;
+    
+    UPROPERTY(BlueprintReadOnly, EditInstanceOnly, Category="Default")
+    bool focusModeColor = false;
 
     UFUNCTION(BlueprintCallable)
     void setIntensity(double newIntensity);
@@ -196,11 +202,11 @@ protected:
     UFUNCTION(BlueprintCallable)
     void addShutterHandle(int index, UStaticMeshComponent* handle);
 
-    UFUNCTION()
-    virtual double getPower();
+    UFUNCTION(BlueprintNativeEvent)
+    void onLightUpdate();
 
     UFUNCTION()
-    virtual void onLightUpdate() {};
+    virtual double getPower();
 
     UPROPERTY()
     double actualIntensity = 0;
@@ -210,6 +216,7 @@ protected:
 
 private:
     virtual double getIntensityScale_Implementation() { return 1; }
+    virtual void onLightUpdate_Implementation() { return; }
 
     UFUNCTION()
     void updateBeam();

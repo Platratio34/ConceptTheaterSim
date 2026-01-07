@@ -28,7 +28,7 @@ void ACIntelligentLightRect::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
     
 }
-void ACIntelligentLightRect::onLightUpdate()
+void ACIntelligentLightRect::onLightUpdate_Implementation()
 {
     rectLight->SetIntensity(actualIntensity * maxIntensity);
     rectLight->SetLightColor(color);
