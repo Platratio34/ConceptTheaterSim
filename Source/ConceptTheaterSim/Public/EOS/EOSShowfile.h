@@ -75,9 +75,17 @@ public:
     UPROPERTY()
     TSet<FName> properties;
 
+    UPROPERTY()
+    TMap<FName, double> defaultValues;
+
     void addProperty(FName property)
     {
         properties.Add(property);
+    }
+    void addProperty(FName property, double def)
+    {
+        properties.Add(property);
+        defaultValues.Add(property, def);
     }
 };
 

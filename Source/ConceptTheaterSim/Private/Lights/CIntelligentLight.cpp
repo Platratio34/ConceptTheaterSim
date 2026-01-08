@@ -80,6 +80,25 @@ FName ACIntelligentLight::getParameterIndexed(FName id)
     return profile->getRange(id, *p);
 }
 
+TArray<bool> ACIntelligentLight::getParameterBitmask(FName id)
+{
+    TArray<bool> arr;
+    arr.Init(false, 8);
+    int *p = parameterValues.Find(id);
+    if(!p)
+        return arr;
+    int v = *p;
+    arr[0] = (v & 0x01) != 0;
+    arr[1] = (v & 0x02) != 0;
+    arr[2] = (v & 0x04) != 0;
+    arr[3] = (v & 0x08) != 0;
+    arr[4] = (v & 0x10) != 0;
+    arr[5] = (v & 0x20) != 0;
+    arr[6] = (v & 0x40) != 0;
+    arr[7] = (v & 0x80) != 0;
+    return arr;
+}
+
 void ACIntelligentLight::onSourceUpdate(UCDMXCableConnector *source)
 {
     if(source == nullptr)

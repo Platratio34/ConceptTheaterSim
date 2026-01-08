@@ -26,7 +26,10 @@ bool UEOSShowfile::patchLight(int ch, UEOSPatch* light)
         UEOSPropertySet* propSet = UEOSPropertySet::Create();
         for(FName &name : light->properties)
         {
-            propSet->add(name, 0);
+            if(double* p2 = light->defaultValues.Find(name))
+                propSet->add(name, *p2);
+            else
+                propSet->add(name, 0);
         }
         channels.Add(ch, propSet);
     }

@@ -68,6 +68,9 @@ public:
     FName getParameterIndexed(FName id);
 
     UFUNCTION(BlueprintCallable)
+    TArray<bool> getParameterBitmask(FName id);
+
+    UFUNCTION(BlueprintCallable)
     bool hasParameter(FName id)
     {
         if(profile == nullptr)

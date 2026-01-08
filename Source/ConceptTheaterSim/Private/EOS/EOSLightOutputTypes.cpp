@@ -252,6 +252,90 @@ class CONCEPTTHEATERSIM_API MaverickMk3WashBasic : public EOSLightOutputType
     } 
 };
 
+class CONCEPTTHEATERSIM_API GenericLightPanel : public EOSLightOutputType
+{
+    virtual void output(UEOSChannelView *channel, TArray<int>& dmx, int start) override
+    {
+        dmx[start+1] = toByte(channel->getProperty(PROPERTY_INTENSITY));
+        dmx[start+2] = toByte(channel->getProperty(PROPERTY_RED));
+        dmx[start+3] = toByte(channel->getProperty(PROPERTY_GREEN));
+        dmx[start+4] = toByte(channel->getProperty(PROPERTY_BLUE));
+        int mask1 = 0;
+        mask1 |= channel->getProperty(FName("Cell1")) == 1 ? 1 : 0x0;
+        mask1 |= channel->getProperty(FName("Cell2")) == 1 ? 2 : 0x0;
+        mask1 |= channel->getProperty(FName("Cell3")) == 1 ? 4 : 0x0;
+        mask1 |= channel->getProperty(FName("Cell4")) == 1 ? 8 : 0x0;
+        mask1 |= channel->getProperty(FName("Cell5")) == 1 ? 16 : 0x0;
+        dmx[start+5] = mask1;
+        int mask2 = 0;
+        mask2 |= channel->getProperty(FName("Cell6")) == 1 ? 1 : 0x0;
+        mask2 |= channel->getProperty(FName("Cell7")) == 1 ? 2 : 0x0;
+        mask2 |= channel->getProperty(FName("Cell8")) == 1 ? 4 : 0x0;
+        mask2 |= channel->getProperty(FName("Cell9")) == 1 ? 8 : 0x0;
+        mask2 |= channel->getProperty(FName("Cell10")) == 1 ? 16 : 0x0;
+        dmx[start+6] = mask2;
+        int mask3 = 0;
+        mask3 |= channel->getProperty(FName("Cell11")) == 1 ? 1 : 0x0;
+        mask3 |= channel->getProperty(FName("Cell12")) == 1 ? 2 : 0x0;
+        mask3 |= channel->getProperty(FName("Cell13")) == 1 ? 4 : 0x0;
+        mask3 |= channel->getProperty(FName("Cell14")) == 1 ? 8 : 0x0;
+        mask3 |= channel->getProperty(FName("Cell15")) == 1 ? 16 : 0x0;
+        dmx[start+7] = mask3;
+        int mask4 = 0;
+        mask4 |= channel->getProperty(FName("Cell16")) == 1 ? 1 : 0x0;
+        mask4 |= channel->getProperty(FName("Cell17")) == 1 ? 2 : 0x0;
+        mask4 |= channel->getProperty(FName("Cell18")) == 1 ? 4 : 0x0;
+        mask4 |= channel->getProperty(FName("Cell19")) == 1 ? 8 : 0x0;
+        mask4 |= channel->getProperty(FName("Cell20")) == 1 ? 16 : 0x0;
+        dmx[start+8] = mask4;
+        int mask5 = 0;
+        mask5 |= channel->getProperty(FName("Cell21")) == 1 ? 1 : 0x0;
+        mask5 |= channel->getProperty(FName("Cell22")) == 1 ? 2 : 0x0;
+        mask5 |= channel->getProperty(FName("Cell23")) == 1 ? 4 : 0x0;
+        mask5 |= channel->getProperty(FName("Cell24")) == 1 ? 8 : 0x0;
+        mask5 |= channel->getProperty(FName("Cell25")) == 1 ? 16 : 0x0;
+        dmx[start+9] = mask5;
+    }
+
+    virtual void input(TArray<int> &dmx, UEOSPropertySet *parameters, int start) override
+    {
+        parameters->set(PROPERTY_INTENSITY, fromByte(dmx[start+1]));
+        parameters->set(PROPERTY_RED, fromByte(dmx[start+2]));
+        parameters->set(PROPERTY_GREEN, fromByte(dmx[start+3]));
+        parameters->set(PROPERTY_BLUE, fromByte(dmx[start+4]));
+        int mask = dmx[start + 5];
+        parameters->set(FName("Cell1"), (mask & 1) != 0 ? 1 : 0);
+        parameters->set(FName("Cell2"), (mask & 2) != 0 ? 1 : 0);
+        parameters->set(FName("Cell3"), (mask & 4) != 0 ? 1 : 0);
+        parameters->set(FName("Cell4"), (mask & 8) != 0 ? 1 : 0);
+        parameters->set(FName("Cell5"), (mask & 16) != 0 ? 1 : 0);
+        mask = dmx[start + 6];
+        parameters->set(FName("Cell6"), (mask & 1) != 0 ? 1 : 0);
+        parameters->set(FName("Cell7"), (mask & 2) != 0 ? 1 : 0);
+        parameters->set(FName("Cell8"), (mask & 4) != 0 ? 1 : 0);
+        parameters->set(FName("Cell9"), (mask & 8) != 0 ? 1 : 0);
+        parameters->set(FName("Cell10"), (mask & 16) != 0 ? 1 : 0);
+        mask = dmx[start + 7];
+        parameters->set(FName("Cell11"), (mask & 1) != 0 ? 1 : 0);
+        parameters->set(FName("Cell12"), (mask & 2) != 0 ? 1 : 0);
+        parameters->set(FName("Cell13"), (mask & 4) != 0 ? 1 : 0);
+        parameters->set(FName("Cell14"), (mask & 8) != 0 ? 1 : 0);
+        parameters->set(FName("Cell15"), (mask & 16) != 0 ? 1 : 0);
+        mask = dmx[start + 8];
+        parameters->set(FName("Cell16"), (mask & 1) != 0 ? 1 : 0);
+        parameters->set(FName("Cell17"), (mask & 2) != 0 ? 1 : 0);
+        parameters->set(FName("Cell18"), (mask & 4) != 0 ? 1 : 0);
+        parameters->set(FName("Cell19"), (mask & 8) != 0 ? 1 : 0);
+        parameters->set(FName("Cell20"), (mask & 16) != 0 ? 1 : 0);
+        mask = dmx[start + 9];
+        parameters->set(FName("Cell21"), (mask & 1) != 0 ? 1 : 0);
+        parameters->set(FName("Cell22"), (mask & 2) != 0 ? 1 : 0);
+        parameters->set(FName("Cell23"), (mask & 4) != 0 ? 1 : 0);
+        parameters->set(FName("Cell24"), (mask & 8) != 0 ? 1 : 0);
+        parameters->set(FName("Cell25"), (mask & 16) != 0 ? 1 : 0);
+    } 
+};
+
 EOSLightOutputType* EOSLightOutputType::getType(FName type)
 {
     static TMap < FName, EOSLightOutputType*> types;
@@ -283,6 +367,10 @@ EOSLightOutputType* EOSLightOutputType::getType(FName type)
     else if(type == LIGHT_TYPE_MAVERICK_MK3_PROFILE_54CH)
     {
         typeI = new MaverickMk3Profile54Ch();
+    }
+    else if(type == LIGHT_TYPE_GENERIC_LIGHT_PANEL)
+    {
+        typeI = new GenericLightPanel();
     }
     else
     {

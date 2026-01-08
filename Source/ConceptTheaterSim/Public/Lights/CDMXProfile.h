@@ -13,7 +13,8 @@ enum class ECDMXProfileParameterType : uint8
     FINE,
     COARSE,
     INDEXED,
-    CONTROL
+    CONTROL,
+    BITMASK
 };
 
 USTRUCT(BlueprintType)

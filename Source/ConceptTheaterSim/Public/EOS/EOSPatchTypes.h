@@ -11,6 +11,7 @@ const FName LIGHT_TYPE_ETC_D60_DIRECT = FName(TEXT("ETC_D60_Direct"));
 const FName LIGHT_TYPE_ETC_COLOR_SOURCE_CYC_DIRECT = FName(TEXT("ETC_ColorSource_CYC_Direct"));
 const FName LIGHT_TYPE_MAVERICK_MK3_WASH_BASIC = FName(TEXT("MaverickMk3Wash_Basic"));
 const FName LIGHT_TYPE_MAVERICK_MK3_PROFILE_54CH = FName(TEXT("MaverickMk3Profile_54ch"));
+const FName LIGHT_TYPE_GENERIC_LIGHT_PANEL = FName(TEXT("GenericLightPanel"));
 
 const FName PROPERTY_INTENSITY = FName(TEXT("Intensity"));
 const FName PROPERTY_BACKGROUND_INTENSITY = FName(TEXT("BackgroundIntensity"));
@@ -111,47 +112,47 @@ public:
         if(type == LIGHT_TYPE_DIMMER)
         {
             UEOSPatch *patch = UEOSPatch::Create(type, 1);
-            patch->addProperty(PROPERTY_INTENSITY);
+            patch->addProperty(PROPERTY_INTENSITY, 0);
             return patch;
         }
         if(type == LIGHT_TYPE_ETC_S4_LUSTR_P_DIRECT || type == LIGHT_TYPE_ETC_D60_DIRECT)
         {
             UEOSPatch *patch = UEOSPatch::Create(type, 10);
-            patch->addProperty(PROPERTY_INTENSITY);
-            patch->addProperty(PROPERTY_RED);
-            patch->addProperty(PROPERTY_WHITE);
-            patch->addProperty(PROPERTY_AMBER);
-            patch->addProperty(PROPERTY_GREEN);
-            patch->addProperty(PROPERTY_CYAN);
-            patch->addProperty(PROPERTY_BLUE);
-            patch->addProperty(PROPERTY_INDIGO);
+            patch->addProperty(PROPERTY_INTENSITY, 0);
+            patch->addProperty(PROPERTY_RED, 1);
+            patch->addProperty(PROPERTY_WHITE, 1);
+            patch->addProperty(PROPERTY_AMBER, 1);
+            patch->addProperty(PROPERTY_GREEN, 1);
+            patch->addProperty(PROPERTY_CYAN, 1);
+            patch->addProperty(PROPERTY_BLUE, 1);
+            patch->addProperty(PROPERTY_INDIGO, 1);
             patch->addProperty(PROPERTY_STROBE);
-            patch->addProperty(PROPERTY_FAN);
+            patch->addProperty(PROPERTY_FAN, 0);
             return patch;
         }
         if(type == LIGHT_TYPE_ETC_COLOR_SOURCE_CYC_DIRECT)
         {
             UEOSPatch *patch = UEOSPatch::Create(type, 10);
-            patch->addProperty(PROPERTY_INTENSITY);
-            patch->addProperty(PROPERTY_RED);
-            patch->addProperty(PROPERTY_GREEN);
-            patch->addProperty(PROPERTY_BLUE);
-            patch->addProperty(PROPERTY_INDIGO);
-            patch->addProperty(PROPERTY_LIME);
+            patch->addProperty(PROPERTY_INTENSITY, 0);
+            patch->addProperty(PROPERTY_RED, 1);
+            patch->addProperty(PROPERTY_GREEN, 1);
+            patch->addProperty(PROPERTY_BLUE, 1);
+            patch->addProperty(PROPERTY_INDIGO, 1);
+            patch->addProperty(PROPERTY_LIME, 1);
             patch->addProperty(PROPERTY_STROBE);
             return patch;
         }
         if(type == LIGHT_TYPE_MAVERICK_MK3_PROFILE_54CH)
         {
             UEOSPatch *patch = UEOSPatch::Create(type, 54);
-            patch->addProperty(PROPERTY_PAN);
-            patch->addProperty(PROPERTY_TILT);
+            patch->addProperty(PROPERTY_PAN, 0);
+            patch->addProperty(PROPERTY_TILT, 0);
             patch->addProperty(PROPERTY_POSITION_MSPEED);
             patch->addProperty(PROPERTY_INTENSITY);
             patch->addProperty(PROPERTY_STROBE);
-            patch->addProperty(PROPERTY_CYAN);
-            patch->addProperty(PROPERTY_MAGENTA);
-            patch->addProperty(PROPERTY_YELLOW);
+            patch->addProperty(PROPERTY_CYAN, 0);
+            patch->addProperty(PROPERTY_MAGENTA, 0);
+            patch->addProperty(PROPERTY_YELLOW, 0);
             patch->addProperty(PROPERTY_CT);
             patch->addProperty(PROPERTY_COLOR_SELECT);
             patch->addProperty(PROPERTY_GOBO_SELECT);
@@ -202,10 +203,45 @@ public:
             patch->addProperty(PROPERTY_STROBE);
             patch->addProperty(PROPERTY_ZOOM);
             patch->addProperty(PROPERTY_POSITION_BLINK);
-            patch->addProperty(PROPERTY_RED);
-            patch->addProperty(PROPERTY_GREEN);
-            patch->addProperty(PROPERTY_BLUE);
-            patch->addProperty(PROPERTY_WHITE);
+            patch->addProperty(PROPERTY_RED, 1);
+            patch->addProperty(PROPERTY_GREEN, 1);
+            patch->addProperty(PROPERTY_BLUE, 1);
+            patch->addProperty(PROPERTY_WHITE, 1);
+            return patch;
+        }
+        if(type == LIGHT_TYPE_MAVERICK_MK3_WASH_BASIC)
+        {
+            UEOSPatch *patch = UEOSPatch::Create(type, 21);
+            patch->addProperty(PROPERTY_INTENSITY, 0);
+            patch->addProperty(PROPERTY_RED, 1);
+            patch->addProperty(PROPERTY_GREEN, 1);
+            patch->addProperty(PROPERTY_BLUE, 1);
+            
+            patch->addProperty(FName(TEXT("Cell1")), 1);
+            patch->addProperty(FName(TEXT("Cell2")), 1);
+            patch->addProperty(FName(TEXT("Cell3")), 1);
+            patch->addProperty(FName(TEXT("Cell4")), 1);
+            patch->addProperty(FName(TEXT("Cell5")), 1);
+            patch->addProperty(FName(TEXT("Cell6")), 1);
+            patch->addProperty(FName(TEXT("Cell7")), 1);
+            patch->addProperty(FName(TEXT("Cell8")), 1);
+            patch->addProperty(FName(TEXT("Cell9")), 1);
+            patch->addProperty(FName(TEXT("Cell10")), 1);
+            patch->addProperty(FName(TEXT("Cell11")), 1);
+            patch->addProperty(FName(TEXT("Cell12")), 1);
+            patch->addProperty(FName(TEXT("Cell13")), 1);
+            patch->addProperty(FName(TEXT("Cell14")), 1);
+            patch->addProperty(FName(TEXT("Cell15")), 1);
+            patch->addProperty(FName(TEXT("Cell16")), 1);
+            patch->addProperty(FName(TEXT("Cell17")), 1);
+            patch->addProperty(FName(TEXT("Cell18")), 1);
+            patch->addProperty(FName(TEXT("Cell19")), 1);
+            patch->addProperty(FName(TEXT("Cell20")), 1);
+            patch->addProperty(FName(TEXT("Cell21")), 1);
+            patch->addProperty(FName(TEXT("Cell22")), 1);
+            patch->addProperty(FName(TEXT("Cell23")), 1);
+            patch->addProperty(FName(TEXT("Cell24")), 1);
+            patch->addProperty(FName(TEXT("Cell25")), 1);
             return patch;
         }
         UE_LOG(LogTemp, Warning, TEXT("Unknown patch type: %s"), *(type.ToString()));
