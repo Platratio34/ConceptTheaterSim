@@ -563,11 +563,11 @@ void AETCLightBoard::executeCommand()
                 UE_LOG(LogTemp, Display, TEXT("- At: %f"), v);
             }
             float sneakTime = 0;
-            if(command.Num() >= next && command[next] == BUTTON_SNEAK)
+            if(command.Num() > next && command[next] == BUTTON_SNEAK)
             {
                 sneakTime = 5;
                 next++;
-                if(command.Num() >= next)
+                if(command.Num() > next)
                 {
                     sneakTime = getCmdNumberD(next, &next);
                     next++;
@@ -616,7 +616,7 @@ void AETCLightBoard::executeCommand()
     {
         int next = 1;
         double time = 5;
-        if(command.Num() > next)
+        if(command.Num() > next+1)
         {
             time = getCmdNumberD(next, &next);
             if (time == 0)

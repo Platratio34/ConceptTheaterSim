@@ -193,6 +193,9 @@ protected:
     UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Power")
     double requiredPower = 575;
 
+    UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Light")
+    bool ignorePower = false;
+
     UFUNCTION(BlueprintNativeEvent)
     double getIntensityScale();
 
@@ -213,6 +216,9 @@ protected:
 
     UFUNCTION()
     virtual void updateCull(FName volume, bool active);
+
+    UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Power")
+    bool castVolumetricShadows = false;
 
 private:
     virtual double getIntensityScale_Implementation() { return 1; }

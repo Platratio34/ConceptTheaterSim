@@ -256,45 +256,45 @@ class CONCEPTTHEATERSIM_API GenericLightPanel : public EOSLightOutputType
 {
     virtual void output(UEOSChannelView *channel, TArray<int>& dmx, int start) override
     {
-        dmx[start+1] = toByte(channel->getProperty(PROPERTY_INTENSITY));
-        dmx[start+2] = toByte(channel->getProperty(PROPERTY_RED));
-        dmx[start+3] = toByte(channel->getProperty(PROPERTY_GREEN));
-        dmx[start+4] = toByte(channel->getProperty(PROPERTY_BLUE));
+        dmx[start+0] = toByte(channel->getProperty(PROPERTY_INTENSITY));
+        dmx[start+1] = toByte(channel->getProperty(PROPERTY_RED));
+        dmx[start+2] = toByte(channel->getProperty(PROPERTY_GREEN));
+        dmx[start+3] = toByte(channel->getProperty(PROPERTY_BLUE));
         int mask1 = 0;
         mask1 |= channel->getProperty(FName("Cell1")) == 1 ? 1 : 0x0;
         mask1 |= channel->getProperty(FName("Cell2")) == 1 ? 2 : 0x0;
         mask1 |= channel->getProperty(FName("Cell3")) == 1 ? 4 : 0x0;
         mask1 |= channel->getProperty(FName("Cell4")) == 1 ? 8 : 0x0;
         mask1 |= channel->getProperty(FName("Cell5")) == 1 ? 16 : 0x0;
-        dmx[start+5] = mask1;
+        dmx[start+4] = mask1;
         int mask2 = 0;
         mask2 |= channel->getProperty(FName("Cell6")) == 1 ? 1 : 0x0;
         mask2 |= channel->getProperty(FName("Cell7")) == 1 ? 2 : 0x0;
         mask2 |= channel->getProperty(FName("Cell8")) == 1 ? 4 : 0x0;
         mask2 |= channel->getProperty(FName("Cell9")) == 1 ? 8 : 0x0;
         mask2 |= channel->getProperty(FName("Cell10")) == 1 ? 16 : 0x0;
-        dmx[start+6] = mask2;
+        dmx[start+5] = mask2;
         int mask3 = 0;
         mask3 |= channel->getProperty(FName("Cell11")) == 1 ? 1 : 0x0;
         mask3 |= channel->getProperty(FName("Cell12")) == 1 ? 2 : 0x0;
         mask3 |= channel->getProperty(FName("Cell13")) == 1 ? 4 : 0x0;
         mask3 |= channel->getProperty(FName("Cell14")) == 1 ? 8 : 0x0;
         mask3 |= channel->getProperty(FName("Cell15")) == 1 ? 16 : 0x0;
-        dmx[start+7] = mask3;
+        dmx[start+6] = mask3;
         int mask4 = 0;
         mask4 |= channel->getProperty(FName("Cell16")) == 1 ? 1 : 0x0;
         mask4 |= channel->getProperty(FName("Cell17")) == 1 ? 2 : 0x0;
         mask4 |= channel->getProperty(FName("Cell18")) == 1 ? 4 : 0x0;
         mask4 |= channel->getProperty(FName("Cell19")) == 1 ? 8 : 0x0;
         mask4 |= channel->getProperty(FName("Cell20")) == 1 ? 16 : 0x0;
-        dmx[start+8] = mask4;
+        dmx[start+7] = mask4;
         int mask5 = 0;
         mask5 |= channel->getProperty(FName("Cell21")) == 1 ? 1 : 0x0;
         mask5 |= channel->getProperty(FName("Cell22")) == 1 ? 2 : 0x0;
         mask5 |= channel->getProperty(FName("Cell23")) == 1 ? 4 : 0x0;
         mask5 |= channel->getProperty(FName("Cell24")) == 1 ? 8 : 0x0;
         mask5 |= channel->getProperty(FName("Cell25")) == 1 ? 16 : 0x0;
-        dmx[start+9] = mask5;
+        dmx[start+8] = mask5;
     }
 
     virtual void input(TArray<int> &dmx, UEOSPropertySet *parameters, int start) override

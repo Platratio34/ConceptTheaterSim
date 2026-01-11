@@ -12,7 +12,7 @@ ACIntelligentLight::ACIntelligentLight()
 void ACIntelligentLight::OnConstruction(const FTransform &Transform)
 {
     Super::OnConstruction(Transform);
-
+    dmxInput->input = true;
 }
 
 // Called when the game starts or when spawned

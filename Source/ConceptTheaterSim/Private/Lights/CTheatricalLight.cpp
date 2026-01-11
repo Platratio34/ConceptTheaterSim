@@ -66,6 +66,7 @@ void ACTheatricalLight::OnConstruction(const FTransform &Transform)
     if(light != nullptr)
     {
         light->SetLightFunctionMaterial(activeLightFunction);
+        light->SetCastVolumetricShadow(castVolumetricShadows);
     }
 
     if(focusMode)
@@ -170,7 +171,7 @@ void ACTheatricalLight::setIntensity(double newIntensity)
     if(newIntensity > 1)
         newIntensity = 1;
     intensity = newIntensity;
-    actualIntensity = intensity * getIntensityScale() * getPower();
+    actualIntensity = intensity * getIntensityScale() * (ignorePower ? 1 : getPower());
     if(actualIntensity > 1)
     {
         actualIntensity = 1;

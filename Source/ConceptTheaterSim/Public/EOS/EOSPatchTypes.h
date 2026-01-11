@@ -209,7 +209,7 @@ public:
             patch->addProperty(PROPERTY_WHITE, 1);
             return patch;
         }
-        if(type == LIGHT_TYPE_MAVERICK_MK3_WASH_BASIC)
+        if(type == LIGHT_TYPE_GENERIC_LIGHT_PANEL)
         {
             UEOSPatch *patch = UEOSPatch::Create(type, 21);
             patch->addProperty(PROPERTY_INTENSITY, 0);
