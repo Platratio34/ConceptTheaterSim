@@ -340,6 +340,7 @@ void AETCLightBoard::onInteract(UPrimitiveComponent* component)
             command.Empty();
             clearCmd = false;
         }
+        cmdComplete = false;
         
         if(button == BUTTON_ENTER)
         {
@@ -449,6 +450,127 @@ void AETCLightBoard::onInteractScroll(UPrimitiveComponent* component, double dir
             showfile->setManualProperty(ch, PROPERTY_INTENSITY, val);
         }
     }
+    else if (int *p = wheelsByMesh.Find(mesh))
+    {
+        int wheelIndex = *p;
+        FName property = FName("None");
+        double delta = 0.05;
+        double min = 0;
+        double max = 1;
+        if (wheelIndex == 1)
+        {
+            property = PROPERTY_PAN;
+            delta = 0.5;
+            min = -90;
+            max = 90;
+        }
+        else if (wheelIndex == 2)
+        {
+            property = PROPERTY_TILT;
+            delta = 0.5;
+            min = -90;
+            max = 90;
+        }
+        else if (wheelIndex == 3)
+        {
+            property = PROPERTY_RED;
+        }
+        else if (wheelIndex == 4)
+        {
+            property = PROPERTY_GREEN;
+        }
+        else if (wheelIndex == 5)
+        {
+            property = PROPERTY_BLUE;
+        }
+        if(property == FName("None"))
+            return;
+
+        if(!activeSelection.chan)
+            return;
+        
+        for (int i = 0; i < activeSelection.values.Num(); i++)
+        {
+            int ch = activeSelection.values[i];
+            UEOSChannelView *chView = showfile->getChannel(ch);
+            if(chView == nullptr)
+                continue;
+            if(!chView->hasProperty(property))
+                continue;
+            double val = chView->getProperty(property) + (direction * delta);
+            if(val < min)
+                val = min;
+            else if (val > max)
+                val = max;
+            showfile->setManualProperty(ch, property, val);
+        }
+    }
+    else if (int *p2 = dialsByMesh.Find(mesh))
+    {
+        int wheelIndex = *p2;
+        FName property = FName("None");
+        double delta = 0.05;
+        double min = 0;
+        double max = 1;
+        if (wheelIndex == 1)
+        {
+            property = PROPERTY_PAN;
+            delta = 0.5;
+            min = -90;
+            max = 90;
+        }
+        else if (wheelIndex == 2)
+        {
+            property = PROPERTY_TILT;
+            delta = 0.5;
+            min = -90;
+            max = 90;
+        }
+        else if (wheelIndex == 3)
+        {
+            property = PROPERTY_CYAN;
+        }
+        else if (wheelIndex == 4)
+        {
+            property = PROPERTY_YELLOW;
+        }
+        else if (wheelIndex == 5)
+        {
+            property = PROPERTY_MAGENTA;
+        }
+        else if (wheelIndex == 6)
+        {
+            property = PROPERTY_EDGE;
+        }
+        else if (wheelIndex == 7)
+        {
+            property = PROPERTY_ZOOM;
+            delta = 0.5;
+            min = 10;
+            max = 50;
+        }
+        if(property == FName("None"))
+            return;
+
+        if(!activeSelection.chan)
+            return;
+        
+        for (int i = 0; i < activeSelection.values.Num(); i++)
+        {
+            int ch = activeSelection.values[i];
+            UEOSChannelView *chView = showfile->getChannel(ch);
+            if(chView == nullptr)
+                continue;
+            if(!chView->hasProperty(property))
+                continue;
+            double val = chView->getProperty(property) + (direction * delta);
+            if(val < min)
+                val = min;
+            else if (val > max)
+                val = max;
+            showfile->setManualProperty(ch, property, val);
+        }
+    }
 }
 
 void AETCLightBoard::setButtonInteractionText_Implementation(UPrimitiveComponent *component, FName button)
@@ -473,7 +595,7 @@ void AETCLightBoard::executeCommand()
     if(command.Num() == 1 && command[0] == BUTTON_HIGH)
     {
         highlightMode = !highlightMode;
-        clearCmd = true;
+        finishCommand(true);
         return;
     }
     else if(command.Num() == 1 && command[0] == BUTTON_PARK)
@@ -481,7 +603,7 @@ void AETCLightBoard::executeCommand()
         if(parkedChannels.IsEmpty())
         {
             commandError = TEXT("No parked channels");
-            clearCmd = true;
+            finishCommand(true);
             return;
         }
         command.Empty();
@@ -491,8 +613,7 @@ void AETCLightBoard::executeCommand()
     }
     else if(command.Num() == 1 && command[0] == CMD_UNPARK && confirmCmd)
     {
-        confirmCmd = false;
-        clearCmd = true;
+        finishCommand(true);
         parkedChannels.Empty();
         return;
     }
@@ -511,6 +632,7 @@ void AETCLightBoard::executeCommand()
         UE_LOG(LogTemp, Display, TEXT("- next is %d (of %d)"), next, command.Num());
         if(next == command.Num())
         {
+            finishCommand(false);
             return;
         }
 
@@ -535,7 +657,7 @@ void AETCLightBoard::executeCommand()
             {
                 parkedChannels.Add(activeSelection.values[i]);
             }
-            clearCmd = true;
+            finishCommand(true);
             return;
         }
         else if(command[next] == CMD_UNPARK)
@@ -544,7 +666,7 @@ void AETCLightBoard::executeCommand()
             {
                 parkedChannels.Remove(activeSelection.values[i]);
             }
-            clearCmd = true;
+            finishCommand(true);
             return;
         }
         else if(command[next] == BUTTON_FULL || command[next] == BUTTON_OUT || command[next] == BUTTON_AT)
@@ -586,7 +708,7 @@ void AETCLightBoard::executeCommand()
                 else
                     showfile->addFade(ch, PROPERTY_INTENSITY, v, sneakTime, true, false);
             }
-            clearCmd = true;
+            finishCommand(true);
             return;
         }
         else if (command[next] == BUTTON_SNEAK)
@@ -608,7 +730,7 @@ void AETCLightBoard::executeCommand()
                 UE_LOG(LogTemp, Display, TEXT("- Chan %d"), ch);
                 showfile->addFade(ch, PROPERTY_INTENSITY, 0, time, true, true);
             }
-            clearCmd = true;
+            finishCommand(true);
             return;
         }
     }
@@ -636,7 +758,7 @@ void AETCLightBoard::executeCommand()
                 showfile->addFade(ch, p2.Key, 0, time, true, true);
             }
         }
-        clearCmd = true;
+        finishCommand(true);
         return;
     }
     else if(command[0] == BUTTON_GO_TO_CUE)
@@ -649,7 +771,7 @@ void AETCLightBoard::executeCommand()
                 executeCue(i, 1);
             }
         }
-        clearCmd = true;
+        finishCommand(true);
         return;
     }
     
@@ -712,6 +834,12 @@ void AETCLightBoard::executeCommand()
         }
     }
     commandError = TEXT("Unknown command");
+}
+void AETCLightBoard::finishCommand(bool clear)
+{
+    clearCmd = clear;
+    cmdComplete = true;
+    confirmCmd = false;
 }
 
 int AETCLightBoard::getCmdNumber(int start, int* len)

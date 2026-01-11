@@ -239,6 +239,9 @@ public:
 
     void getKeys(TArray<FName> outKeys);
 
+    UFUNCTION(BlueprintCallable)
+    bool hasProperty(FName property);
+
 protected:
     UEOSShowfile *showfile;
     int channel;

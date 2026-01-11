@@ -382,6 +382,17 @@ FName UEOSChannelView::propertySource(FName property)
     }
     return FName("Cue");
 }
+bool UEOSChannelView::hasProperty(FName property)
+{
+    if(UEOSPropertySet* set = showfile->getManualChannel(channel))
+    {
+        if(set->has(property))
+        {
+            return true;
+        }
+    }
+    return showfile->getCueChannel(channel)->has(property);
+}
 void UEOSChannelView::getKeys(TArray<FName> outKeys)
 {
     showfile->getCueChannel(channel)->properties.GetKeys(outKeys);

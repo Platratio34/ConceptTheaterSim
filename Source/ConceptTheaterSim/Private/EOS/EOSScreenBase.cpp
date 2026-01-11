@@ -62,7 +62,7 @@ FString UEOSScreenBase::getCommandString()
     {
         str += TEXT(" Confirm");
     }
-    if(board->clearCmd)
+    if(board->cmdComplete)
     {
         str += TEXT(" *");
     }
@@ -77,7 +77,7 @@ FLinearColor UEOSScreenBase::getCommandColor()
         {
             return FLinearColor(1.0, 0.25, 0.25, 1.0);
         }
-        else if(board->clearCmd)
+        else if(board->cmdComplete)
         {
             return FLinearColor(0.25, 1.0, 0.25, 1.0);
         }

@@ -285,7 +285,7 @@
             { "ch":13, "Intensity": 1.0, "Tilt": 45, "Pan": -30, "Cyan": 0.0, "Yellow": 0.0, "Magenta": 0.0, "Zoom": 10, "Edge": 1},
             
             { "ch":16, "Intensity": 1.0, "Tilt": -40, "Pan": 32, "Cyan": 0.0, "Yellow": 0.0, "Magenta": 0.0, "Zoom": 15, "Edge": 0.5},
-            { "ch":17, "Intensity": 1.0, "Tilt": 40, "Pan": -32, "Cyan": 0.0, "Yellow": 0.0, "Magenta": 0.0, "Zoom": 15, "Edge": 0.5},
+            { "ch":17, "Intensity": 1.0, "Tilt": -40, "Pan": -32, "Cyan": 0.0, "Yellow": 0.0, "Magenta": 0.0, "Zoom": 15, "Edge": 0.5},
             
             { "ch":21, "Intensity": 1.0, "Tilt": 45, "Pan": 30, "Cyan": 0.0, "Yellow": 0.0, "Magenta": 0.0, "Zoom": 10, "Edge": 1},
             { "ch":22, "Intensity": 1.0, "Tilt": 45, "Pan": 0, "Cyan": 0.0, "Yellow": 0.0, "Magenta": 0.0, "Zoom": 10, "Edge": 1},

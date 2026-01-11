@@ -107,6 +107,8 @@ public:
     UPROPERTY(VisibleInstanceOnly, Category="EOS", AdvancedDisplay)
     bool clearCmd = false;
     UPROPERTY(VisibleInstanceOnly, Category="EOS", AdvancedDisplay)
+    bool cmdComplete = false;
+    UPROPERTY(VisibleInstanceOnly, Category="EOS", AdvancedDisplay)
     bool highlightMode = false;
     
     UPROPERTY(VisibleInstanceOnly, Category="EOS")
@@ -190,4 +192,7 @@ private:
 
     UFUNCTION()
     void onNetworkPacket(UNetworkPacket *packet);
+
+    UFUNCTION()
+    void finishCommand(bool clear);
 };
