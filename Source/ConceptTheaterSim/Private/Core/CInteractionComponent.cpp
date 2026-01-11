@@ -54,6 +54,12 @@ void UCInteractionComponent::interactScroll(UPrimitiveComponent *targetComponent
 
 FText UCInteractionComponent::getAction(UPrimitiveComponent *targetComponent)
 {
+    if(onGetAction.IsBound())
+    {
+        FOptionalText opt = onGetAction.Execute(targetComponent);
+        if(opt.present)
+            return opt.text;
+    }
     if(FText* p = actions.Find(targetComponent))
     {
         return *p;
@@ -63,6 +69,12 @@ FText UCInteractionComponent::getAction(UPrimitiveComponent *targetComponent)
 
 FText UCInteractionComponent::getName(UPrimitiveComponent *targetComponent)
 {
+    if(onGetName.IsBound())
+    {
+        FOptionalText opt = onGetName.Execute(targetComponent);
+        if(opt.present)
+            return opt.text;
+    }
     return name;
 }
 

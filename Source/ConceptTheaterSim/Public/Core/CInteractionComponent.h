@@ -16,6 +16,22 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnInteractEnd, UPrimitiveComponent
 UDELEGATE(BlueprintCallable, BlueprintAuthorityOnly)
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnInteractScroll, UPrimitiveComponent*, component, float, scrollDirection);
 
+USTRUCT(BlueprintType)
+struct FOptionalText {
+    GENERATED_BODY()
+
+public:
+
+    UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+    bool present = false;
+    
+    UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+    FText text;
+};
+
+UDELEGATE(BlueprintCallable, BlueprintAuthorityOnly)
+DECLARE_DYNAMIC_DELEGATE_RetVal_OneParam(FOptionalText, FOnGetText, UPrimitiveComponent *, component);
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class CONCEPTTHEATERSIM_API UCInteractionComponent : public UActorComponent
 {
@@ -54,14 +70,20 @@ public:
     UFUNCTION(BlueprintCallable)
     void updateAction(UPrimitiveComponent *targetComponent, FText action);
 
-    UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+    UPROPERTY(BlueprintReadOnly, VisibleAnywhere, BlueprintAssignable)
     FOnInteract onInteract;
 
-    UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+    UPROPERTY(BlueprintReadOnly, VisibleAnywhere, BlueprintAssignable)
     FOnInteractEnd onInteractEnd;
 
-    UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+    UPROPERTY(BlueprintReadOnly, VisibleAnywhere, BlueprintAssignable)
     FOnInteractScroll onInteractScroll;
+
+    UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+    FOnGetText onGetAction;
+    
+    UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+    FOnGetText onGetName;
 
 protected:
     UPROPERTY(VisibleInstanceOnly)
