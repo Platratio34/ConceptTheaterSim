@@ -10,6 +10,7 @@
 #include "EOS/EOSPatchTypes.h"
 #include "EOS/EOSShowPatch.h"
 #include "Networking/DMXNetworkCard.h"
+#include "Core/CInteractionComponent.h"
 #include "ETCLightBoard.generated.h"
 
 UENUM(BlueprintType)
@@ -49,6 +50,8 @@ public:
 	// Sets default values for this actor's properties
 	AETCLightBoard();
 
+    void OnConstruction(const FTransform &Transform) override;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -62,6 +65,12 @@ protected:
     UFUNCTION(BlueprintCallable)
     void onInteractScroll(UPrimitiveComponent* component, double direction);
 
+    UFUNCTION(BlueprintCallable)
+    void onInputOM(FKeyEvent event);
+
+    UFUNCTION(BlueprintCallable)
+    void onInputUpOM(FKeyEvent event);
+
     UFUNCTION(BlueprintNativeEvent)
     void setButtonInteractionText(UPrimitiveComponent *component, FName button);
 
@@ -71,11 +80,17 @@ protected:
     UFUNCTION(BlueprintCallable)
     TArray<int> outputUniverse(int universe);
 
+    UFUNCTION(BlueprintCallable)
+    void onButton(FName button);
+
     UFUNCTION()
     void executeCommand();
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Components")
     UDMXNetworkCard *networkCard;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Components")
+    UCInteractionComponent *interaction;
 
     UFUNCTION()
     void executeCue(int cueI, double time = -1);

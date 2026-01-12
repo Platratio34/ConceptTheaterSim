@@ -90,3 +90,24 @@ void UCInteractionComponent::updateAction(UPrimitiveComponent *targetComponent, 
 {
     actions.Add(targetComponent, action);
 }
+
+void UCInteractionComponent::setObjectMode(bool active)
+{
+    if(!supportsObjectMode)
+        return;
+    objectMode = active;
+}
+
+void UCInteractionComponent::inputOM(FKeyEvent event)
+{
+    if(!objectMode)
+        return;
+    onInputOM.Broadcast(event);
+}
+
+void UCInteractionComponent::inputUpOM(FKeyEvent event)
+{
+    if(!objectMode)
+        return;
+    onInputUpOM.Broadcast(event);
+}

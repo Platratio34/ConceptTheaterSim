@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Framework/Application/SlateApplication.h"
 #include "CInteractionComponent.generated.h"
 
 
@@ -31,6 +32,9 @@ public:
 
 UDELEGATE(BlueprintCallable, BlueprintAuthorityOnly)
 DECLARE_DYNAMIC_DELEGATE_RetVal_OneParam(FOptionalText, FOnGetText, UPrimitiveComponent *, component);
+
+UDELEGATE(BlueprintCallable, BlueprintAuthorityOnly)
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInputOM, FKeyEvent, event);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class CONCEPTTHEATERSIM_API UCInteractionComponent : public UActorComponent
@@ -84,6 +88,27 @@ public:
     
     UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
     FOnGetText onGetName;
+
+    UPROPERTY(BlueprintReadWrite, EditAnywhere)
+    bool supportsObjectMode = false;
+
+    UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+    bool objectMode = true;
+
+    UFUNCTION(BlueprintCallable)
+    void setObjectMode(bool active);
+
+    UFUNCTION(BlueprintCallable)
+    void inputOM(FKeyEvent event);
+    
+    UFUNCTION(BlueprintCallable)
+    void inputUpOM(FKeyEvent event);
+    
+    UPROPERTY(BlueprintReadOnly, VisibleAnywhere, BlueprintAssignable)
+    FOnInputOM onInputOM;
+
+    UPROPERTY(BlueprintReadOnly, VisibleAnywhere, BlueprintAssignable)
+    FOnInputOM onInputUpOM;
 
 protected:
     UPROPERTY(VisibleInstanceOnly)

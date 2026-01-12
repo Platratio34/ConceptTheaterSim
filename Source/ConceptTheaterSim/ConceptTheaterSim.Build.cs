@@ -8,7 +8,7 @@ public class ConceptTheaterSim : ModuleRules
     {
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-        PublicDependencyModuleNames.AddRange(["Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput"]);
+        PublicDependencyModuleNames.AddRange(["Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "SlateCore"]);
 
         PrivateDependencyModuleNames.AddRange([ "Json", "JsonUtilities" ]);
 

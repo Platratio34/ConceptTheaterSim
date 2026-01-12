@@ -14,6 +14,12 @@ AETCLightBoard::AETCLightBoard()
 	PrimaryActorTick.bCanEverTick = true;
 
     networkCard = CreateDefaultSubobject<UDMXNetworkCard>(TEXT("Network Card"));
+    interaction = CreateDefaultSubobject<UCInteractionComponent>(TEXT("CInteraction"));
+}
+
+void AETCLightBoard::OnConstruction(const FTransform &Transform)
+{
+    interaction->supportsObjectMode = true;
 }
 
 // Called when the game starts or when spawned
@@ -21,6 +27,8 @@ void AETCLightBoard::BeginPlay()
 {
 	Super::BeginPlay();
     networkCard->onNetworkPacket.AddDynamic(this, &AETCLightBoard::onNetworkPacket);
+    interaction->onInputOM.AddDynamic(this, &AETCLightBoard::onInputOM);
+    interaction->onInputUpOM.AddDynamic(this, &AETCLightBoard::onInputUpOM);
     for (int u = 1; u <= 10; u++)
     {
         networkCard->addUniverse(u);
@@ -300,106 +308,7 @@ void AETCLightBoard::onInteract(UPrimitiveComponent* component)
         return;
     if(FName *buttonPntr = buttonsByMesh.Find(mesh))
     {
-        FName button = *buttonPntr;
-        if(button == BUTTON_LIVE)
-        {
-            mode = EEOSMode::LIVE;
-            return;
-        }
-        else if(button == BUTTON_BLIND)
-        {
-            mode = EEOSMode::BLIND;
-            return;
-        }
-        else if(button == BUTTON_STAGE)
-        {
-            mode = EEOSMode::STAGE;
-            return;
-        }
-        else if(button == BUTTON_GO)
-        {
-            // TODO: update when Qs are added
-            if(showfile != nullptr)
-            {
-                cueGo();
-            }
-            return;
-        }
-        else if(button == BUTTON_BACK)
-        {
-            // TODO: update when Qs are added
-            if(showfile != nullptr)
-            {
-                cueBack();
-            }
-            return;
-        }
-        
-        if(clearCmd)
-        {
-            command.Empty();
-            clearCmd = false;
-        }
-        cmdComplete = false;
-        
-        if(button == BUTTON_ENTER)
-        {
-            executeCommand();
-            return;
-        }
-        else if(button == BUTTON_CLEAR)
-        {
-            if(commandError.Len() > 0)
-                commandError = TEXT("");
-            else if(command.Num() > 0) {
-                if(shift)
-                    command.Empty();
-                else
-                    command.RemoveAt(command.Num() - 1);
-            }
-            return;
-        }
-        else if(button == BUTTON_SHIFT)
-        {
-            shift = !shift;
-            return;
-        }
-        if(shift && button == BUTTON_UPDATE)
-        {
-            if(showfile == nullptr)
-                return;
-            saveShowfile(showfile->fileName);
-            return;
-        }
-        
-        if(commandError.Len() > 0)
-        {
-            commandError = TEXT("");
-        }
-
-        if(UEOSButton::isNumeric(button) && command.Num() == 0)
-        {
-            command.Add(CMD_CHAN);
-        }
-        else if(button == BUTTON_DELAY)
-        {
-            if(shift)
-            {
-                button = CMD_FOLLOW;
-            }
-        }
-        else if(button == BUTTON_FULL && command.Num() > 0 && command[command.Num()-1] == BUTTON_FULL)
-        {
-            executeCommand();
-            return;
-        }
-
-        command.Add(button);
-        if(button == BUTTON_OUT)
-        {
-            executeCommand();
-            return;
-        }
+        onButton(*buttonPntr);
 
         // if(button == BUTTON_PARK)
         // {
@@ -573,6 +482,182 @@ void AETCLightBoard::onInteractScroll(UPrimitiveComponent* component, double dir
     }
 }
 
+void AETCLightBoard::onInputUpOM(FKeyEvent event)
+{
+    FName keyName = event.GetKey().GetFName();
+    if (keyName == FName("Z"))
+        shift = false;
+}
+void AETCLightBoard::onInputOM(FKeyEvent event)
+{
+    FName keyName = event.GetKey().GetFName();
+    UE_LOG(LogTemp, Display, TEXT("Key input %s"), *keyName.ToString());
+    if (keyName == FName("Z"))
+        shift = true;
+    else if(keyName == FName("NumPadZero"))
+        onButton(BUTTON_0);
+    else if(keyName == FName("NumPadOne"))
+        onButton(BUTTON_1);
+    else if(keyName == FName("NumPadTwo"))
+        onButton(BUTTON_2);
+    else if(keyName == FName("NumPadThree"))
+        onButton(BUTTON_3);
+    else if(keyName == FName("NumPadFour"))
+        onButton(BUTTON_4);
+    else if(keyName == FName("NumPadFive"))
+        onButton(BUTTON_5);
+    else if(keyName == FName("NumPadSix"))
+        onButton(BUTTON_6);
+    else if(keyName == FName("NumPadSeven"))
+        onButton(BUTTON_7);
+    else if(keyName == FName("NumPadEight"))
+        onButton(BUTTON_8);
+    else if(keyName == FName("NumPadNine"))
+        onButton(BUTTON_9);
+    else if(keyName == FName("BackSpace"))
+        onButton(BUTTON_CLEAR);
+    else if(keyName == FName("Enter"))
+        onButton(BUTTON_ENTER);
+    else if(keyName == FName("Add"))
+        onButton(BUTTON_PLUS);
+    else if(keyName == FName("T"))
+        onButton(BUTTON_THRU);
+    else if(keyName == FName("F"))
+        onButton(BUTTON_FULL);
+    else if(keyName == FName("O"))
+        onButton(BUTTON_OUT);
+    else if(keyName == FName("A"))
+        onButton(BUTTON_AT);
+    else if(keyName == FName("N"))
+        onButton(BUTTON_SNEAK);
+    else if(keyName == FName("U"))
+        onButton(BUTTON_UPDATE);
+    else if(keyName == FName("One"))
+        onButton(BUTTON_SK1);
+    else if(keyName == FName("Two"))
+        onButton(BUTTON_SK2);
+    else if(keyName == FName("Three"))
+        onButton(BUTTON_SK3);
+    else if(keyName == FName("Four"))
+        onButton(BUTTON_SK4);
+    else if(keyName == FName("Five"))
+        onButton(BUTTON_SK5);
+    else if(keyName == FName("Six"))
+        onButton(BUTTON_SK6);
+    else if(keyName == FName("Seven"))
+        onButton(BUTTON_MORE_SK);
+    else if(keyName == FName("Space"))
+    {
+        if(event.IsControlDown())
+            onButton(BUTTON_BACK);
+        else
+            onButton(BUTTON_CUE);
+    }
+}
+
+void AETCLightBoard::onButton(FName button)
+{
+    if(button == BUTTON_LIVE)
+    {
+        mode = EEOSMode::LIVE;
+        return;
+    }
+    else if(button == BUTTON_BLIND)
+    {
+        mode = EEOSMode::BLIND;
+        return;
+    }
+    else if(button == BUTTON_STAGE)
+    {
+        mode = EEOSMode::STAGE;
+        return;
+    }
+    else if(button == BUTTON_GO)
+    {
+        // TODO: update when Qs are added
+        if(showfile != nullptr)
+        {
+            cueGo();
+        }
+        return;
+    }
+    else if(button == BUTTON_BACK)
+    {
+        // TODO: update when Qs are added
+        if(showfile != nullptr)
+        {
+            cueBack();
+        }
+        return;
+    }
+    
+    if(clearCmd)
+    {
+        command.Empty();
+        clearCmd = false;
+    }
+    cmdComplete = false;
+    
+    if(button == BUTTON_ENTER)
+    {
+        executeCommand();
+        return;
+    }
+    else if(button == BUTTON_CLEAR)
+    {
+        if(commandError.Len() > 0)
+            commandError = TEXT("");
+        else if(command.Num() > 0) {
+            if(shift)
+                command.Empty();
+            else
+                command.RemoveAt(command.Num() - 1);
+        }
+        return;
+    }
+    else if(button == BUTTON_SHIFT)
+    {
+        shift = !shift;
+        return;
+    }
+    if(shift && button == BUTTON_UPDATE)
+    {
+        if(showfile == nullptr)
+            return;
+        saveShowfile(showfile->fileName);
+        return;
+    }
+    
+    if(commandError.Len() > 0)
+    {
+        commandError = TEXT("");
+    }
+
+    if(UEOSButton::isNumeric(button) && command.Num() == 0)
+    {
+        command.Add(CMD_CHAN);
+    }
+    else if(button == BUTTON_DELAY)
+    {
+        if(shift)
+        {
+            button = CMD_FOLLOW;
+        }
+    }
+    else if(button == BUTTON_FULL && command.Num() > 0 && command[command.Num()-1] == BUTTON_FULL)
+    {
+        executeCommand();
+        return;
+    }
+
+    command.Add(button);
+    if(button == BUTTON_OUT)
+    {
+        executeCommand();
+        return;
+    }
+}
+
 void AETCLightBoard::setButtonInteractionText_Implementation(UPrimitiveComponent *component, FName button)
 {
 
@@ -713,6 +798,7 @@ void AETCLightBoard::executeCommand()
         }
         else if (command[next] == BUTTON_SNEAK)
         {
+            next++;
             double time = 5;
             if(command.Num() > next)
             {
@@ -738,7 +824,7 @@ void AETCLightBoard::executeCommand()
     {
         int next = 1;
         double time = 5;
-        if(command.Num() > next+1)
+        if(command.Num() > next)
         {
             time = getCmdNumberD(next, &next);
             if (time == 0)
