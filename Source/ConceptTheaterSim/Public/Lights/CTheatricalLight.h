@@ -193,7 +193,7 @@ protected:
     UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Power")
     double requiredPower = 575;
 
-    UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Light")
+    UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Power")
     bool ignorePower = false;
 
     UFUNCTION(BlueprintNativeEvent)
@@ -217,7 +217,7 @@ protected:
     UFUNCTION()
     virtual void updateCull(FName volume, bool active);
 
-    UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Power")
+    UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Light")
     bool castVolumetricShadows = false;
 
 private:
