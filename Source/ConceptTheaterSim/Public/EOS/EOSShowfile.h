@@ -107,6 +107,13 @@ public:
             return true;
         return devices[0]->type == device->type;
     }
+
+    bool hasProperty(FName property)
+    {
+        if (devices.Num() == 0)
+            return false;
+        return devices[0]->properties.Contains(property);
+    }
 };
 
 UCLASS()
@@ -263,6 +270,26 @@ public:
     bool update(UEOSShowfile *showfile, double deltaTime);
 };
 
+UCLASS()
+class CONCEPTTHEATERSIM_API UEOSGroup : public UObject
+{
+	GENERATED_BODY()
+	
+public:
+    UPROPERTY()
+    FString name;
+
+    UPROPERTY()
+    TSet<int> channels;
+
+    static inline FString JSON_CHS = TEXT("chs");
+    static inline FString JSON_NAME = TEXT("name");
+
+    static UEOSGroup *FromJSON(TSharedPtr<FJsonObject> groupJson);
+    
+    TSharedPtr<FJsonObject> toJson();
+};
+
 UCLASS(BlueprintType)
 class CONCEPTTHEATERSIM_API UEOSShowfile : public UObject
 {
@@ -288,6 +315,9 @@ public:
 
     UPROPERTY()
     TArray<UEOSCue*> cues;
+
+    UPROPERTY()
+    TMap<int, UEOSGroup*> groups;
 
     UPROPERTY()
     int currentCue;

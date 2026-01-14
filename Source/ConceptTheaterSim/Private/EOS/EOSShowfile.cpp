@@ -497,3 +497,33 @@ bool UEOSFade::update(UEOSShowfile* showfile, double deltaTime)
     set->set(property, value + delta);
     return false;
 }
+
+UEOSGroup *UEOSGroup::FromJSON(TSharedPtr<FJsonObject> groupJson)
+{
+    UEOSGroup *group = NewObject<UEOSGroup>();
+    if(groupJson->HasField(JSON_NAME))
+        group->name = groupJson->GetStringField(JSON_NAME);
+    if(groupJson->HasField(JSON_CHS))
+    {
+        TArray<TSharedPtr<FJsonValue>> chsJson = groupJson->GetArrayField(JSON_CHS);
+        for(const TSharedPtr<FJsonValue>& j : chsJson)
+        {
+            group->channels.Add(static_cast<int>(j->AsNumber()));
+        }
+    }
+    return group;
+}
+
+TSharedPtr<FJsonObject> UEOSGroup::toJson()
+{
+    TSharedPtr<FJsonObject> groupJson = MakeShared<FJsonObject>();
+    if(name.Len() > 0)
+        groupJson->SetStringField(JSON_NAME, name);
+    TArray<TSharedPtr<FJsonValue>> chsJson;
+    for(const int& ch : channels)
+    {
+        chsJson.Add(MakeShareable(new FJsonValueNumber(ch)));
+    }
+    groupJson->SetArrayField(JSON_CHS, chsJson);
+    return groupJson;
+}

@@ -133,3 +133,31 @@ FString UEOSScreenBase::getCurrentCue()
         return TEXT("");
     return board->showfile->cues[board->showfile->currentCue]->cueNumber;
 }
+
+FName UEOSScreenBase::getEncoderProperty(int index)
+{
+    if(board == nullptr)
+        return FName("None");
+    return board->getEncoderProperty(index);
+}
+
+FName UEOSScreenBase::getEncoderCategory()
+{
+    if(board == nullptr)
+        return FName("None");
+    return board->getEncoderCategory();
+}
+
+int UEOSScreenBase::getEncoderPage()
+{
+    if(board == nullptr)
+        return 0;
+    return board->getEncoderPage();
+}
+
+int UEOSScreenBase::getEncoderMaxPage()
+{
+    if(board == nullptr)
+        return 0;
+    return board->getEncoderMaxPage();
+}

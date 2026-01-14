@@ -39,6 +39,9 @@ public:
 
     UPROPERTY()
     FString error;
+
+    UPROPERTY();
+    TArray<FName> cmd;
 };
 
 UCLASS()
@@ -79,9 +82,6 @@ protected:
 
     UFUNCTION(BlueprintCallable)
     TArray<int> outputUniverse(int universe);
-
-    UFUNCTION(BlueprintCallable)
-    void onButton(FName button);
 
     UFUNCTION()
     void executeCommand();
@@ -153,6 +153,24 @@ public:
     UFUNCTION(BlueprintCallable)
     double getCueTime() { return cueTime; }
 
+    UFUNCTION(BlueprintCallable)
+    FName getEncoderProperty(int index);
+
+    UFUNCTION(BlueprintCallable)
+    FName getEncoderCategory() { return encoderCategory; };
+
+    UFUNCTION(BlueprintCallable)
+    int getEncoderPage() { return encoderPage; };
+
+    UFUNCTION(BlueprintCallable)
+    int getEncoderMaxPage() { return encoderMaxPage; };
+
+    UFUNCTION(BlueprintCallable)
+    void setEncoderPage(FName category);
+
+    UFUNCTION(BlueprintCallable)
+    void onButton(FName button);
+
 private:
     UPROPERTY(VisibleInstanceOnly, Category="EOS", AdvancedDisplay)
     bool shift = false;
@@ -162,6 +180,19 @@ private:
     
     UPROPERTY(VisibleInstanceOnly, Category="EOS", AdvancedDisplay)
     FCmdSelection activeSelection;
+    
+    UPROPERTY(VisibleInstanceOnly, Category="EOS - Encoders", AdvancedDisplay)
+    TArray<FName> encoderProperties;
+    
+    UPROPERTY(VisibleInstanceOnly, Category="EOS - Encoders", AdvancedDisplay)
+    FName encoderCategory = FName("None");
+    UPROPERTY(VisibleInstanceOnly, Category="EOS - Encoders", AdvancedDisplay)
+    TSet<int> encoderSelection;
+    
+    UPROPERTY(VisibleInstanceOnly, Category="EOS - Encoders", AdvancedDisplay)
+    int encoderPage = 0;
+    UPROPERTY(VisibleInstanceOnly, Category="EOS - Encoders", AdvancedDisplay)
+    int encoderMaxPage = 0;
 
     UPROPERTY(VisibleInstanceOnly, Category="EOS", AdvancedDisplay)
     double followTime = -1;
@@ -210,4 +241,7 @@ private:
 
     UFUNCTION()
     void finishCommand(bool clear);
+
+    UFUNCTION()
+    void updateEncoderPage(bool changed);
 };

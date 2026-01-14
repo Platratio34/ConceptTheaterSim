@@ -41,6 +41,18 @@ protected:
     UFUNCTION(BlueprintCallable)
     FString getCurrentCue();
 
+    UFUNCTION(BlueprintCallable)
+    FName getEncoderProperty(int index);
+
+    UFUNCTION(BlueprintCallable)
+    FName getEncoderCategory();
+
+    UFUNCTION(BlueprintCallable)
+    int getEncoderPage();
+    
+    UFUNCTION(BlueprintCallable)
+    int getEncoderMaxPage();
+
     static TMap<FName, FString> getNamesToDisplay()
     {
         static bool namesToDisplayInit = false;

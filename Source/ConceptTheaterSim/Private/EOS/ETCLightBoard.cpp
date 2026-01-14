@@ -361,46 +361,39 @@ void AETCLightBoard::onInteractScroll(UPrimitiveComponent* component, double dir
     }
     else if (int *p = wheelsByMesh.Find(mesh))
     {
+        if(encoderSelection.Num() == 0)
+            return;
         int wheelIndex = *p;
         FName property = FName("None");
         double delta = 0.05;
         double min = 0;
         double max = 1;
-        if (wheelIndex == 1)
+        int encoderIndex = wheelIndex - 1 + (encoderPage * 6);
+        if(encoderProperties.Num() > encoderIndex)
         {
-            property = PROPERTY_PAN;
-            delta = 0.5;
-            min = -90;
-            max = 90;
+            property = encoderProperties[encoderIndex];
+            if(property == PROPERTY_PAN || property == PROPERTY_TILT)
+            {
+                delta = 0.5;
+                min = -90;
+                max = 90;
+            }
+            else if (property == PROPERTY_ZOOM)
+            {
+                delta = 0.5;
+                min = 10;
+                max = 50;
+            }
         }
-        else if (wheelIndex == 2)
-        {
-            property = PROPERTY_TILT;
-            delta = 0.5;
-            min = -90;
-            max = 90;
-        }
-        else if (wheelIndex == 3)
-        {
-            property = PROPERTY_RED;
-        }
-        else if (wheelIndex == 4)
-        {
-            property = PROPERTY_GREEN;
-        }
-        else if (wheelIndex == 5)
-        {
-            property = PROPERTY_BLUE;
-        }
-        if(property == FName("None"))
-            return;
-
-        if(!activeSelection.chan)
-            return;
         
-        for (int i = 0; i < activeSelection.values.Num(); i++)
+        UE_LOG(LogTemp, Display, TEXT("Encoder scroll: `%s`"), *property.ToString());
+        if(property == FName("None"))
         {
-            int ch = activeSelection.values[i];
+            return;
+        }
+        
+        for (const int& ch : encoderSelection)
+        {
             UEOSChannelView *chView = showfile->getChannel(ch);
             if(chView == nullptr)
                 continue;
@@ -411,6 +404,7 @@ void AETCLightBoard::onInteractScroll(UPrimitiveComponent* component, double dir
                 val = min;
             else if (val > max)
                 val = max;
+            UE_LOG(LogTemp, Display, TEXT("- new val: [%d] %f"), ch, val);
             showfile->setManualProperty(ch, property, val);
         }
     }
@@ -532,6 +526,8 @@ void AETCLightBoard::onInputOM(FKeyEvent event)
         onButton(BUTTON_SNEAK);
     else if(keyName == FName("U"))
         onButton(BUTTON_UPDATE);
+    else if(keyName == FName("E"))
+        onButton(BUTTON_RECALL_FROM);
     else if(keyName == FName("One"))
         onButton(BUTTON_SK1);
     else if(keyName == FName("Two"))
@@ -546,7 +542,7 @@ void AETCLightBoard::onInputOM(FKeyEvent event)
         onButton(BUTTON_SK6);
     else if(keyName == FName("Seven"))
         onButton(BUTTON_MORE_SK);
-    else if(keyName == FName("Space"))
+    else if(keyName == FName("SpaceBar"))
     {
         if(event.IsControlDown())
             onButton(BUTTON_BACK);
@@ -590,11 +586,40 @@ void AETCLightBoard::onButton(FName button)
         }
         return;
     }
+    else if (shift && button == BUTTON_SK1)
+    {
+        setEncoderPage(FName("Intensity"));
+        return;
+    }
+    else if (shift && button == BUTTON_SK2)
+    {
+        setEncoderPage(FName("Color"));
+        return;
+    }
+    else if (shift && button == BUTTON_SK3)
+    {
+        setEncoderPage(FName("Focus"));
+        return;
+    }
+    else if (shift && button == BUTTON_SK4)
+    {
+        setEncoderPage(FName("Form"));
+        return;
+    }
+    else if (shift && button == BUTTON_SK5)
+    {
+        setEncoderPage(FName("Image"));
+        return;
+    }
     
     if(clearCmd)
     {
         command.Empty();
         clearCmd = false;
+        if((button == BUTTON_FULL || button == BUTTON_OUT || button == BUTTON_AT || PROPERTIES.Contains(button)) && activeSelection.chan) {
+            for (int i = 0; i < activeSelection.cmd.Num(); i++)
+                command.Add(activeSelection.cmd[i]);
+        }
     }
     cmdComplete = false;
     
@@ -712,6 +737,7 @@ void AETCLightBoard::executeCommand()
             commandError = TEXT("Invalid selection: ") + activeSelection.error;
             return;
         }
+        updateEncoderPage(false);
         next++;
         UE_LOG(LogTemp, Display, TEXT("- Channel selection start"));
         UE_LOG(LogTemp, Display, TEXT("- next is %d (of %d)"), next, command.Num());
@@ -754,20 +780,48 @@ void AETCLightBoard::executeCommand()
             finishCommand(true);
             return;
         }
-        else if(command[next] == BUTTON_FULL || command[next] == BUTTON_OUT || command[next] == BUTTON_AT)
+        else if(command[next] == BUTTON_FULL || command[next] == BUTTON_OUT || command[next] == BUTTON_AT || PROPERTIES.Contains(command[next]))
         {
             FName action = command[next++];
             double v = (action == BUTTON_FULL) ? 1 : 0;
-            if(action == BUTTON_AT)
+            FName property = PROPERTY_INTENSITY;
+            if(PROPERTIES.Contains(action))
+                property = action;
+            if(action == BUTTON_AT || PROPERTIES.Contains(action))
             {
-                v = getCmdNumberD(next, &next);
-                next++;
-                if(v < 0 || v > 100)
+                if(command[next] == BUTTON_RECALL_FROM)
                 {
-                    commandError = TEXT("Value must be between 0-100");
-                    return;
+                    FCmdSelection sel2 = getCmdSelection(next, &next);
+                    if(!sel2.chan)
+                    {
+                        commandError = TEXT("Must select a channel");
+                        return;
+                    }
+                    UEOSChannelView *view = showfile->getChannel(sel2.values[0]);
+                    if(view == nullptr)
+                    {
+                        commandError = TEXT("Must select a valid channel");
+                        return;
+                    }
+                    if(!view->hasProperty(property))
+                    {
+                        commandError = TEXT("Channel does not have parameter");
+                        return;
+                    }
+                    v = view->getProperty(property);
+                    UE_LOG(LogTemp, Display, TEXT("- Recall from: %f"), v);
                 }
-                UE_LOG(LogTemp, Display, TEXT("- At: %f"), v);
+                else
+                {
+                    v = getCmdNumberD(next, &next);
+                    next++;
+                    if((v < 0 || v > 100) && property == PROPERTY_INTENSITY)
+                    {
+                        commandError = TEXT("Value must be between 0-100");
+                        return;
+                    }
+                    UE_LOG(LogTemp, Display, TEXT("- At: %f"), v);
+                }
             }
             float sneakTime = 0;
             if(command.Num() > next && command[next] == BUTTON_SNEAK)
@@ -789,9 +843,9 @@ void AETCLightBoard::executeCommand()
             {
                 int ch = activeSelection.values[i];
                 if(sneakTime == 0)
-                    showfile->setManualProperty(ch, PROPERTY_INTENSITY, v);
+                    showfile->setManualProperty(ch, property, v);
                 else
-                    showfile->addFade(ch, PROPERTY_INTENSITY, v, sneakTime, true, false);
+                    showfile->addFade(ch, property, v, sneakTime, true, false);
             }
             finishCommand(true);
             return;
@@ -928,6 +982,125 @@ void AETCLightBoard::finishCommand(bool clear)
     confirmCmd = false;
 }
 
+void AETCLightBoard::setEncoderPage(FName category)
+{
+    if(!activeSelection.chan || showfile == nullptr)
+    {
+        encoderProperties.Empty();
+        encoderPage = 0;
+        encoderMaxPage = 0;
+        encoderSelection.Empty();
+        encoderCategory = FName("None");
+        UE_LOG(LogTemp, Display, TEXT("Clearing encoder page"));
+        return;
+    }
+    TSet<int> newSel;
+    bool changed = false;
+    for (int i = 0; i < activeSelection.values.Num(); i++)
+    {
+        int ch = activeSelection.values[i];
+        if(showfile->patch.Contains(ch))
+        {
+            newSel.Add(ch);
+            if (!encoderSelection.Contains(ch))
+                changed = true;
+        }
+    }
+    changed |= encoderSelection.Num() != newSel.Num();
+
+    if (category == encoderCategory && !changed)
+    {
+        encoderPage++;
+        if (encoderPage > encoderMaxPage)
+            encoderPage = 0;
+        UE_LOG(LogTemp, Display, TEXT("Set encoder page to %s, %d of %d"), *encoderCategory.ToString(), encoderPage, encoderMaxPage);
+    }
+    else
+    {
+        encoderCategory = category;
+        updateEncoderPage(true);
+        UE_LOG(LogTemp, Display, TEXT("Reset encoder page to %s, %d of %d"), *encoderCategory.ToString(), encoderPage, encoderMaxPage);
+    }
+}
+
+void AETCLightBoard::updateEncoderPage(bool changed)
+{
+    if(encoderCategory == FName("None"))
+        return;
+    if(!activeSelection.chan || showfile == nullptr)
+    {
+        encoderProperties.Empty();
+        encoderPage = 0;
+        encoderMaxPage = 0;
+        encoderSelection.Empty();
+        encoderCategory = FName("None");
+        UE_LOG(LogTemp, Display, TEXT("Clearing encoder page"));
+        return;
+    }
+    TSet<int> newSel;
+    for (int i = 0; i < activeSelection.values.Num(); i++)
+    {
+        int ch = activeSelection.values[i];
+        if(showfile->patch.Contains(ch))
+        {
+            newSel.Add(ch);
+            if (!encoderSelection.Contains(ch))
+                changed = true;
+        }
+    }
+    changed |= encoderSelection.Num() != newSel.Num();
+    encoderSelection = newSel;
+    if (!changed)
+        return;
+    encoderPage = 0;
+    encoderMaxPage = 0;
+    encoderProperties.Empty();
+    TSet<FName> propSet;
+    if (encoderCategory == FName("Intensity"))
+    {
+        propSet = PROPERTIES_INTENSITY;
+    }
+    else if (encoderCategory == FName("Color"))
+    {
+        propSet = PROPERTIES_COLOR;
+    }
+    else if (encoderCategory == FName("Focus"))
+    {
+        propSet = PROPERTIES_FOCUS;
+    }
+    else if (encoderCategory == FName("Form"))
+    {
+        propSet = PROPERTIES_FORM;
+    }
+    else if (encoderCategory == FName("Image"))
+    {
+        propSet = PROPERTIES_IMAGE;
+    }
+
+    int b = 0;
+    for(const FName& property : propSet)
+    {
+        bool has = true;
+        for(const int& ch : encoderSelection)
+        {
+            if(!showfile->patch[ch]->hasProperty(property)) {
+                has = false;
+                break;
+            }
+        }
+        if(has)
+        {
+            encoderProperties.Add(property);
+            b++;
+            if(b > 6) {
+                b = 1;
+                encoderMaxPage++;
+            }
+        }
+    }
+    UE_LOG(LogTemp, Display, TEXT("New encoder pages generated, %d properties"), encoderProperties.Num());
+}
+
 int AETCLightBoard::getCmdNumber(int start, int* len)
 {
     int c = 0;
@@ -975,6 +1148,10 @@ int AETCLightBoard::getCmdNumber(int start, int* len)
         {
             c = (c * 10) + 9;
         }
+        else if(n == BUTTON_MINUS)
+        {
+            c *= -1;
+        }
         else
         {
             break;
@@ -990,6 +1167,7 @@ double AETCLightBoard::getCmdNumberD(int start, int* len)
     double c = 0;
     int l = 0;
     bool dec = false;
+    bool neg = false;
     double nextBase = 0.1;
     for (int i = start; i < command.Num(); i++)
     {
@@ -998,6 +1176,10 @@ double AETCLightBoard::getCmdNumberD(int start, int* len)
         if(n == BUTTON_DOT)
         {
             dec = true;
+        }
+        else if(n == BUTTON_MINUS)
+        {
+            neg = true;
         }
         else if(n == BUTTON_0)
         {
@@ -1059,6 +1241,8 @@ double AETCLightBoard::getCmdNumberD(int start, int* len)
     }
     if(len != nullptr)
         *len = l;
+    if (neg)
+        c *= -1;
     return c;
 }
 FString AETCLightBoard::getCmdNumberS(int start, int* len)
@@ -1140,6 +1324,7 @@ FCmdSelection AETCLightBoard::getCmdSelection(int start, int *end)
         selection.error = TEXT("No valid selector type");
         return selection;
     }
+    selection.cmd.Add(command[i]);
     i++;
     int itCount = 0;
     int cmdLength = command.Num();
@@ -1168,7 +1353,10 @@ FCmdSelection AETCLightBoard::getCmdSelection(int start, int *end)
             }
             i++;
             int p;
+            selection.cmd.Add(val);
             int n = getCmdNumber(i, &p);
+            for (int j = i; j < i + p; j++) 
+                selection.cmd.Add(command[j]);
             i += p;
             if(n > last)
             {
@@ -1202,7 +1390,10 @@ FCmdSelection AETCLightBoard::getCmdSelection(int start, int *end)
             }
             i++;
             int p;
+            selection.cmd.Add(val);
             int n = getCmdNumber(i, &p);
+            for (int j = i; j < i + p; j++) 
+                selection.cmd.Add(command[j]);
             i += p;
             last = n;
             selection.values.AddUnique(n);
@@ -1217,7 +1408,10 @@ FCmdSelection AETCLightBoard::getCmdSelection(int start, int *end)
             }
             i++;
             int p;
+            selection.cmd.Add(val);
             int n = getCmdNumber(i, &p);
+            for (int j = i; j < i + p; j++) 
+                selection.cmd.Add(command[j]);
             i += p;
             last = n;
             selection.values.Remove(n);
@@ -1227,6 +1421,8 @@ FCmdSelection AETCLightBoard::getCmdSelection(int start, int *end)
         {
             int p;
             int n = getCmdNumber(i, &p);
+            for (int j = i; j < i + p; j++) 
+                selection.cmd.Add(command[j]);
             if(p == 0)
             {
                 selection.error = TEXT("No values");
@@ -1424,4 +1620,12 @@ void AETCLightBoard::onTimecode(int frames)
     if(nextCue->timecode != frames)
         return;
     executeCue(nextI);
+}
+
+FName AETCLightBoard::getEncoderProperty(int index)
+{
+    index += encoderPage * 6;
+    if(encoderProperties.Num() <= index)
+        return FName("None");
+    return encoderProperties[index];
 }
