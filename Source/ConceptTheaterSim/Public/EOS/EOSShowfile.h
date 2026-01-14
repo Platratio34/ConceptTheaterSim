@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
 #include "JsonUtilities.h"
+#include "EOS/EOSPropertyType.h"
 #include "EOSShowfile.generated.h"
 
 /*
@@ -73,19 +74,31 @@ public:
     FString label;
 
     UPROPERTY()
-    TSet<FName> properties;
-
-    UPROPERTY()
-    TMap<FName, double> defaultValues;
+    TMap<FName, UEOSPropertyType *> properties;
 
     void addProperty(FName property)
     {
-        properties.Add(property);
+        properties.Add(property, UEOSPropertyType::Create(property));
     }
     void addProperty(FName property, double def)
     {
-        properties.Add(property);
-        defaultValues.Add(property, def);
+        properties.Add(property, UEOSPropertyType::Create(property, def));
+    }
+    void addProperty(UEOSPropertyType *propertyType)
+    {
+        properties.Add(propertyType->property, propertyType);
+    }
+    UEOSPropertyType* getProperty(FName property)
+    {
+        if(UEOSPropertyType** p = properties.Find(property))
+        {
+            return *p;
+        }
+        return nullptr;
+    }
+    bool hasProperty(FName property)
+    {
+        return properties.Contains(property);
     }
 };
 
@@ -112,7 +125,14 @@ public:
     {
         if (devices.Num() == 0)
             return false;
-        return devices[0]->properties.Contains(property);
+        return devices[0]->hasProperty(property);
+    }
+
+    UEOSPropertyType* getProperty(FName property)
+    {
+        if (devices.Num() == 0)
+            return nullptr;
+        return devices[0]->getProperty(property);
     }
 };
 

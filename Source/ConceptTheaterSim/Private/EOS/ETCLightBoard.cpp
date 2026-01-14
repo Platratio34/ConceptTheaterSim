@@ -399,11 +399,36 @@ void AETCLightBoard::onInteractScroll(UPrimitiveComponent* component, double dir
                 continue;
             if(!chView->hasProperty(property))
                 continue;
-            double val = chView->getProperty(property) + (direction * delta);
-            if(val < min)
-                val = min;
-            else if (val > max)
-                val = max;
+            UEOSPropertyType *propertyType = showfile->patch[ch]->getProperty(property);
+            double val = chView->getProperty(property);
+            if(propertyType->indexed)
+            {
+                double step = propertyType->indexStep(val);
+                if(step > 0)
+                {
+                    val += direction * step;
+                    if(val < propertyType->min)
+                        val = propertyType->max;
+                    else if (val > propertyType->max)
+                        val = propertyType->min;
+                }
+                else if(direction > 0)
+                {
+                    val = propertyType->nextIndex(val);
+                }
+                else if(direction < 0)
+                {
+                    val = propertyType->lastIndex(val);
+                }
+            }
+            else
+            {
+                val += (direction * propertyType->encoderStep);
+                if(val < propertyType->min)
+                    val = propertyType->min;
+                else if (val > propertyType->max)
+                    val = propertyType->max;
+            }
             UE_LOG(LogTemp, Display, TEXT("- new val: [%d] %f"), ch, val);
             showfile->setManualProperty(ch, property, val);
         }
@@ -547,7 +572,7 @@ void AETCLightBoard::onInputOM(FKeyEvent event)
         if(event.IsControlDown())
             onButton(BUTTON_BACK);
         else
-            onButton(BUTTON_CUE);
+            onButton(BUTTON_GO);
     }
 }
 

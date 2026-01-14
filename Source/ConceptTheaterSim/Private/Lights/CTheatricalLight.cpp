@@ -79,7 +79,7 @@ void ACTheatricalLight::OnConstruction(const FTransform &Transform)
         }
         if(light != nullptr)
         {
-            light->SetIntensity(maxIntensity);
+            light->SetIntensity(maxIntensity * intensityOverride);
             light->SetLightColor(tColor);
         }
         actualIntensity = 1;
@@ -183,7 +183,7 @@ void ACTheatricalLight::setIntensity(double newIntensity)
     if(intensityCurve != nullptr)
         actualIntensity = intensityCurve->GetFloatValue(actualIntensity);
     if(light != nullptr && !dummy)
-        light->SetIntensity(actualIntensity * maxIntensity);
+        light->SetIntensity(actualIntensity * maxIntensity * intensityOverride);
     if(lenseMaterialInstance != nullptr)
         lenseMaterialInstance->SetScalarParameterValue(FName("Intensity"), actualIntensity * lenseIntensityScalar);
     onLightUpdate();

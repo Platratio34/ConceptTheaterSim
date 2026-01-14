@@ -305,7 +305,7 @@ const TSet<FName> PROPERTIES = {
     PROPERTY_COLOR_MIX_SPEED,
     PROPERTY_COLOR_MIX,
     PROPERTY_BACKGROUND_COLOR_MIX};
-
+    
 class CONCEPTTHEATERSIM_API EOSPatchTypes
 {
 public:
@@ -329,7 +329,11 @@ public:
             patch->addProperty(PROPERTY_BLUE, 1);
             patch->addProperty(PROPERTY_INDIGO, 1);
             patch->addProperty(PROPERTY_STROBE);
-            patch->addProperty(PROPERTY_FAN, 0);
+            patch->addProperty(UEOSPropertyType::Create(PROPERTY_FAN, {
+                UEOSPropertyIndex::Create(FName("Auto"), 0, 0),
+                UEOSPropertyIndex::Create(FName("On"), 1, 254, true),
+                UEOSPropertyIndex::Create(FName("Full"), 255, 255)
+            }));
             return patch;
         }
         if(type == LIGHT_TYPE_ETC_COLOR_SOURCE_CYC_DIRECT)
@@ -347,8 +351,8 @@ public:
         if(type == LIGHT_TYPE_MAVERICK_MK3_PROFILE_54CH)
         {
             UEOSPatch *patch = UEOSPatch::Create(type, 54);
-            patch->addProperty(PROPERTY_PAN, 0);
-            patch->addProperty(PROPERTY_TILT, 0);
+            patch->addProperty(UEOSPropertyType::Create(PROPERTY_PAN, 0, -270, 270, 1));
+            patch->addProperty(UEOSPropertyType::Create(PROPERTY_TILT, 0, -90, 90, 1));
             patch->addProperty(PROPERTY_POSITION_MSPEED);
             patch->addProperty(PROPERTY_INTENSITY);
             patch->addProperty(PROPERTY_STROBE);
@@ -356,12 +360,76 @@ public:
             patch->addProperty(PROPERTY_MAGENTA, 0);
             patch->addProperty(PROPERTY_YELLOW, 0);
             patch->addProperty(PROPERTY_CT);
-            patch->addProperty(PROPERTY_COLOR_SELECT);
-            patch->addProperty(PROPERTY_GOBO_SELECT);
-            patch->addProperty(PROPERTY_GOBO_INDEX_SPEED);
-            patch->addProperty(PROPERTY_GOBO_SELECT_2);
+            patch->addProperty(UEOSPropertyType::Create(PROPERTY_COLOR_SELECT, {
+                UEOSPropertyIndex::Create(FName("Open"), 0, 7),
+                UEOSPropertyIndex::Create(FName("Red"), 8, 15),
+                UEOSPropertyIndex::Create(FName("Orange"), 16, 23),
+                UEOSPropertyIndex::Create(FName("Green"), 24, 31),
+                UEOSPropertyIndex::Create(FName("Yellow"), 32, 39),
+                UEOSPropertyIndex::Create(FName("Dark Blue"), 40, 47),
+                UEOSPropertyIndex::Create(FName("CTB"), 48, 59),
+                UEOSPropertyIndex::Create(FName("Indexed"), 60, 187, true),
+                UEOSPropertyIndex::Create(FName("Scroll"), 118, 2198, true),
+                UEOSPropertyIndex::Create(FName("Stop"), 220, 223),
+                UEOSPropertyIndex::Create(FName("Scroll Reverse"), 224, 255, true),
+            }));
+            patch->addProperty(UEOSPropertyType::Create(PROPERTY_GOBO_SELECT, {
+                UEOSPropertyIndex::Create(FName("Open"), 0, 7),
+                UEOSPropertyIndex::Create(FName("Gobo 1"), 8, 15),
+                UEOSPropertyIndex::Create(FName("Gobo 2"), 16, 23),
+                UEOSPropertyIndex::Create(FName("Gobo 3"), 24, 31),
+                UEOSPropertyIndex::Create(FName("Gobo 4"), 32, 39),
+                UEOSPropertyIndex::Create(FName("Gobo 5"), 40, 47),
+                UEOSPropertyIndex::Create(FName("Gobo 6"), 48, 55),
+                UEOSPropertyIndex::Create(FName("Gobo 7"), 56, 63),
+                UEOSPropertyIndex::Create(FName("Gobo 7 Shaking"), 64, 71),
+                UEOSPropertyIndex::Create(FName("Gobo 6 Shaking"), 72, 79),
+                UEOSPropertyIndex::Create(FName("Gobo 5 Shaking"), 80, 87),
+                UEOSPropertyIndex::Create(FName("Gobo 4 Shaking"), 88, 95),
+                UEOSPropertyIndex::Create(FName("Gobo 3 Shaking"), 96, 103),
+                UEOSPropertyIndex::Create(FName("Gobo 2 Shaking"), 104, 111),
+                UEOSPropertyIndex::Create(FName("Gobo 1 Shaking"), 112, 119),
+                UEOSPropertyIndex::Create(FName("Open"), 120, 127),
+                UEOSPropertyIndex::Create(FName("Scroll"), 128, 191, true),
+                UEOSPropertyIndex::Create(FName("Scroll Reverse"), 192, 255, true),
+            }));
+            patch->addProperty(UEOSPropertyType::Create(PROPERTY_GOBO_INDEX_SPEED, {
+                UEOSPropertyIndex::Create(FName("Index"), 0, 63, true),
+                UEOSPropertyIndex::Create(FName("Rotate"), 64, 145, true),
+                UEOSPropertyIndex::Create(FName("Stop"), 146, 149),
+                UEOSPropertyIndex::Create(FName("Rotate Reverse"), 150, 231, true),
+                UEOSPropertyIndex::Create(FName("Bounce"), 232, 255, true)
+            }));
+            patch->addProperty(UEOSPropertyType::Create(PROPERTY_GOBO_SELECT_2, {
+                UEOSPropertyIndex::Create(FName("Open"), 0, 5),
+                UEOSPropertyIndex::Create(FName("Gobo 1"), 6, 11),
+                UEOSPropertyIndex::Create(FName("Gobo 2"), 12, 17),
+                UEOSPropertyIndex::Create(FName("Gobo 3"), 18, 23),
+                UEOSPropertyIndex::Create(FName("Gobo 4"), 24, 29),
+                UEOSPropertyIndex::Create(FName("Gobo 5"), 30, 35),
+                UEOSPropertyIndex::Create(FName("Gobo 6"), 36, 41),
+                UEOSPropertyIndex::Create(FName("Gobo 7"), 42, 47),
+                UEOSPropertyIndex::Create(FName("Gobo 8"), 48, 53),
+                UEOSPropertyIndex::Create(FName("Gobo 9"), 54, 63),
+                UEOSPropertyIndex::Create(FName("Gobo 9 Shaking"), 64, 69),
+                UEOSPropertyIndex::Create(FName("Gobo 8 Shaking"), 70, 75),
+                UEOSPropertyIndex::Create(FName("Gobo 7 Shaking"), 76, 81),
+                UEOSPropertyIndex::Create(FName("Gobo 6 Shaking"), 82, 87),
+                UEOSPropertyIndex::Create(FName("Gobo 5 Shaking"), 88, 93),
+                UEOSPropertyIndex::Create(FName("Gobo 4 Shaking"), 94, 99),
+                UEOSPropertyIndex::Create(FName("Gobo 3 Shaking"), 100, 105),
+                UEOSPropertyIndex::Create(FName("Gobo 2 Shaking"), 106, 111),
+                UEOSPropertyIndex::Create(FName("Gobo 1 Shaking"), 112, 117),
+                UEOSPropertyIndex::Create(FName("Open"), 118, 127),
+                UEOSPropertyIndex::Create(FName("Scroll"), 128, 191, true),
+                UEOSPropertyIndex::Create(FName("Scroll Reverse"), 192, 255, true),
+            }));
             patch->addProperty(PROPERTY_ANIMATION_SELECT);
-            patch->addProperty(PROPERTY_ANIMATION_INDEX_SPEED);
+            patch->addProperty(UEOSPropertyType::Create(PROPERTY_ANIMATION_INDEX_SPEED, {
+                UEOSPropertyIndex::Create(FName("Rotate"), 0, 124, true),
+                UEOSPropertyIndex::Create(FName("Stop"), 125, 130),
+                UEOSPropertyIndex::Create(FName("Rotate Reverse"), 131, 255, true),
+            }));
             patch->addProperty(PROPERTY_SHUTTER_3_B);
             patch->addProperty(PROPERTY_SHUTTER_3_A);
             patch->addProperty(PROPERTY_SHUTTER_2_B);
@@ -374,15 +442,37 @@ public:
             patch->addProperty(PROPERTY_EDGE);
             patch->addProperty(PROPERTY_EDGE_MODE);
             patch->addProperty(PROPERTY_ZOOM);
-            patch->addProperty(PROPERTY_BEAM_FX_SELECT);
-            patch->addProperty(PROPERTY_BEAM_FX_INDEX_SPEED);
-            patch->addProperty(PROPERTY_BEAM_FX_SELECT_2);
-            patch->addProperty(PROPERTY_BEAM_FX_INDEX_SPEED_2);
+            patch->addProperty(UEOSPropertyType::Create(PROPERTY_BEAM_FX_SELECT, {
+                UEOSPropertyIndex::Create(FName("Open"), 0, 4),
+                UEOSPropertyIndex::Create(FName("Prism"), 5, 255)
+            }));
+            patch->addProperty(UEOSPropertyType::Create(PROPERTY_BEAM_FX_INDEX_SPEED, {
+                UEOSPropertyIndex::Create(FName("Index"), 0, 127, true),
+                UEOSPropertyIndex::Create(FName("Rotate"), 128, 189, true),
+                UEOSPropertyIndex::Create(FName("Stop"), 190, 193),
+                UEOSPropertyIndex::Create(FName("Rotate Reverse"), 194, 255, true)
+            }));
+            patch->addProperty(UEOSPropertyType::Create(PROPERTY_BEAM_FX_SELECT_2, {
+                UEOSPropertyIndex::Create(FName("Open"), 0, 4),
+                UEOSPropertyIndex::Create(FName("Prism"), 5, 255)
+            }));
+            patch->addProperty(UEOSPropertyType::Create(PROPERTY_BEAM_FX_INDEX_SPEED_2, {
+                UEOSPropertyIndex::Create(FName("Index"), 0, 127, true),
+                UEOSPropertyIndex::Create(FName("Rotate"), 128, 189, true),
+                UEOSPropertyIndex::Create(FName("Stop"), 190, 193),
+                UEOSPropertyIndex::Create(FName("Rotate Reverse"), 194, 255, true)
+            }));
             patch->addProperty(PROPERTY_IRIS);
             patch->addProperty(PROPERTY_DIFFUSION);
             patch->addProperty(PROPERTY_DIFFUSION_2);
-            patch->addProperty(PROPERTY_CRI);
-            patch->addProperty(PROPERTY_COLOR_MIX);
+            patch->addProperty(UEOSPropertyType::Create(PROPERTY_CRI, {
+                UEOSPropertyIndex::Create(FName("Open"), 0, 4),
+                UEOSPropertyIndex::Create(FName("CRI Filter"), 5, 189)
+            }));
+            patch->addProperty(UEOSPropertyType::Create(PROPERTY_COLOR_MIX, {
+                UEOSPropertyIndex::Create(FName("Open"), 0, 4),
+                UEOSPropertyIndex::Create(FName("Macro"), 5, 189)
+            }));
             patch->addProperty(PROPERTY_COLOR_MIX_SPEED);
             patch->addProperty(PROPERTY_POSITION_BLINK);
             return patch;
@@ -390,8 +480,8 @@ public:
         if(type == LIGHT_TYPE_MAVERICK_MK3_WASH_BASIC)
         {
             UEOSPatch *patch = UEOSPatch::Create(type, 21);
-            patch->addProperty(PROPERTY_PAN);
-            patch->addProperty(PROPERTY_TILT);
+            patch->addProperty(UEOSPropertyType::Create(PROPERTY_PAN, 0, -270, 270, 1));
+            patch->addProperty(UEOSPropertyType::Create(PROPERTY_TILT, 0, -90, 90, 1));
             patch->addProperty(PROPERTY_POSITION_MSPEED);
             patch->addProperty(PROPERTY_CT);
             patch->addProperty(PROPERTY_COLOR_MIX);

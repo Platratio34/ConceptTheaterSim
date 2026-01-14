@@ -54,8 +54,11 @@ public:
     UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Light")
     double intensity = 0;
 
-    UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category="Light")
+    UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category="Light")
     double maxIntensity = 1000;
+
+    UPROPERTY(BlueprintReadWrite, EditInstanceOnly, Category="Light")
+    double intensityOverride = 1;
 
     UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Light")
     FLinearColor color = FColor(255, 255, 255);
