@@ -53,6 +53,9 @@ protected:
     UFUNCTION(BlueprintCallable)
     int getEncoderMaxPage();
 
+    UFUNCTION(BlueprintCallable)
+    bool isSelected(int ch);
+
     static TMap<FName, FString> getNamesToDisplay()
     {
         static bool namesToDisplayInit = false;

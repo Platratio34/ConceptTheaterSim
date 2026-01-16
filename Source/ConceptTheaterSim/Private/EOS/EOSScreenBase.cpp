@@ -161,3 +161,10 @@ int UEOSScreenBase::getEncoderMaxPage()
         return 0;
     return board->getEncoderMaxPage();
 }
+
+bool UEOSScreenBase::isSelected(int ch)
+{
+    if(board == nullptr)
+        return false;
+    return board->isSelected(ch);
+}

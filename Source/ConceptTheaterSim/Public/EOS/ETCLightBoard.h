@@ -39,6 +39,8 @@ public:
 
     UPROPERTY()
     FString error;
+    UPROPERTY()
+    bool hadError = false;
 
     UPROPERTY();
     TArray<FName> cmd;
@@ -170,6 +172,9 @@ public:
 
     UFUNCTION(BlueprintCallable)
     void onButton(FName button);
+
+    UFUNCTION(BlueprintCallable)
+    bool isSelected(int ch);
 
 private:
     UPROPERTY(VisibleInstanceOnly, Category="EOS", AdvancedDisplay)

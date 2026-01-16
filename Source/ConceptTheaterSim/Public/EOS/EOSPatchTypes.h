@@ -352,7 +352,7 @@ public:
         {
             UEOSPatch *patch = UEOSPatch::Create(type, 54);
             patch->addProperty(UEOSPropertyType::Create(PROPERTY_PAN, 0, -270, 270, 1));
-            patch->addProperty(UEOSPropertyType::Create(PROPERTY_TILT, 0, -90, 90, 1));
+            patch->addProperty(UEOSPropertyType::Create(PROPERTY_TILT, 0, -135, 135, 1));
             patch->addProperty(PROPERTY_POSITION_MSPEED);
             patch->addProperty(PROPERTY_INTENSITY);
             patch->addProperty(PROPERTY_STROBE);
@@ -481,7 +481,7 @@ public:
         {
             UEOSPatch *patch = UEOSPatch::Create(type, 21);
             patch->addProperty(UEOSPropertyType::Create(PROPERTY_PAN, 0, -270, 270, 1));
-            patch->addProperty(UEOSPropertyType::Create(PROPERTY_TILT, 0, -90, 90, 1));
+            patch->addProperty(UEOSPropertyType::Create(PROPERTY_TILT, 0, -135, 135, 1));
             patch->addProperty(PROPERTY_POSITION_MSPEED);
             patch->addProperty(PROPERTY_CT);
             patch->addProperty(PROPERTY_COLOR_MIX);

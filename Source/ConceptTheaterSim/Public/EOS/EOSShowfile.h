@@ -337,7 +337,7 @@ public:
     TArray<UEOSCue*> cues;
 
     UPROPERTY()
-    TMap<int, UEOSGroup*> groups;
+    TMap<FString, UEOSGroup*> groups;
 
     UPROPERTY()
     int currentCue;
@@ -376,6 +376,7 @@ public:
     static inline FString JSON_PATCH_ADDRESS = TEXT("address");
 
     static inline FString JSON_CUES = TEXT("cues");
+    static inline FString JSON_GROUPS = TEXT("groups");
 
     static inline FString JSON_CURRENT_CUE = TEXT("currentCue");
 

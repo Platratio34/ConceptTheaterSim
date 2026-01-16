@@ -120,6 +120,14 @@ bool UEOSShowfile::loadFromJson(TSharedPtr<FJsonObject> showJson)
             cues.Add(cue);
         }
     }
+    if(showJson->HasField(JSON_GROUPS))
+    {
+        TSharedPtr<FJsonObject> groupsJson = showJson->GetObjectField(JSON_GROUPS);
+        for(const auto& pair : groupsJson->Values)
+        {
+            groups.Add(pair.Key, UEOSGroup::FromJSON(pair.Value->AsObject()));
+        }
+    }
     if(showJson->HasField(JSON_CURRENT_CUE))
         currentCue = showJson->GetNumberField(JSON_CURRENT_CUE);
     return true;
@@ -152,6 +160,14 @@ TSharedPtr<FJsonObject> UEOSShowfile::toJson()
         cuesJson.Add(MakeShared<FJsonValueObject>(cue->toJson()));
     }
     showJson->SetArrayField(JSON_CUES, cuesJson);
+
+    TSharedPtr<FJsonObject> groupsJson = MakeShared<FJsonObject>();
+    for(const auto& pair : groups)
+    {
+        groupsJson->SetObjectField(pair.Key, pair.Value->toJson());
+    }
+    showJson->SetObjectField(JSON_GROUPS, groupsJson);
+
     showJson->SetNumberField(JSON_CURRENT_CUE, currentCue);
 
     return showJson;

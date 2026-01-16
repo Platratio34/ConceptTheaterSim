@@ -112,7 +112,19 @@ public:
     
     UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Zoom & Focus")
     double zoom = 20;
+
+    UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category="Zoom & Focus")
+    double maxZoom = 180;
+    UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category="Zoom & Focus")
+    double minZoom = 0;
     
+    UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, AdvancedDisplay, Category="Zoom & Focus")
+    bool dynamicAttenuationDistance = false;
+    UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, AdvancedDisplay, Category="Zoom & Focus")
+    double maxZoomDistance = 3000;
+    UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, AdvancedDisplay, Category="Zoom & Focus")
+    double minZoomDistance = 5000;
+
     UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Zoom & Focus")
     bool simpleEdge = false;
 

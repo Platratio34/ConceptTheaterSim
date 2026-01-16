@@ -223,13 +223,18 @@ void ACTheatricalLight::setEdge(double newEdge)
 
 void ACTheatricalLight::setZoom(double newZoom)
 {
-    if(newZoom < 0)
-        newZoom = 0;
-    if(newZoom > 180)
-        newZoom = 180;
+    if(newZoom < minZoom)
+        newZoom = minZoom;
+    if(newZoom > maxZoom)
+        newZoom = maxZoom;
     zoom = newZoom;
+    double zoomP = (zoom - minZoom) / (maxZoom - minZoom);
     if(light != nullptr)
+    {
         light->SetOuterConeAngle(zoom * 0.5);
+        if(dynamicAttenuationDistance)
+            light->SetAttenuationRadius(minZoomDistance + zoomP * (maxZoomDistance - minZoomDistance));
+    }
     updateBeam();
 }
 

@@ -539,6 +539,12 @@ void AETCLightBoard::onInputOM(FKeyEvent event)
         onButton(BUTTON_ENTER);
     else if(keyName == FName("Add"))
         onButton(BUTTON_PLUS);
+    else if(keyName == FName("Subtract"))
+        onButton(BUTTON_MINUS);
+    else if(keyName == FName("Divide"))
+        onButton(BUTTON_SLASH);
+    else if(keyName == FName("Decimal"))
+        onButton(BUTTON_DOT);
     else if(keyName == FName("T"))
         onButton(BUTTON_THRU);
     else if(keyName == FName("F"))
@@ -553,6 +559,10 @@ void AETCLightBoard::onInputOM(FKeyEvent event)
         onButton(BUTTON_UPDATE);
     else if(keyName == FName("E"))
         onButton(BUTTON_RECALL_FROM);
+    else if(keyName == FName("R"))
+        onButton(event.IsControlDown() ? BUTTON_RECORD_ONLY : BUTTON_RECORD);
+    else if(keyName == FName("G"))
+        onButton(BUTTON_GROUP);
     else if(keyName == FName("One"))
         onButton(BUTTON_SK1);
     else if(keyName == FName("Two"))
@@ -568,12 +578,7 @@ void AETCLightBoard::onInputOM(FKeyEvent event)
     else if(keyName == FName("Seven"))
         onButton(BUTTON_MORE_SK);
     else if(keyName == FName("SpaceBar"))
-    {
-        if(event.IsControlDown())
-            onButton(BUTTON_BACK);
-        else
-            onButton(BUTTON_GO);
-    }
+        onButton(event.IsControlDown() ? BUTTON_BACK : BUTTON_GO);
 }
 
 void AETCLightBoard::onButton(FName button)
@@ -753,11 +758,11 @@ void AETCLightBoard::executeCommand()
         return;
     }
 
-    if(command[0] == CMD_CHAN)
+    if(command[0] == CMD_CHAN || command[0] == BUTTON_GROUP)
     {
         int next = 0;
         activeSelection = getCmdSelection(0, &next);
-        if(next == 0)
+        if(next == -1 || activeSelection.hadError)
         {
             commandError = TEXT("Invalid selection: ") + activeSelection.error;
             return;
@@ -817,7 +822,12 @@ void AETCLightBoard::executeCommand()
                 if(command[next] == BUTTON_RECALL_FROM)
                 {
                     FCmdSelection sel2 = getCmdSelection(next, &next);
-                    if(!sel2.chan)
+                    if(sel2.hadError)
+                    {
+                        commandError = sel2.error;
+                        return;
+                    }
+                    else if(!sel2.chan)
                     {
                         commandError = TEXT("Must select a channel");
                         return;
@@ -898,6 +908,50 @@ void AETCLightBoard::executeCommand()
             finishCommand(true);
             return;
         }
+        else if(command[next] == BUTTON_RECORD_ONLY)
+        {
+            next++;
+            if(command[next] == BUTTON_GROUP)
+            {
+                next++;
+                int l;
+                FString gId = getCmdNumberS(next, &l);
+                if(l == 0)
+                {
+                    commandError = TEXT("Must select group for record");
+                    return;
+                }
+                next += l;
+                UEOSGroup *group;
+                if(UEOSGroup** gp = showfile->groups.Find(gId))
+                {
+                    if(!confirmCmd)
+                    {
+                        confirmCmd = true;
+                        return;
+                    }
+                    group = *gp;
+                    group->channels.Empty();
+                }
+                else
+                {
+                    group = NewObject<UEOSGroup>();
+                    showfile->groups.Add(gId, group);
+                }
+                for(const int& ch : activeSelection.values)
+                {
+                    if(!showfile->patch.Contains(ch))
+                        continue;
+                    group->channels.Add(ch);
+                }
+                finishCommand(true);
+                return;
+            }
+            else if(command[next] == BUTTON_CUE)
+            {
+
+            }
+        }
     }
     else if (command[0] == BUTTON_SNEAK)
     {
@@ -954,6 +1008,11 @@ void AETCLightBoard::executeCommand()
             if(i > 0)
             {
                 FCmdSelection selection = getCmdSelection(0, nullptr);
+                if(selection.hadError)
+                {
+                    commandError = selection.error;
+                    return;
+                }
                 sel = &selection;
             }
 
@@ -1337,22 +1396,11 @@ FCmdSelection AETCLightBoard::getCmdSelection(int start, int *end)
     FCmdSelection selection;
     int i = start;
     int last = -1;
-    bool minus = false;
-    selection.chan = command[i] == CMD_CHAN;
-    selection.cue = command[i] == BUTTON_CUE;
-    selection.sub = command[i] == BUTTON_SUB;
-    selection.group = command[i] == BUTTON_GROUP;
-    if(!(selection.chan || selection.cue || selection.sub || selection.group))
-    {
-        if(end != nullptr)
-            *end = i-2;
-        selection.error = TEXT("No valid selector type");
-        return selection;
-    }
-    selection.cmd.Add(command[i]);
-    i++;
     int itCount = 0;
     int cmdLength = command.Num();
+    bool minus = false;
+    bool thru = false;
+
     while (i < cmdLength)
     {
         itCount++;
@@ -1366,100 +1414,159 @@ FCmdSelection AETCLightBoard::getCmdSelection(int start, int *end)
                 selection.error += FString::FromInt(selection.values[j]);
             }
             selection.error += TEXT("}");
-            break;
+            selection.hadError = true;
+            if(end != nullptr)
+                *end = -1;
+            return selection;
         }
-        FName val = command[i];
-        if(val == BUTTON_THRU)
+
+        if(command[i] == BUTTON_PLUS)
         {
-            if(last == -1)
+            if(thru)
             {
-                selection.error = TEXT("Found tru first");
-                break;
+                selection.error = TEXT("Invalid selection: Found + where not expected");
+                selection.hadError = true;
+                if(end != nullptr)
+                    *end = -1;
+                return selection;
             }
+            minus = false;
             i++;
-            int p;
-            selection.cmd.Add(val);
-            int n = getCmdNumber(i, &p);
-            for (int j = i; j < i + p; j++) 
-                selection.cmd.Add(command[j]);
-            i += p;
-            if(n > last)
+        }
+        else if(command[i] == BUTTON_THRU)
+        {
+            if(thru)
             {
-                for (int j = last; j <= n; j++)
+                selection.error = TEXT("Invalid selection: Duplicate thru");
+                selection.hadError = true;
+                if(end != nullptr)
+                    *end = -1;
+                return selection;
+            }
+            thru = true;
+            i++;
+        }
+        else if(command[i] == BUTTON_MINUS)
+        {
+            if(thru)
+            {
+                selection.error = TEXT("Invalid selection: Found - where not expected");
+                selection.hadError = true;
+                if(end != nullptr)
+                    *end = -1;
+                return selection;
+            }
+            minus = true;
+            i++;
+        }
+        else if(command[i] == CMD_CHAN)
+        {
+            selection.chan = true;
+            i++;
+        }
+        else if(command[i] == BUTTON_GROUP)
+        {
+            selection.chan = true;
+            i++;
+            int len;
+            FString group = getCmdNumberS(i, &len);
+            if(len == 0)
+            {
+                selection.error = TEXT("Invalid selection: Missing group");
+                selection.hadError = true;
+                if(end != nullptr)
+                    *end = -1;
+                return selection;
+            }
+            i += len;
+            if(UEOSGroup** p2 = showfile->groups.Find(group))
+            {
+                UEOSGroup *g = *p2;
+                for(const int& ch : g->channels)
                 {
                     if(minus)
-                        selection.values.Remove(j);
+                        selection.values.Remove(ch);
                     else
-                        selection.values.AddUnique(j);
+                        selection.values.AddUnique(ch);
                 }
+                last = -1;
+                minus = false;
             }
             else
             {
-                for (int j = last; j >= n; j--)
+                selection.error = TEXT("Invalid selection: Unknown group");
+                selection.hadError = true;
+                if(end != nullptr)
+                    *end = -1;
+                return selection;
+            }
+        }
+        else if(UEOSButton::isNumeric(command[i]))
+        {
+            if(!selection.chan)
+            {
+                selection.error = TEXT("Invalid selection: Unknown type");
+                selection.hadError = true;
+                if(end != nullptr)
+                    *end = -1;
+                return selection;
+            }
+            int len;
+            int n = getCmdNumber(i, &len);
+            if(len == 0)
+            {
+                selection.error = TEXT("Invalid selection: Missing value");
+                selection.hadError = true;
+                if(end != nullptr)
+                    *end = -1;
+                return selection;
+            }
+            if(thru)
+            {
+                if(last == -1)
+                {
+                    selection.error = TEXT("Invalid thru: Only applicable to channels");
+                    selection.hadError = true;
+                    if(end != nullptr)
+                        *end = -1;
+                    return selection;
+                }
+                bool pos = n > last;
+                int s = pos ? last : n;
+                int e = pos ? n : last;
+                for (int j = s; j <= e; j++)
                 {
                     if(minus)
                         selection.values.Remove(j);
                     else
                         selection.values.AddUnique(j);
                 }
+                thru = false;
             }
+            else if (minus)
+                selection.values.Remove(n);
+            else
+                selection.values.AddUnique(n);
             last = n;
-            minus = false;
-        }
-        else if(val == BUTTON_PLUS)
-        {
-            if(last == -1)
-            {
-                selection.error = TEXT("Found + first");
-                break;
-            }
-            i++;
-            int p;
-            selection.cmd.Add(val);
-            int n = getCmdNumber(i, &p);
-            for (int j = i; j < i + p; j++) 
-                selection.cmd.Add(command[j]);
-            i += p;
-            last = n;
-            selection.values.AddUnique(n);
-            minus = false;
-        }
-        else if(val == BUTTON_MINUS)
-        {
-            if(last == -1)
-            {
-                selection.error = TEXT("Found + first");
-                break;
-            }
-            i++;
-            int p;
-            selection.cmd.Add(val);
-            int n = getCmdNumber(i, &p);
-            for (int j = i; j < i + p; j++) 
-                selection.cmd.Add(command[j]);
-            i += p;
-            last = n;
-            selection.values.Remove(n);
-            minus = true;
+            i += len;
         }
         else
         {
-            int p;
-            int n = getCmdNumber(i, &p);
-            for (int j = i; j < i + p; j++) 
-                selection.cmd.Add(command[j]);
-            if(p == 0)
-            {
-                selection.error = TEXT("No values");
-                break;
-            }
-            i += p;
-            last = n;
-            selection.values.AddUnique(n);
+            break;
         }
     }
-    if(end != nullptr)
-        *end = i-1;
+    if(!selection.chan)
+    {
+        if (end != nullptr)
+            *end = start;
+        return selection;
+    }
+    for (int j = start; j < i; j++)
+    {
+        selection.cmd.Add(command[j]);
+    }
+    if (end != nullptr)
+        *end = i - 1;
     return selection;
 }
 
@@ -1653,4 +1760,16 @@ FName AETCLightBoard::getEncoderProperty(int index)
     if(encoderProperties.Num() <= index)
         return FName("None");
     return encoderProperties[index];
+}
+
+bool AETCLightBoard::isSelected(int ch)
+{
+    if(!activeSelection.chan)
+        return false;
+    for(const int& c : activeSelection.values)
+    {
+        if(c == ch)
+            return true;
+    }
+    return false;
 }
