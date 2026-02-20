@@ -24,11 +24,7 @@ bool UEOSShowfile::patchLight(int ch, UEOSPatch* light)
         set = s;
         patch.Add(ch, s);
         UEOSPropertySet* propSet = UEOSPropertySet::Create();
-        for(const auto& pair : light->properties)
-        {
-            propSet->add(pair.Key, pair.Value->def);
-        }
-        channels.Add(ch, propSet);
+        channels.Add(ch, UEOSPropertySet::Create());
     }
     else
     {
@@ -338,7 +334,7 @@ void UEOSShowfile::setCueProperty(int ch, FName property, float value)
 {
     if(!channels.Contains(ch))
         return;
-    channels[ch]->set(property, value);
+    channels[ch]->add(property, value);
     clearFade(ch, property, false);
 }
 void UEOSShowfile::setCueProperties(int ch, UEOSPropertySet* properties)
@@ -347,7 +343,7 @@ void UEOSShowfile::setCueProperties(int ch, UEOSPropertySet* properties)
         channels.Add(ch, UEOSPropertySet::Create());
     for(TPair<FName, float> pair : properties->properties)
     {
-        channels[ch]->set(pair.Key, pair.Value);
+        channels[ch]->add(pair.Key, pair.Value);
     }
     for (int i = 0; i < fades.Num(); i++)
     {
@@ -382,7 +378,14 @@ float UEOSChannelView::getProperty(FName property)
             return set->get(property);
         }
     }
-    return showfile->getCueChannel(channel)->get(property);
+    if(UEOSPropertySet* set = showfile->getCueChannel(channel))
+    {
+        if(set->has(property))
+        {
+            return set->get(property);
+        }
+    }
+    return showfile->patch[channel]->getDefault(property);
 }
 FName UEOSChannelView::propertySource(FName property)
 {
@@ -393,21 +396,22 @@ FName UEOSChannelView::propertySource(FName property)
             return FName("Manual");
         }
     }
-    return FName("Cue");
-}
-bool UEOSChannelView::hasProperty(FName property)
-{
-    if(UEOSPropertySet* set = showfile->getManualChannel(channel))
+    if(UEOSPropertySet* set = showfile->getCueChannel(channel))
     {
         if(set->has(property))
         {
-            return true;
+            return FName("Cue");
         }
     }
-    return showfile->getCueChannel(channel)->has(property);
+    return FName("Default");
 }
-void UEOSChannelView::getKeys(TArray<FName> outKeys)
+bool UEOSChannelView::hasProperty(FName property)
 {
+    return showfile->patch[channel]->hasProperty(property);
+}
+void UEOSChannelView::getKeys(TArray<FName>& outKeys)
+{
+    showfile->patch[channel]->getProperties(outKeys);
     showfile->getCueChannel(channel)->properties.GetKeys(outKeys);
 }
 
@@ -486,7 +490,7 @@ bool UEOSFade::update(UEOSShowfile* showfile, double deltaTime)
     if(manual)
     {
         if(sneak)
-            target = set->get(property);
+            target = set->get(property, showfile->patch[channel]->getDefault(property));
         set = showfile->getManualChannel(channel);
     }
     double value = set->get(property);
@@ -503,11 +507,11 @@ bool UEOSFade::update(UEOSShowfile* showfile, double deltaTime)
         }
         else
         {
-            set->set(property, target);
+            set->add(property, target);
         }
         return true;
     }
-    set->set(property, value + delta);
+    set->add(property, value + delta);
     return false;
 }
 

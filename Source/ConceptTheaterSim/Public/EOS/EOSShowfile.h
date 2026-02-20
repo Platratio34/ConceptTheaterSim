@@ -134,6 +134,23 @@ public:
             return nullptr;
         return devices[0]->getProperty(property);
     }
+
+    double getDefault(FName property)
+    {
+        if (devices.Num() == 0)
+            return 0;
+        UEOSPropertyType* p = devices[0]->getProperty(property);
+        if(p == nullptr)
+            return 0;
+        return p->def;
+    }
+
+    void getProperties(TArray<FName>& outKeys)
+    {
+        if (devices.Num() == 0)
+            return;
+        devices[0]->properties.GetKeys(outKeys);
+    }
 };
 
 UCLASS()
@@ -163,6 +180,15 @@ public:
         }
         UE_LOG(LogTemp, Warning, TEXT("Tried to get property %s from set, but it was not present"), *property.ToString());
         return 0;
+    }
+
+    double get(FName property, double def)
+    {
+        if(double* v = properties.Find(property))
+        {
+            return *v;
+        }
+        return def;
     }
 
     void set(FName property, double value)
@@ -264,7 +290,7 @@ public:
         return view;
     }
 
-    void getKeys(TArray<FName> outKeys);
+    void getKeys(TArray<FName>& outKeys);
 
     UFUNCTION(BlueprintCallable)
     bool hasProperty(FName property);
