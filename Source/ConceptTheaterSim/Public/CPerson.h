@@ -125,7 +125,7 @@ class CONCEPTTHEATERSIM_API UPersonClothingAsset : public UPrimaryDataAsset
     GENERATED_BODY()
 
 public:
-    UPROPERTY(EditAnywhere, Category="Default")
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Default")
     FText displayName;
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Default")
@@ -200,13 +200,13 @@ struct CONCEPTTHEATERSIM_API FPersonClothing
 
 public:
 
-    UPROPERTY(EditAnywhere)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
     UPersonClothingAsset* asset;
 
-    UPROPERTY(EditAnywhere)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
     TArray<UMaterialInterface*> materialOverrides;
 
-    UPROPERTY(EditAnywhere, BlueprintReadOnly)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
     FName name;
 };
 
@@ -360,6 +360,12 @@ public:
 
     UFUNCTION(BlueprintCallable)
     void hideClothing(FName item, bool hidden);
+
+    UFUNCTION(BlueprintCallable)
+    void updateClothing();
+
+    UFUNCTION(BlueprintCallable)
+    void setBodyType(EPersonBodyType newType);
 
 private:
 

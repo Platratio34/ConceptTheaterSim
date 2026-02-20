@@ -376,3 +376,14 @@ void ACPerson::hideClothing(FName item, bool hidden)
     hiddenClothing.Add(item, hidden);
     updateMeshes();
 }
+
+void ACPerson::updateClothing() {
+    updateMeshes();
+    updateHeight();
+}
+
+void ACPerson::setBodyType(EPersonBodyType newType) {
+    bodyType = newType;
+    updateMeshes();
+    updateHeight();
+}
