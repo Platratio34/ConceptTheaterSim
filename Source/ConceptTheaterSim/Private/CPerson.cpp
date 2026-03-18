@@ -297,6 +297,21 @@ void ACPerson::updateMeshes()
             clothingMeshComponentsVisible[i] = true;
             for (int index = 0; index < clothingAsset->defaultMaterials.Num(); index++)
             {
+                if(c.materialInstanceOverrides.Num() > index) {
+                    FClothingMaterialInstance &inst = c.materialInstanceOverrides[index];
+                    if(inst.base != nullptr) {
+                        UClothingMaterial* base = inst.base;
+                        if(inst.isColored && base->isColorable) {
+                            UMaterialInstanceDynamic* mat = UMaterialInstanceDynamic::Create(base->material, this);
+                            mat->SetVectorParameterValue(base->colorParameter, inst.color);
+                            inst.material = mat;
+                        } else {
+                            inst.material = base->material;
+                        }
+                        meshComponent->SetMaterial(index, inst.material);
+                        continue;
+                    }
+                }
                 meshComponent->SetMaterial(index, clothingAsset->getMaterial(index, c.materialOverrides, skinMaterialInstance));
             }
         }
@@ -375,6 +390,7 @@ void ACPerson::hideClothing(FName item, bool hidden)
     }
     hiddenClothing.Add(item, hidden);
     updateMeshes();
+    updateHeight();
 }
 
 void ACPerson::updateClothing() {
@@ -386,4 +402,47 @@ void ACPerson::setBodyType(EPersonBodyType newType) {
     bodyType = newType;
     updateMeshes();
     updateHeight();
+}
+
+void ACPerson::setHeight(float newHeight) {
+    height = newHeight;
+    updateHeight();
+}
+
+
+void ACPerson::setSkinColor(FColor newColor) {
+    skinColor = newColor;
+    skinMaterialInstance->SetVectorParameterValue(FName("Skin Color"), skinColor);
+}
+
+void ACPerson::setEyeColor(FColor newColor) {
+    eyeColor = newColor;
+    eyeMaterialInstance->SetVectorParameterValue(FName("EyeColor"), eyeColor);
+}
+
+void ACPerson::setHairColor(FColor newColor) {
+    hairColor = newColor;
+    if(hairMaterialInstance == nullptr || !IsValid(hairMaterialInstance))
+        return;
+    hairMaterialInstance->SetVectorParameterValue(FName("HairColor"), hairColor);
+}
+
+void ACPerson::setHairType(int newHair) {
+    hairType = FMath::Clamp(hairType, -1, hairMeshes.Num() - 1);
+    if(hairType >= 0)
+    {
+        if(hairMeshes.Num() > 0 && hairMeshes[hairType] != nullptr)
+            hairMeshComponent->SetStaticMesh(hairMeshes[hairType]);
+        setMeshVisible(hairMeshComponent, true);
+        if(hairMaterialInstance == nullptr || !IsValid(hairMaterialInstance))
+        {
+            hairMaterialInstance = UMaterialInstanceDynamic::Create(hairMaterial, this);
+        }
+        hairMaterialInstance->SetVectorParameterValue(FName("HairColor"), hairColor);
+        hairMeshComponent->SetMaterial(0, hairMaterialInstance);
+    }
+    else
+    {
+        setMeshVisible(hairMeshComponent, false);
+    }
 }

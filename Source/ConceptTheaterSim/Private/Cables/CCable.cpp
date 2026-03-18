@@ -291,9 +291,12 @@ void ACCable::updateCable()
                 endMesh->SetVisibility(false);
                 splineStart = startMesh->GetComponentTransform().TransformPosition(startOffset);
             }
-            else
+            else if(player != nullptr)
             {
                 splineStart = player->GetActorLocation();
+            } else {
+                startMesh->SetVisibility(false);
+                spline->SetVisibility(false);
             }
             if(endConnector != nullptr)
             {
@@ -303,9 +306,12 @@ void ACCable::updateCable()
                 startMesh->SetVisibility(false);
                 splineEnd = endMesh->GetComponentTransform().TransformPosition(endOffset);
             }
-            else
+            else if(player != nullptr)
             {
                 splineEnd = player->GetActorLocation();
+            } else {
+                endMesh->SetVisibility(false);
+                spline->SetVisibility(false);
             }
         }
 

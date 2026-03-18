@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
 #include "Animation/CAnimationComponent.h"
+#include "Person/ClothingMaterial.h"
 #include "CPerson.generated.h"
 
 UENUM(BlueprintType)
@@ -207,6 +208,9 @@ public:
     TArray<UMaterialInterface*> materialOverrides;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    TArray<FClothingMaterialInstance> materialInstanceOverrides;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
     FName name;
 };
 
@@ -366,6 +370,21 @@ public:
 
     UFUNCTION(BlueprintCallable)
     void setBodyType(EPersonBodyType newType);
+
+    UFUNCTION(BlueprintCallable)
+    void setHeight(float newHeight);
+
+    UFUNCTION(BlueprintCallable)
+    void setSkinColor(FColor newColor);
+
+    UFUNCTION(BlueprintCallable)
+    void setEyeColor(FColor newColor);
+
+    UFUNCTION(BlueprintCallable)
+    void setHairColor(FColor newColor);
+
+    UFUNCTION(BlueprintCallable)
+    void setHairType(int newHair);
 
 private:
 
