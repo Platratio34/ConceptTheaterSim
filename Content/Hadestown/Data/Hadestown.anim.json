@@ -1,3 +1,45 @@
 {
-    "tracks": {}
+    "tracks": {
+        "Hermes": {
+            "events": [
+                { "time": "00:00:00:01", "x": "-35'", "y": "-2'", "z": 0, "xRot": 0, "yRot": 0, "zRot": -90, "parent": "", "visibility": true},
+                { "time": "00:00:30:00", "duration": 1, "x": "-25'", "y": "-3'6", "z": 32},
+                { "time": "00:00:31:00", "duration": 2, "x": "-15'", "zRot": 0}
+            ]
+        },
+        "Orpheus": {
+            "events": [
+                { "time": "00:00:00:01", "x": "-2'6", "y": "-18'", "z": 8, "xRot": 0, "yRot": 0, "zRot": 0, "parent": "", "visibility": true},
+                { "time": "00:00:00:02", "parent": "Outer Revolve"}
+            ]
+        },
+        "Fate 1": {
+            "events": [
+                { "time": "00:00:00:01", "x": "33'", "y": "-2'", "z": 0, "xRot": 0, "yRot": 0, "zRot": 90, "parent": "", "visibility": true},
+                { "time": "00:01:40:00", "end": "00:01:45:00", "x": "12'", "y": "-3'6", "z": 32, "zRot": 0},
+                { "time": "00:01:52:00", "end": "00:01:58:00", "x": "-8'", "y": "-21'", "z": 32, "zRot": -5}
+            ]
+        },
+        "Fate 2": {
+            "events": [
+                { "time": "00:00:00:01", "x": "35'", "y": "-2'", "z": 0, "xRot": 0, "yRot": 0, "zRot": 90, "parent": "", "visibility": true},
+                { "time": "00:01:40:00", "end": "00:01:45:00", "x": "15'", "y": "-3'6", "z": 32, "zRot": 0},
+                { "time": "00:01:52:00", "end": "00:01:58:00", "x": "0'", "y": "-24'6", "z": 32, "zRot": 0}
+            ]
+        },
+        "Fate 3": {
+            "events": [
+                { "time": "00:00:00:01", "x": "37'", "y": "-2'", "z": 0, "xRot": 0, "yRot": 0, "zRot": 90, "parent": "", "visibility": true},
+                { "time": "00:01:40:00", "end": "00:01:45:00", "x": "18'", "y": "-3'6", "z": 32, "zRot": 0},
+                { "time": "00:01:52:00", "end": "00:01:58:00", "x": "8'", "y": "-21'", "z": 32, "zRot": 5}
+            ]
+        },
+        "Persephone": {
+            "events": [
+                { "time": "00:00:00:01", "x": "-4", "y": "-33'6", "z": 56, "xRot": 0, "yRot": 0, "zRot": 0, "parent": "", "visibility": true},
+                { "time": "00:01:58:15", "end": "00:02:07:15", "x": "-0'6", "y": "-16'", "z": 8, "zRot": 0},
+                { "time": "00:02:07:16", "parent": "Outer Revolve"}
+            ]
+        }
+    }
 }
