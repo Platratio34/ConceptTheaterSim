@@ -102,6 +102,20 @@ void ACAnimationMaster::reloadFile()
         nextEvent.Add(FName(*key), 0);
     }
 
+    if(jsonObject->HasField(TEXT("keyTracks"))) {
+        TSharedPtr<FJsonObject> keyTracksField = jsonObject->GetObjectField(TEXT("keyTracks"));
+        TArray<FString> keyTrackKeys;
+        keyTracksField->Values.GetKeys(keyTrackKeys);
+        for(const FString& key : keyTrackKeys) {
+            FName name = FName(*key);
+            UAnimationTrack *t = UAnimationTrack::fromJSON(keyTracksField->GetObjectField(key));
+            keyTracks.Add(name, t);
+            if(animatedObjects.Contains(name)) {
+                animatedObjects[name]->setTrack(t);
+            }
+        }
+    }
+
     // reset/setup
     animationFile = animFile;
     animationFileLoaded = true;
@@ -111,6 +125,7 @@ void ACAnimationMaster::reloadFile()
 
 void ACAnimationMaster::onTimeUpdate(int frames, float seconds)
 {
+    lastFrame = frames;
     if(!animationFileLoaded)
         return;
     
@@ -159,6 +174,9 @@ void ACAnimationMaster::registerAnimatedObject(FName id, UCAnimationComponent* c
     animatedObjects.Add(id, component);
     registerParentObject(id, component->GetOwner()->GetRootComponent());
     first = true;
+    if(keyTracks.Contains(id)) {
+        component->setTrack(keyTracks[id]);
+    }
 }
 
 void ACAnimationMaster::registerParentObject(FName id, USceneComponent* parent)

@@ -54,6 +54,26 @@ void UCAnimationComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
     {
         return;
     }
+    if(track != nullptr) {
+        int frame = master->lastFrame;
+        AActor *ow = GetOwner();
+        FVector cPos;
+        cPos.X = xPosTrack->getValueTracked(frame) * IN_TO_CM;
+        cPos.Y = yPosTrack->getValueTracked(frame) * IN_TO_CM;
+        cPos.Z = zPosTrack->getValueTracked(frame) * IN_TO_CM;
+        if(!(xPosTrack->blocked && yPosTrack->blocked && zPosTrack->blocked)) {
+            ow->SetActorRelativeLocation(cPos);
+        }
+
+        FRotator cRot;
+        cRot.Roll = xRotTrack->getValueTracked(frame);
+        cRot.Pitch = yRotTrack->getValueTracked(frame);
+        cRot.Yaw = zRotTrack->getValueTracked(frame);
+        if(!(xRotTrack->blocked && yRotTrack->blocked && zRotTrack->blocked)) {
+            ow->SetActorRelativeRotation(cRot);
+        }
+        return;
+    }
 
     AActor *ow = GetOwner();
     // FEulerTransform transform = ow->GetRootComponent()->GetRelativeTransform();
@@ -73,8 +93,25 @@ void UCAnimationComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
         ow->SetActorRelativeRotation(cRot);
 }
 
+void UCAnimationComponent::setTrack(UAnimationTrack *newTrack) {
+    track = newTrack;
+    if(track == nullptr)
+        return;
+    
+    xPosTrack = track->properties[FName("x")];
+    yPosTrack = track->properties[FName("y")];
+    zPosTrack = track->properties[FName("z")];
+    
+    xRotTrack = track->properties[FName("xRot")];
+    yRotTrack = track->properties[FName("yRot")];
+    zRotTrack = track->properties[FName("zRot")];
+}
+
 void UCAnimationComponent::onEvent(FAnimationFileTrackEvent event)
 {   
+    if(track != nullptr)
+        return;
+    
     if(event.visibleKey)
     {
         if(!event.visible)

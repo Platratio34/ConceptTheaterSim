@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "TimeCodeSourceC.h"
 #include "JsonUtilities.h"
+#include "Animation/AnimationTrack.h"
 #include "CAnimationMaster.generated.h"
 
 DECLARE_LOG_CATEGORY_EXTERN(AnimationLog, Log, All);
@@ -514,6 +515,9 @@ public:
         return nullptr;
     }
 
+    UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly)
+    int lastFrame = 0;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -528,7 +532,10 @@ protected:
     FAnimationFile animationFile;
     UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly)
     bool animationFileLoaded = false;
-    
+
+    UPROPERTY(VisibleInstanceOnly)
+    TMap<FName, UAnimationTrack *> keyTracks;
+
     UPROPERTY(VisibleInstanceOnly)
     TMap<FName, int> nextEvent;
 

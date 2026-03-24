@@ -42,6 +42,8 @@ public:
     UPROPERTY(EditAnywhere)
     bool dummy = false;
 
+    void setTrack(UAnimationTrack *track);
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -57,6 +59,23 @@ protected:
     {
         meshes.Remove(mesh);
     }
+
+    UPROPERTY()
+    UAnimationTrack *track = nullptr;
+    
+    UPROPERTY()
+    UAnimationTrackPropertyTrack *xPosTrack;
+    UPROPERTY()
+    UAnimationTrackPropertyTrack *yPosTrack;
+    UPROPERTY()
+    UAnimationTrackPropertyTrack *zPosTrack;
+    
+    UPROPERTY()
+    UAnimationTrackPropertyTrack *xRotTrack;
+    UPROPERTY()
+    UAnimationTrackPropertyTrack *yRotTrack;
+    UPROPERTY()
+    UAnimationTrackPropertyTrack *zRotTrack;
 
 private:
     UPROPERTY()
