@@ -109,6 +109,7 @@ void ACTheatricalLight::OnConstruction(const FTransform &Transform)
     if(positionActor != nullptr) {
         FVector p = positionActor->getHangLocation(positionDistance);
         SetActorLocation(p);
+        SetActorRotation(positionActor->getHangRotation(positionDistance));
     }
 }
 
@@ -120,6 +121,7 @@ void ACTheatricalLight::BeginPlay()
     if(positionActor != nullptr) {
         FVector p = positionActor->getHangLocation(positionDistance);
         SetActorLocation(p);
+        SetActorRotation(positionActor->getHangRotation(positionDistance));
         root->AttachToComponent(positionActor->GetRootComponent(), FAttachmentTransformRules::KeepWorldTransform);
     }
     else if(parentActor != nullptr)

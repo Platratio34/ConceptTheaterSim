@@ -48,6 +48,9 @@ protected:
     UPROPERTY(EditAnywhere)
     float radius = 0;
     
+    UPROPERTY(EditAnywhere)
+    bool byAngle = false;
+    
     UPROPERTY(EditAnywhere, AdvancedDisplay)
     float debugBoxSize = 3;
 
