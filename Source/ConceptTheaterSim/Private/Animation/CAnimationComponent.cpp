@@ -155,6 +155,13 @@ void UCAnimationComponent::onEvent(FAnimationFileTrackEvent event)
         if(event.visible)
             updateVisibility(true);
     }
+
+    for(const FName& key : event.showClothing) {
+        onClothingVisibilityChange.Broadcast(key, false);
+    }
+    for(const FName& key : event.hideClothing) {
+        onClothingVisibilityChange.Broadcast(key, true);
+    }
 }
 
 void UCAnimationComponent::updateVisibility(bool newVisibility)

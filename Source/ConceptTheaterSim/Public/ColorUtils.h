@@ -14,5 +14,10 @@ class CONCEPTTHEATERSIM_API UColorUtils : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 
-    TArray<int> BlendHSV();
+    // TArray<int> BlendHSV();
+
+    UFUNCTION(BlueprintCallable, Category = "Color")
+    static FColor HexToColor(const FString& hex) {
+        return FColor::FromHex(hex);
+    }
 };

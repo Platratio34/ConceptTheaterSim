@@ -258,6 +258,9 @@ public:
     UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category="Clothing")
     TMap<FName, bool> hiddenClothing;
 
+    UPROPERTY(BlueprintAssignable)
+    FOnVisibilityChange onVisibilityChange;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

@@ -11,6 +11,9 @@
 UDELEGATE(BlueprintCallable)
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnVisibilityChange, bool, newVisibility);
 
+UDELEGATE(BlueprintCallable)
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnClothingVisibilityChange, FName, key, bool, newHidden);
+
 UCLASS(BlueprintType, meta=(BlueprintSpawnableComponent))
 class CONCEPTTHEATERSIM_API UCAnimationComponent : public UActorComponent
 {
@@ -32,6 +35,9 @@ public:
 
     UPROPERTY(BlueprintAssignable)
     FOnVisibilityChange onVisibilityChange;
+
+    UPROPERTY(BlueprintAssignable)
+    FOnClothingVisibilityChange onClothingVisibilityChange;
 
     UPROPERTY(EditAnywhere)
     bool dummy = false;

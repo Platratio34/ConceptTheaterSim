@@ -335,6 +335,7 @@ void ACPerson::BeginPlay()
     if(!dummy)
     animationComponent->registerWithMaster(name);
     animationComponent->onVisibilityChange.AddDynamic(this, &ACPerson::setVisibility);
+    animationComponent->onClothingVisibilityChange.AddDynamic(this, &ACPerson::hideClothing);
 }
 
 // Called every frame
@@ -363,12 +364,12 @@ void ACPerson::setVisibility(bool newVisibility)
         setMeshVisible(hairMeshComponent, newVisibility);
     for (int i = 0; i < clothingMeshComponents.Num(); i++)
     {
-        bool hidden = false;
-        if(clothingMeshComponentsVisible[i])
+        if(clothingMeshComponentsVisible[i] || !newVisibility)
         {
             setMeshVisible(clothingMeshComponents[i], newVisibility);
         }
     }
+    onVisibilityChange.Broadcast(newVisibility);
 
     TArray<AActor *> attachedActors;
     GetAttachedActors(attachedActors);
@@ -428,7 +429,7 @@ void ACPerson::setHairColor(FColor newColor) {
 }
 
 void ACPerson::setHairType(int newHair) {
-    hairType = FMath::Clamp(hairType, -1, hairMeshes.Num() - 1);
+    hairType = FMath::Clamp(newHair, -1, hairMeshes.Num() - 1);
     if(hairType >= 0)
     {
         if(hairMeshes.Num() > 0 && hairMeshes[hairType] != nullptr)

@@ -62,6 +62,11 @@ public:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
     bool visibleKey = false;
     
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+    TArray<FName> showClothing;
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+    TArray<FName> hideClothing;
+    
     static double parseTimeString(FString timeString)
     {
         double seconds = 0;
@@ -393,6 +398,24 @@ public:
             event.visible = eventJson->GetBoolField(JSON_VISIBILITY);
             event.visibleKey = true;
         }
+
+        if(eventJson->HasField(JSON_SHOW_CLOTHING))
+        {
+            TArray<TSharedPtr<FJsonValue>> showJson = eventJson->GetArrayField(JSON_SHOW_CLOTHING);
+            for (int i = 0; i < showJson.Num(); i++)
+            {
+                event.showClothing.Add(FName(showJson[i]->AsString()));
+            }
+        }
+
+        if(eventJson->HasField(JSON_HIDE_CLOTHING))
+        {
+            TArray<TSharedPtr<FJsonValue>> hideJson = eventJson->GetArrayField(JSON_HIDE_CLOTHING);
+            for (int i = 0; i < hideJson.Num(); i++)
+            {
+                event.hideClothing.Add(FName(hideJson[i]->AsString()));
+            }
+        }
         
         return event;
     }
@@ -409,6 +432,9 @@ public:
     static inline FString JSON_Z_ROT = TEXT("zRot");
     static inline FString JSON_PARENT = TEXT("parent");
     static inline FString JSON_VISIBILITY = TEXT("visibility");
+
+    static inline FString JSON_SHOW_CLOTHING = TEXT("showClothing");
+    static inline FString JSON_HIDE_CLOTHING = TEXT("hideClothing");
 };
 
 USTRUCT(BlueprintType)

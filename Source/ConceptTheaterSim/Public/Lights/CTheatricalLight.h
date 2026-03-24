@@ -8,6 +8,7 @@
 #include "Components/SpotLightComponent.h"
 #include "Cables/CPowerCableConnector.h"
 #include "CCullVolume.h"
+#include "LightingPosition.h"
 #include "CTheatricalLight.generated.h"
 
 const double DEG_TO_RAD = 3.14592653589793 / 180;
@@ -142,6 +143,12 @@ public:
 
     UPROPERTY(EditInstanceOnly, Category="Default")
     TSoftObjectPtr<AActor> parentActor = nullptr;
+
+    UPROPERTY(EditInstanceOnly, Category="Default")
+    TSoftObjectPtr<ALightingPosition> positionActor = nullptr;
+
+    UPROPERTY(EditInstanceOnly, Category="Default")
+    float positionDistance = 0;
     
     UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Image")
     UTexture2D* gobo = nullptr;

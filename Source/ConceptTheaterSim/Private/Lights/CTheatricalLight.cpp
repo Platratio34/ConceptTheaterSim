@@ -105,6 +105,11 @@ void ACTheatricalLight::OnConstruction(const FTransform &Transform)
     if(activeLightFunction != nullptr)
         activeLightFunction->SetVectorParameterValue(FName("LightPosition"), GetActorLocation());
     onLightUpdate();
+
+    if(positionActor != nullptr) {
+        FVector p = positionActor->getHangLocation(positionDistance);
+        SetActorLocation(p);
+    }
 }
 
 // Called when the game starts or when spawned
@@ -112,7 +117,12 @@ void ACTheatricalLight::BeginPlay()
 {
 	Super::BeginPlay();
     
-    if(parentActor != nullptr)
+    if(positionActor != nullptr) {
+        FVector p = positionActor->getHangLocation(positionDistance);
+        SetActorLocation(p);
+        root->AttachToComponent(positionActor->GetRootComponent(), FAttachmentTransformRules::KeepWorldTransform);
+    }
+    else if(parentActor != nullptr)
     {
         root->AttachToComponent(parentActor->GetRootComponent(), FAttachmentTransformRules::KeepWorldTransform);
     }
