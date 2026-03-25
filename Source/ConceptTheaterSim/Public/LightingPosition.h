@@ -30,7 +30,7 @@ public:
     virtual FVector getHangLocation(float position);
 
     UFUNCTION(BlueprintCallable)
-    virtual FQuat getHangRotation(float position);
+    virtual FQuat getHangRotation(float position, float roll);
 
 private:
     void drawDebugBox(FVector pos, FQuat rot);

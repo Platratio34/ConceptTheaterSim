@@ -83,10 +83,10 @@ public:
     UPROPERTY(BlueprintReadOnly, VisibleAnywhere, BlueprintAssignable)
     FOnInteractScroll onInteractScroll;
 
-    UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+    UPROPERTY(BlueprintReadWrite, EditAnywhere)
     FOnGetText onGetAction;
     
-    UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+    UPROPERTY(BlueprintReadWrite, EditAnywhere)
     FOnGetText onGetName;
 
     UPROPERTY(BlueprintReadWrite, EditAnywhere)

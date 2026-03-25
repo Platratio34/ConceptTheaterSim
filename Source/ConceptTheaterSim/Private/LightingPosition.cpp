@@ -25,7 +25,7 @@ void ALightingPosition::OnConstruction(const FTransform& Transform)
     float step = byAngle ? 5 : 12;
 
     if(minPosition < 0 && maxPosition > 0)
-        drawDebugBox(getHangLocation(0), getHangRotation(0));
+        drawDebugBox(getHangLocation(0), getHangRotation(0, 0));
 
     float start = minPosition;
     if(start < 0)
@@ -33,9 +33,9 @@ void ALightingPosition::OnConstruction(const FTransform& Transform)
     start = start + (step - FMath::Fmod(start, step));
     for (float p = start; p < maxPosition; p += step)
     {
-        drawDebugBox(getHangLocation(p), getHangRotation(p));
+        drawDebugBox(getHangLocation(p), getHangRotation(p, 0));
     }
-    drawDebugBox(getHangLocation(maxPosition), getHangRotation(maxPosition));
+    drawDebugBox(getHangLocation(maxPosition), getHangRotation(maxPosition, 0));
 
     start = maxPosition;
     if(start > -step)
@@ -43,9 +43,9 @@ void ALightingPosition::OnConstruction(const FTransform& Transform)
     start = start - FMath::Fmod(start, step);
     for (float p = start; p > minPosition; p -= step)
     {
-        drawDebugBox(getHangLocation(p), getHangRotation(p));
+        drawDebugBox(getHangLocation(p), getHangRotation(p, 0));
     }
-    drawDebugBox(getHangLocation(minPosition), getHangRotation(minPosition));
+    drawDebugBox(getHangLocation(minPosition), getHangRotation(minPosition, 0));
 }
 
 void ALightingPosition::drawDebugBox(FVector pos, FQuat rot)
@@ -85,24 +85,25 @@ FVector ALightingPosition::getHangLocation(float position)
         float theta = byAngle ? (position / 180 * 3.141592653) : (position / radius);
         float x = FMath::Cos(theta);
         float y = FMath::Sin(theta);
-        FVector pos = GetActorLocation();
-        pos += FVector(y * radius * 2.54, -(1-x) * radius * 2.54, 0);
-        return pos;
+        FVector pos = /*GetActorLocation();
+        pos += */FVector(y * radius * 2.54, -(1-x) * radius * 2.54, 0);
+        return GetActorTransform().TransformPosition(pos);
     }
-    return GetActorLocation() + FVector(position * 2.54, 0, 0);
+    return GetActorTransform().TransformPosition(FVector(position * 2.54, 0, 0));
 }
 
-FQuat ALightingPosition::getHangRotation(float position)
+FQuat ALightingPosition::getHangRotation(float position, float roll)
 {
+    FRotator r = GetActorRotation();
     if(radius != 0)
     {
-        FRotator r = GetActorRotation();
         if(byAngle) {
-            r += FRotator(0, -position, 0);
+            r += FRotator(roll, -position, 0);
         } else {
-            r += FRotator(0, -(position / (3.141592653 * 2 * radius)) * 360, 0);
+            r += FRotator(roll, -(position / (3.141592653 * 2 * radius)) * 360, 0);
         }
-        return r.Quaternion();
+    } else {
+        r.Roll = roll;
     }
-    return GetActorRotation().Quaternion();
+    return r.Quaternion();
 }

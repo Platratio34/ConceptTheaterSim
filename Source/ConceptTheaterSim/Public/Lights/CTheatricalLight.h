@@ -67,7 +67,7 @@ public:
     UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category="Light")
     UCurveFloat* intensityCurve = nullptr;
 
-    UPROPERTY(EditDefaultsOnly, Category="Light")
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Light")
     USpotLightComponent* light = nullptr;
 
     UPROPERTY(EditDefaultsOnly, Category="Light")
@@ -144,11 +144,14 @@ public:
     UPROPERTY(EditInstanceOnly, Category="Default")
     TSoftObjectPtr<AActor> parentActor = nullptr;
 
-    UPROPERTY(EditInstanceOnly, Category="Default")
+    UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category="Default")
     TSoftObjectPtr<ALightingPosition> positionActor = nullptr;
 
-    UPROPERTY(EditInstanceOnly, Category="Default")
+    UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category="Default")
     float positionDistance = 0;
+
+    UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category="Default")
+    float positionRoll = 0;
     
     UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Image")
     UTexture2D* gobo = nullptr;

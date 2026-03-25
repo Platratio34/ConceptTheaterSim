@@ -48,6 +48,7 @@ void AFlyrail::OnConstruction(const FTransform &Transform)
 
     setRopeLength(frontHandline, headBlockHeight - (tensionBlockHeight + 6));
 
+    lastPosition = -1;
     updatePosition();
 
     if(weightBlocks.Num() < weights.Num())
@@ -95,8 +96,25 @@ void AFlyrail::OnConstruction(const FTransform &Transform)
     {
         for (int i = loftBlockComponents.Num()-1; i >= loftBlocks.Num(); i--)
         {
-            loftBlockComponents[i]->DestroyComponent();
+            if(IsValid(loftBlockComponents[i]))
+                loftBlockComponents[i]->DestroyComponent();
             loftBlockComponents.RemoveAt(i);
+        }
+    }
+    if(loftBlockRopeComponents.Num() < loftBlocks.Num())
+    {
+        for (int i = loftBlockRopeComponents.Num(); i < loftBlocks.Num(); i++)
+        {
+            loftBlockRopeComponents.Add(NewObject<UStaticMeshComponent>(this));
+        }
+    }
+    else if(loftBlockRopeComponents.Num() > loftBlocks.Num())
+    {
+        for (int i = loftBlockRopeComponents.Num()-1; i >= loftBlocks.Num(); i--)
+        {
+            if(IsValid(loftBlockRopeComponents[i]))
+                loftBlockRopeComponents[i]->DestroyComponent();
+            loftBlockRopeComponents.RemoveAt(i);
         }
     }
     for (int i = 0; i < loftBlocks.Num(); i++)
@@ -114,6 +132,19 @@ void AFlyrail::OnConstruction(const FTransform &Transform)
         meshComp->SetRelativeLocation(block->position * 2.54);
         meshComp->SetRelativeRotation(block->rotation);
         meshComp->SetStaticMesh(block->loftBlockMesh != nullptr ? block->loftBlockMesh : loftBlockMesh);
+
+        UStaticMeshComponent *meshRopeComp = loftBlockRopeComponents[i];
+        if(meshRopeComp == nullptr || !IsValid(meshRopeComp))
+        {
+            meshRopeComp = NewObject<UStaticMeshComponent>(this);
+            loftBlockRopeComponents[i] = meshRopeComp;
+            meshRopeComp->RegisterComponent();
+            meshRopeComp->CreationMethod = EComponentCreationMethod::Instance;
+        }
+        meshRopeComp->AttachToComponent(meshComp, FAttachmentTransformRules::SnapToTargetIncludingScale);
+        // meshComp->SetRelativeLocation(block->position * 2.54);
+        // meshComp->SetRelativeRotation(block->rotation);
+        meshRopeComp->SetStaticMesh(block->loftBlockRopeMesh != nullptr ? block->loftBlockRopeMesh : loftBlockRopeMesh);
     }
 }
 
@@ -123,11 +154,32 @@ void AFlyrail::updatePosition()
         position = 0;
     if(position > maxPosition)
         position = maxPosition;
-
-    arbor->SetRelativeLocation( FVector( 0, 0, 2.54 * ( position + arborOffsetHeight ) ) );
     
-    setRopeLength(arborHandlineLower, (position + arborOffsetHeight - 6) - (tensionBlockHeight + 6));
-    setRopeLength(arborHandlineUpper, headBlockHeight - ( arborOffsetHeight + position + 102 ));
+    if((position < (lastPosition + 0.05)) && (position > (lastPosition - 0.05)))
+        return;
+    lastPosition = position;
+
+    float arborPos = (maxPosition - position) + arborOffsetHeight;
+    arbor->SetRelativeLocation( FVector( 0, 0, 2.54 * arborPos ) );
+    
+    setRopeLength(arborHandlineLower, (arborPos - 6) - (tensionBlockHeight + 6));
+    setRopeLength(arborHandlineUpper, headBlockHeight - ( arborPos + 102 ));
+
+    if(battonActor != nullptr) {
+        FVector cPos = battonActor->GetActorLocation();
+        cPos.Z = (battonMinHeight + position) * 2.54;
+        battonActor->SetActorLocation(cPos);
+    }
+}
+
+void AFlyrail::setPosition(float newPosition) {
+    position = newPosition;
+    if(position < 0)
+        position = 0;
+    if(position > maxPosition)
+        position = maxPosition;
+
+    updatePosition();
 }
 
 // Called when the game starts or when spawned
