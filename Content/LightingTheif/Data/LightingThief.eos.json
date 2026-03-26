@@ -810,6 +810,121 @@
             { "ch": 61, "Intensity": 0.0 },
             { "ch": 11, "Intensity": 0.0 },
             { "ch": 31, "Intensity": 0.0 }
+        ]},
+        { "cue": "20", "time": 2, "timecode": "00:02:25:15", "actions": [
+            { "ch": 56, "Intensity": 1.0 },
+            { "ch": 6, "Intensity": 1.0 },
+            { "ch": 94, "Intensity": 0.5 }
+        ]},
+        { "cue": "21", "time": 0.3, "timecode": "00:02:26:10", "follow": 0.2, "actions": [
+            { "ch": 59, "Intensity": 0.75 },
+            { "ch": 9, "Intensity": 1.0 },
+            { "ch": 29, "Intensity": 1.0 },
+
+            { "ch": 113, "Red": 1.0, "Green": 0.5, "Blue": 0.5 }
+        ]},
+        { "cue": "21.1", "time": 4.5, "actions": [
+            { "ch": 58, "Intensity": 0.0 },
+            { "ch": 8, "Intensity": 0.0 },
+            { "ch": 28, "Intensity": 0.0 }
+        ]},
+        { "cue": "21.5", "time": 0.3, "timecode": "00:02:27:00", "actions": [
+            { "ch": 113, "Intensity": 0.75 },
+            { "ch": 67, "Intensity": 0.75 },
+            { "ch": 43, "Intensity": 0.75 }
+        ]},
+        { "cue": "22", "time": 2, "timecode": "00:02:38:00", "follow": 0.5, "actions": [
+            { "ch": 63, "Intensity": 0.75 },
+            { "ch": 13, "Intensity": 0.75 },
+            { "ch": 33, "Intensity": 0.75 },
+            
+            { "ch": 55, "Intensity": 0.75 },
+            { "ch": 5, "Intensity": 0.75 },
+            { "ch": 25, "Intensity": 0.75 },
+            
+            { "ch": 57, "Intensity": 0.75 },
+            { "ch": 7, "Intensity": 0.75 },
+            { "ch": 27, "Intensity": 0.75 }
+        ]},
+        { "cue": "22.1", "time": 2, "actions": [
+            { "ch": 113, "Intensity": 0.0 },
+            { "ch": 67, "Intensity": 0.0 },
+            { "ch": 63, "Intensity": 0.0 }
+        ]},
+        { "cue": "23", "time": 0.2, "timecode": "00:02:55:05", "actions": [
+            { "ch": 113, "Intensity": 0.75 },
+            { "ch": 63, "Red": 1.0, "Green": 0.0, "Blue": 0.0 },
+            { "ch": 43, "Red": 0.0, "Green": 1.0, "Blue": 0.0 },
+            { "ch": 13, "Red": 0.0, "Green": 1.0, "Blue": 0.0 },
+
+            { "ch": 59, "Intensity": 0.5 },
+            { "ch": 9, "Intensity": 0.5 },
+            { "ch": 29, "Intensity": 0.5 },
+            { "ch": 55, "Intensity": 0.5 },
+            { "ch": 5, "Intensity": 0.5 },
+            { "ch": 25, "Intensity": 0.5 },
+
+            { "ch": 56, "Intensity": 0.5 },
+            { "ch": 6, "Intensity": 0.5 },
+            { "ch": 26, "Intensity": 0.5 },
+            { "ch": 57, "Intensity": 0.5 },
+            { "ch": 7, "Intensity": 0.5 },
+            { "ch": 27, "Intensity": 0.5 },
+            { "ch": 56, "Intensity": 0.5 },
+
+            { "ch": 1, "Intensity": 0.5 },
+            { "ch": 24, "Intensity": 0.5 },
+
+            { "ch": 52, "Intensity": 0.5 },
+            { "ch": 2, "Intensity": 0.5 },
+            { "ch": 22, "Intensity": 0.5 },
+            { "ch": 53, "Intensity": 0.5 },
+            { "ch": 3, "Intensity": 0.5 },
+            { "ch": 23, "Intensity": 0.5 },
+
+            { "ch": 91, "Intensity": 0.1 },
+            { "ch": 92, "Intensity": 0.1 },
+            { "ch": 93, "Intensity": 0.1 },
+            { "ch": 94, "Intensity": 0.1 },
+            { "ch": 95, "Intensity": 0.1 },
+            { "ch": 97, "Intensity": 0.1 },
+            { "ch": 98, "Intensity": 0.1 }
+        ]},
+        { "cue": "23.5", "time": 2, "timecode": "00:02:59:00", "actions": [
+            { "ch": 113, "Intensity": 0.0 },
+            { "ch": 63, "Red": 1.0, "Green": 1.0, "Blue": 1.0 },
+            { "ch": 43, "Red": 1.0, "Green": 1.0, "Blue": 0.0 },
+            { "ch": 13, "Red": 1.0, "Green": 1.0, "Blue": 0.0 },
+
+            { "ch": 55, "Intensity": 0.75 },
+            { "ch": 5, "Intensity": 0.75 },
+            { "ch": 25, "Intensity": 0.75 },
+
+            { "ch": 56, "Intensity": 0.75 },
+            { "ch": 6, "Intensity": 0.75 },
+            { "ch": 26, "Intensity": 0.75 },
+            { "ch": 57, "Intensity": 0.75 },
+            { "ch": 7, "Intensity": 0.75 },
+            { "ch": 27, "Intensity": 0.75 },
+            { "ch": 56, "Intensity": 0.75 },
+
+            { "ch": 1, "Intensity": 0.75 },
+            { "ch": 24, "Intensity": 0.75 },
+
+            { "ch": 52, "Intensity": 0.75 },
+            { "ch": 2, "Intensity": 0.75 },
+            { "ch": 22, "Intensity": 0.75 },
+            { "ch": 53, "Intensity": 0.75 },
+            { "ch": 3, "Intensity": 0.75 },
+            { "ch": 23, "Intensity": 0.75 },
+
+            { "ch": 91, "Intensity": 0.25 },
+            { "ch": 92, "Intensity": 0.25 },
+            { "ch": 93, "Intensity": 0.25 },
+            { "ch": 94, "Intensity": 0.25 },
+            { "ch": 95, "Intensity": 0.25 },
+            { "ch": 97, "Intensity": 0.25 },
+            { "ch": 98, "Intensity": 0.25 }
         ]}
         
     ],
