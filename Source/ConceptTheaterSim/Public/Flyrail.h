@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Components/SplineMeshComponent.h"
 #include "Flyrail.generated.h"
 
 USTRUCT(BlueprintType)
@@ -32,6 +33,37 @@ enum class EFlyrailWeightType : uint8
 };
 
 UCLASS(BlueprintType)
+class CONCEPTTHEATERSIM_API AFlyrailRedirectBlock : public AActor
+{
+	GENERATED_BODY()
+	
+public:	
+	// Sets default values for this actor's properties
+	AFlyrailRedirectBlock();
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+    USceneComponent *root;
+
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+
+    virtual void OnConstruction(const FTransform &Transform) override;
+
+    UPROPERTY(BlueprintReadWrite)
+    TArray<UStaticMeshComponent*> blockLines;
+    
+    UPROPERTY(BlueprintReadWrite)
+    TArray<USplineMeshComponent*> outLines;
+
+public:
+    UPROPERTY(BlueprintReadWrite)
+    TArray<USceneComponent*> inLineEnds;
+
+    void setup(TArray<UStaticMeshComponent*>& loftBlocks);
+};
+
+UCLASS(BlueprintType)
 class CONCEPTTHEATERSIM_API AFlyrail : public AActor
 {
 	GENERATED_BODY()
@@ -44,7 +76,7 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-    UPROPERTY(VisibleAnywhere)
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
     USceneComponent *root;
     
     UPROPERTY(VisibleDefaultsOnly)
@@ -69,14 +101,20 @@ protected:
     UPROPERTY(VisibleDefaultsOnly)
     UStaticMeshComponent *upperBumper;
 
-    UPROPERTY()
+    UPROPERTY(BlueprintReadOnly)
     TArray<UStaticMeshComponent *> weightBlocks;
     
-    UPROPERTY()
+    UPROPERTY(BlueprintReadOnly)
     TArray<UStaticMeshComponent *> loftBlockComponents;
     
-    UPROPERTY()
+    UPROPERTY(BlueprintReadOnly)
     TArray<UStaticMeshComponent *> loftBlockRopeComponents;
+
+    UPROPERTY(BlueprintReadOnly)
+    UChildActorComponent *redirectBlockComponent;
+    
+    UPROPERTY(BlueprintReadOnly)
+    AFlyrailRedirectBlock *redirectBlockActor;
 
     virtual void OnConstruction(const FTransform &Transform) override;
 
@@ -94,11 +132,23 @@ protected:
     UPROPERTY(EditDefaultsOnly)
     UStaticMesh* loftBlockRopeMesh;
     
-    UPROPERTY(EditAnywhere, Category = "Batton")
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Batton")
     AActor* battonActor;
     
-    UPROPERTY(EditAnywhere, Category = "Batton")
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Batton")
     float battonMinHeight;
+
+    UPROPERTY(BlueprintReadWrite)
+    TArray<UStaticMeshComponent*> headBlockLines;
+    
+    UPROPERTY(BlueprintReadWrite)
+    TArray<USplineMeshComponent*> loftBlockLines;
+    
+    UPROPERTY(BlueprintReadWrite)
+    TArray<USplineMeshComponent*> arborLines;
+
+    UPROPERTY(BlueprintReadWrite)
+    TArray<USceneComponent*> arborLineEnds;
 
 public:	
 	// Called every frame
@@ -121,6 +171,15 @@ public:
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly)
     TArray<FFlyrailLoftBlock> loftBlocks;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly)
+    bool hasRedirectBlock;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly)
+    FFlyrailLoftBlock redirectBlock;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly)
+    TSubclassOf<AFlyrailRedirectBlock> redirectBlockClass;
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly)
     TArray<EFlyrailWeightType> weights;

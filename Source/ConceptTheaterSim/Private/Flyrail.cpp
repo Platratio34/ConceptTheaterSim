@@ -146,6 +146,80 @@ void AFlyrail::OnConstruction(const FTransform &Transform)
         // meshComp->SetRelativeRotation(block->rotation);
         meshRopeComp->SetStaticMesh(block->loftBlockRopeMesh != nullptr ? block->loftBlockRopeMesh : loftBlockRopeMesh);
     }
+
+    int numLoftBlocks = loftBlocks.Num();
+    for (int i = 0; i < headBlockLines.Num(); i++) {
+        if(i >= numLoftBlocks) {
+            headBlockLines[i]->SetVisibility(false);
+            continue;
+        }
+        headBlockLines[i]->SetVisibility(true);
+    }
+    int numArborLineEnds = arborLineEnds.Num();
+    for (int i = 0; i < arborLines.Num(); i++) {
+        USplineMeshComponent *comp = arborLines[i];
+        if(i >= numLoftBlocks || i >= numArborLineEnds) {
+            comp->SetVisibility(false);
+            continue;
+        }
+        comp->SetVisibility(true);
+        comp->SetEndPosition(comp->GetComponentTransform().InverseTransformPosition(arborLineEnds[i]->GetComponentLocation()), true);
+    }
+
+    if(hasRedirectBlock) {
+        if(redirectBlockComponent == nullptr || !IsValid(redirectBlockComponent)) {
+            redirectBlockComponent = NewObject<UChildActorComponent>(this);
+            redirectBlockComponent->RegisterComponent();
+            redirectBlockComponent->CreationMethod = EComponentCreationMethod::Instance;
+        }
+
+        redirectBlockComponent->AttachToComponent(root, FAttachmentTransformRules::KeepRelativeTransform);
+        redirectBlockComponent->SetRelativeLocation(redirectBlock.position * 2.54);
+        redirectBlockComponent->SetRelativeRotation(redirectBlock.rotation);
+        redirectBlockComponent->SetChildActorClass(redirectBlockClass);
+
+        redirectBlockActor = Cast<AFlyrailRedirectBlock>(redirectBlockComponent->GetChildActor());
+        redirectBlockActor->setup(loftBlockComponents);
+
+        for (int i = 0; i < loftBlockLines.Num(); i++) {
+            USplineMeshComponent *comp = loftBlockLines[i];
+            if(i >= numLoftBlocks || redirectBlockActor == nullptr || i >= redirectBlockActor->inLineEnds.Num()) {
+                comp->SetVisibility(false);
+                continue;
+            }
+            comp->SetVisibility(true);
+            FVector ePos = redirectBlockActor->inLineEnds[i]->GetComponentLocation();
+            comp->SetEndPosition(comp->GetComponentTransform().InverseTransformPosition(ePos), true);
+        }
+    } else {
+        for (int i = 0; i < loftBlockLines.Num(); i++) {
+            USplineMeshComponent *comp = loftBlockLines[i];
+            if(i >= numLoftBlocks) {
+                comp->SetVisibility(false);
+                continue;
+            }
+            comp->SetVisibility(true);
+            FVector ePos = loftBlockComponents[i]->GetComponentTransform().TransformPosition(FVector(0, -3 * 2.54, 7 * 2.54));
+            comp->SetEndPosition(comp->GetComponentTransform().InverseTransformPosition(ePos), true);
+        }
+    }
+    // int loftBlockI = 0;
+    // int redirectNum = 0;
+    // int loftBlockLineI = 0;
+    // for (int i = 0; i < loftBlocks.Num(); i++)
+    //     FFlyrailLoftBlock &block = loftBlocks[loftBlockI];
+    //     // USplineMeshComponent *comp = loftBlockLines[i];
+    //     // if(loftBlockNum >= numLoftBlocks) {
+    //     //     comp->SetVisibility(false);
+    //     //     continue;
+    //     // }
+    //     // comp->SetVisibility(true);
+    //     // if(block.redirectIn.Num() >= redirectNum) {
+
+    //     // } else {
+
+    //     // }
+    // }
 }
 
 void AFlyrail::updatePosition()
@@ -170,6 +244,14 @@ void AFlyrail::updatePosition()
         cPos.Z = (battonMinHeight + position) * 2.54;
         battonActor->SetActorLocation(cPos);
     }
+
+    int numLoftBlocks = loftBlocks.Num();
+    int numArborLineEnds = arborLineEnds.Num();
+    for (int i = 0; i < arborLines.Num(); i++) {
+        if(i >= numLoftBlocks || i >= numArborLineEnds)
+            break;
+        arborLines[i]->SetEndPosition(arborLines[i]->GetComponentTransform().InverseTransformPosition(arborLineEnds[i]->GetComponentLocation()), true);
+    }
 }
 
 void AFlyrail::setPosition(float newPosition) {
@@ -187,6 +269,10 @@ void AFlyrail::BeginPlay()
 {
 	Super::BeginPlay();
 	
+    if(hasRedirectBlock) {
+        redirectBlockActor = Cast<AFlyrailRedirectBlock>(redirectBlockComponent->GetChildActor());
+        redirectBlockActor->setup(loftBlockComponents);
+    }
 }
 
 // Called every frame
@@ -196,3 +282,47 @@ void AFlyrail::Tick(float DeltaTime)
 
 }
 
+/*
+AFlyrailRedirectBlock
+*/
+AFlyrailRedirectBlock::AFlyrailRedirectBlock()
+{
+ 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	PrimaryActorTick.bCanEverTick = false;
+
+    root = CreateDefaultSubobject<USceneComponent>("Root");
+    SetRootComponent(root);
+}
+
+void AFlyrailRedirectBlock::BeginPlay()
+{
+	Super::BeginPlay();
+	
+}
+
+void AFlyrailRedirectBlock::OnConstruction(const FTransform &Transform)
+{
+
+}
+
+void AFlyrailRedirectBlock::setup(TArray<UStaticMeshComponent*>& loftBlocks) {
+    int numLoftBlocks = loftBlocks.Num();
+    for (int i = 0; i < blockLines.Num(); i++) {
+        UStaticMeshComponent *comp = blockLines[i];
+        if (i > numLoftBlocks) {
+            comp->SetVisibility(false);
+            continue;
+        }
+        comp->SetVisibility(true);
+    }
+    for (int i = 0; i < outLines.Num(); i++) {
+        USplineMeshComponent *comp = outLines[i];
+        if (i > numLoftBlocks) {
+            comp->SetVisibility(false);
+            continue;
+        }
+        comp->SetVisibility(true);
+        FVector ePos = loftBlocks[i]->GetComponentTransform().TransformPosition(FVector(0, -3 * 2.54, 7 * 2.54));
+        comp->SetEndPosition(comp->GetComponentTransform().InverseTransformPosition(ePos), true);
+    }
+}
