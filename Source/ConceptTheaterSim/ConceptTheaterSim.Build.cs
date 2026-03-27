@@ -11,6 +11,7 @@ public class ConceptTheaterSim : ModuleRules
         PublicDependencyModuleNames.AddRange(["Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "SlateCore"]);
 
         PrivateDependencyModuleNames.AddRange([ "Json", "JsonUtilities" ]);
+        AddEngineThirdPartyPrivateStaticDependencies(Target, "portmidi");
 
         bEnableExceptions = true;
 

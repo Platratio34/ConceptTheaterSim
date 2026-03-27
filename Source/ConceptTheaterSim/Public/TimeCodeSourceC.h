@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "Networking/NetworkCard.h"
 #include "Networking/NetworkPacketTypes.h"
+#include "RawMidiOutput.h"
 #include "TimeCodeSourceC.generated.h"
 
 /**
@@ -57,15 +58,29 @@ public:
     UPROPERTY(VisibleAnywhere)
     FName timeSourceName = FName(TEXT("TimeCodeSourceC"));
 
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    bool midiEnabled = false;
+
 protected:
+    UPROPERTY(VisibleInstanceOnly)
+    int qf = 0;
+
+    UPROPERTY(VisibleInstanceOnly)
     int frames = 0;
+
+    UPROPERTY()
     int frameRate = 30;
 
+    UPROPERTY()
     FTimerHandle timer;
 
+    UPROPERTY(VisibleInstanceOnly)
     bool running = false;
 
     virtual void BeginPlay() override;
 
     void sendTimePacket();
+
+    UPROPERTY(BlueprintReadOnly)
+    URawMidiOutput *midiOutput = nullptr;
 };

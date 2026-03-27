@@ -2,82 +2,115 @@
 
 
 #include "RawMidiOutput.h"
+#include "portmidi.h"
 
-RtMidi::Api chooseMidiApi()
-{
-    std::vector< RtMidi::Api > apis;
-    RtMidi::getCompiledApi(apis);
-
-    if (apis.size() <= 1)
-        return RtMidi::Api::UNSPECIFIED;
-
-    return static_cast<RtMidi::Api>(0);
+static FString ParsePmError(const PmError& InError) {
+    FString ErrorText = ANSI_TO_TCHAR(Pm_GetErrorText(InError));
+    if(InError == pmHostError) {
+        char ErrorTextBuffer[1024];
+        Pm_GetHostErrorText(ErrorTextBuffer, 1024);
+        ErrorText = ANSI_TO_TCHAR(ErrorTextBuffer);
+    }
+    return ErrorText;
 }
 
-void URawMidiOutput::setup(int device) {
-    
-
-    try {
-        midiOut = new RtMidiOut(chooseMidiApi());
-        midiOut->openPort( device );
-    } catch (RtMidiError &error) {
-        UE_LOG(LogTemp, Fatal, TEXT("Error seting up raw Midi"));
-        error.printMessage();
+bool URawMidiOutput::setup(const int32 device) {
+    if(isSetup)
+        return deviceId == device;
+    if(device < 0) {
+        UE_LOG(LogTemp, Warning, TEXT("Failed to bind to MIDI device: ID was invalid"));
+        return false;
     }
+    deviceId = device;
+    UE_LOG(LogTemp, Display, TEXT("Attempting to bind to MIDI device %i"), deviceId);
+    const PmDeviceID pmDeviceId = deviceId;
+    const PmDeviceInfo *pmDeviceInfo = Pm_GetDeviceInfo(pmDeviceId);
+    if(pmDeviceInfo != nullptr) {
+        if(pmDeviceInfo->opened != 0) {
+            UE_LOG(LogTemp, Warning, TEXT("Failed to bind to MIDI device '%s' (ID: %i): Device is already in use"), ANSI_TO_TCHAR(pmDeviceInfo->name), pmDeviceId);
+            return false;
+        }
+
+        if(pmDeviceInfo->output == 0) {
+            UE_LOG(LogTemp, Warning, TEXT("Failed to bind to MIDI device '%s' (ID: %i): Device not setup to receive MIDI"), ANSI_TO_TCHAR(pmDeviceInfo->name), pmDeviceId);
+            return false;
+        }
+
+        const PmError pmError = Pm_OpenOutput(&pmMIDIStream, pmDeviceId, nullptr, 1, nullptr, nullptr, 0);
+        if(pmError == pmNoError) {
+            check(pmMIDIStream != nullptr);
+            deviceName = ANSI_TO_TCHAR(pmDeviceInfo->name);
+        } else {
+			pmMIDIStream = nullptr;
+			const FString errorText = ParsePmError(pmError);
+			UE_LOG(LogTemp, Error, TEXT("Unable to open output connection to MIDI device ID %i (%s) (PortMidi error: %s)."), pmDeviceId, ANSI_TO_TCHAR(pmDeviceInfo->name), *errorText);
+		}
+	} else {
+		UE_LOG(LogTemp, Error, TEXT("Unable to query information about MIDI device (PortMidi device ID: %i)."), pmDeviceId);
+	}
+    UE_LOG(LogTemp, Display, TEXT("Bound to MIDI device '%s' (ID: %i)"), ANSI_TO_TCHAR(pmDeviceInfo->name), deviceId);
 
     isSetup = true;
+    return true;
 }
 
-void URawMidiOutput::sendFullFrame(int framerate, int hour, int minute, int second, int frame){
-    if(!isSetup)
+void URawMidiOutput::close() {
+    if(!isSetup || pmMIDIStream == nullptr)
         return;
-    std::vector<unsigned char> message;
-    message.push_back(0xf0); // System exclusive
-    message.push_back(0x7f); // ??
-    message.push_back(0x7f); // ??
-    message.push_back(0x01); // ??
-    message.push_back(0x01); // ??
-    message.push_back((framerate << 5) | (hour & 0b0001111));
-    message.push_back(minute & 0b00111111);
-    message.push_back(second & 0b00111111);
-    message.push_back(frame & 0b00111111);
-    message.push_back(0xf7); // Special System Exclusive
-    this->sendMessage(message);
+
+    const PmError pmError = Pm_Close(pmMIDIStream);
+    if (pmError != pmNoError)
+    {
+        const FString errorText = ParsePmError(pmError);
+        UE_LOG(LogTemp, Error, TEXT("Encounter an error when closing the output connection to MIDI device ID %i (%s) (PortMidi error: %s)."), deviceId, *deviceName, *errorText);
+    }
+    pmMIDIStream = nullptr;
+
+    isSetup = false;
+}
+
+void URawMidiOutput::BeginDestroy() {
+    close();
+    Super::BeginDestroy();
+}
+
+void URawMidiOutput::sendFullFrame(int framerate, int hour, int minute, int second, int frame) {
+    if(!isSetup) return;
+    unsigned char msg[10];
+    msg[0] = 0xf0;     // System exclusive
+    msg[1] = 0x7f; // Manufacturer: real-time universal message
+    msg[2] = 0x7f; // Channel: Global broadcast
+    msg[3] = 0x01; // Type: Timecode
+    msg[4] = 0x01; // Full frame
+    msg[5] = (framerate << 5) | (hour & 0b0001111);
+    msg[6] = minute & 0b00111111;
+    msg[7] = second & 0b00111111;
+    msg[8] = frame & 0b00111111;
+    msg[9] = 0xf7; // Special System Exclusive
+
+    Pm_WriteSysEx(pmMIDIStream, 0, msg);
 }
 
 void URawMidiOutput::sendQuarterFrame(int qf, int framerate, int hour, int minute, int second, int frame){
     if(!isSetup) return;
-    std::vector<unsigned char> message;
-    message.push_back(0xf1); // MTC
-    unsigned char data;
+    int32 msg;
     if(qf == 0) {
-        data = frame & 0x0f;
+        msg = frame & 0x0f;
     } else if (qf == 1) {
-        data = (frame & 0x10) >> 4;
+        msg = (frame & 0x10) >> 4;
     } else if(qf == 2) {
-        data = second & 0x0f;
+        msg = second & 0x0f;
     } else if (qf == 3) {
-        data = (second & 0x30) >> 4;
+        msg = (second & 0x30) >> 4;
     } else if(qf == 4) {
-        data = minute & 0x0f;
+        msg = minute & 0x0f;
     } else if (qf == 5) {
-        data = (minute & 0x30) >> 4;
+        msg = (minute & 0x30) >> 4;
     } else if(qf == 6) {
-        data = hour & 0x0f;
+        msg = hour & 0x0f;
     } else if (qf == 3) {
-        data = ((hour & 0x10) >> 4) | (framerate << 1);
+        msg = ((hour & 0x10) >> 4) | (framerate << 1);
     }
-    message.push_back(data);
-    message.push_back(0x00); // unused
-    this->sendMessage(message);
-    // 0x00
-}
-
-void URawMidiOutput::sendMessage(std::vector<unsigned char> message) {
-    try {
-        midiOut->sendMessage(&message);
-    } catch (RtMidiError &error) {
-        UE_LOG(LogTemp, Fatal, TEXT("Error sending Midi Message"));
-        error.printMessage();
-    }
+    msg = (msg << 8) | 0xf1;
+    Pm_WriteShort(pmMIDIStream, 0, msg);
 }

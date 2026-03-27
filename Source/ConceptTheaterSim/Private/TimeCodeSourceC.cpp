@@ -10,12 +10,31 @@ ATimeCodeSourceC::ATimeCodeSourceC() {
 void ATimeCodeSourceC::BeginPlay() {
     Super::BeginPlay();
 
-    GetWorld()->GetTimerManager().SetTimer(timer, this, &ATimeCodeSourceC::TimerUpdate, 1.0f / ((float)frameRate), true);
+    if(midiEnabled) {
+        GetWorld()->GetTimerManager().SetTimer(timer, this, &ATimeCodeSourceC::TimerUpdate, 1.0f / ((float)frameRate*4), true);
+    } else {
+        GetWorld()->GetTimerManager().SetTimer(timer, this, &ATimeCodeSourceC::TimerUpdate, 1.0f / ((float)frameRate), true);
+    }
 }
 
 void ATimeCodeSourceC::TimerUpdate() {
     if(!running)
         return;
+    if(midiEnabled) {
+        qf++;
+        if(qf >= 7)
+            qf = 0;
+
+        int s = frames / 30;
+        int m = s / 60;
+        int h = m / 60;
+        if(midiOutput != nullptr)
+            midiOutput->sendQuarterFrame(qf, MTC_30FPS, h, m, s, frames % 30);
+        
+        if(!(qf == 0 || qf == 4)) {
+            return;
+        }
+    }
     frames++;
     onTimeChangeEvent.Broadcast(frames, GetSeconds());
     sendTimePacket();
@@ -32,9 +51,17 @@ void ATimeCodeSourceC::Start(int startFrames) {
     if(running)
         return;
     frames = startFrames;
+    qf = 0;
     running = true;
     onTimeChangeEvent.Broadcast(frames, GetSeconds());
     sendTimePacket();
+    if(midiOutput != nullptr) {
+        int s = frames / 30;
+        int m = s / 60;
+        int h = m / 60;
+        if(midiOutput != nullptr)
+            midiOutput->sendFullFrame(MTC_30FPS, h, m, s, frames % 30);
+    }
 }
 
 void ATimeCodeSourceC::Stop() {
@@ -43,6 +70,13 @@ void ATimeCodeSourceC::Stop() {
     running = false;
     onTimeStopEvent.Broadcast();
     sendTimePacket();
+    if(midiOutput != nullptr) {
+        int s = frames / 30;
+        int m = s / 60;
+        int h = m / 60;
+        if(midiOutput != nullptr)
+            midiOutput->sendFullFrame(MTC_30FPS, h, m, s, frames % 30);
+    }
 }
 
 bool ATimeCodeSourceC::IsRunning() {
