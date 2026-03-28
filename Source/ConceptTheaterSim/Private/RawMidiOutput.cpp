@@ -4,6 +4,11 @@
 #include "RawMidiOutput.h"
 #include "portmidi.h"
 
+#define FRAMERATE_30FPS 0b110
+#define FRAMES_TO_SECONDS 30
+#define FRAMES_TO_MINUTES 1800
+#define FRAMES_TO_HOURS 108000
+
 static FString ParsePmError(const PmError& InError) {
     FString ErrorText = ANSI_TO_TCHAR(Pm_GetErrorText(InError));
     if(InError == pmHostError) {
@@ -91,26 +96,97 @@ void URawMidiOutput::sendFullFrame(int framerate, int hour, int minute, int seco
     Pm_WriteSysEx(pmMIDIStream, 0, msg);
 }
 
+void URawMidiOutput::sendFullFrameByFrames(int frames) {
+    if(!isSetup) return;
+    unsigned char msg[10];
+    msg[0] = 0xf0;     // System exclusive
+    msg[1] = 0x7f; // Manufacturer: real-time universal message
+    msg[2] = 0x7f; // Channel: Global broadcast
+    msg[3] = 0x01; // Type: Timecode
+    msg[4] = 0x01; // Full frame
+    msg[5] = (FRAMERATE_30FPS << 4) | ((frames / FRAMES_TO_HOURS) & 0b0001111);
+    msg[6] = (frames / FRAMES_TO_MINUTES) & 0b00111111;
+    msg[7] = (frames / FRAMES_TO_SECONDS) & 0b00111111;
+    msg[8] = (frames % 30) & 0b00111111;
+    msg[9] = 0xf7; // Special System Exclusive
+
+    Pm_WriteSysEx(pmMIDIStream, 0, msg);
+}
+
 void URawMidiOutput::sendQuarterFrame(int qf, int framerate, int hour, int minute, int second, int frame){
     if(!isSetup) return;
-    int32 msg;
-    if(qf == 0) {
-        msg = frame & 0x0f;
-    } else if (qf == 1) {
-        msg = (frame & 0x10) >> 4;
-    } else if(qf == 2) {
-        msg = second & 0x0f;
-    } else if (qf == 3) {
-        msg = (second & 0x30) >> 4;
-    } else if(qf == 4) {
-        msg = minute & 0x0f;
-    } else if (qf == 5) {
-        msg = (minute & 0x30) >> 4;
-    } else if(qf == 6) {
-        msg = hour & 0x0f;
-    } else if (qf == 3) {
-        msg = ((hour & 0x10) >> 4) | (framerate << 1);
+    unsigned char data = 0;
+    switch (qf) {
+    case 0:
+        data = frame & 0x0f;
+        break;
+    case 1:
+        data = (frame & 0x10) >> 4;
+        break;
+    case 2:
+        data = second & 0x0f;
+        break;
+    case 3:
+        data = (second & 0x30) >> 4;
+        break;
+    case 4:
+        data = minute & 0x0f;
+        break;
+    case 5:
+        data = (minute & 0x30) >> 4;
+        break;
+    case 6:
+        data = hour & 0x0f;
+        break;
+    case 7:
+        data = ((hour & 0x10) >> 4) | (framerate << 1);
+        break;
+    default:
+        break;
     }
-    msg = (msg << 8) | 0xf1;
-    Pm_WriteShort(pmMIDIStream, 0, msg);
+    unsigned char msg[2];
+    msg[0] = 0xf1;
+    msg[1] = (qf << 4) | data;
+    Pm_WriteSysEx(pmMIDIStream, 0, msg);
+    // msg = (msg << 8) | 0xf1;
+    // Pm_WriteShort(pmMIDIStream, 0, msg);
+}
+
+void URawMidiOutput::sendQuarterFrameByFrames(int qf, int frames){
+    if(!isSetup) return;
+    unsigned char data = 0;
+    switch (qf) {
+    case 0:
+        data = (frames % 30) & 0x0f;
+        break;
+    case 1:
+        data = ((frames % 30) & 0x10) >> 4;
+        break;
+    case 2:
+        data = (frames / FRAMES_TO_SECONDS) & 0x0f;
+        break;
+    case 3:
+        data = ((frames / FRAMES_TO_SECONDS) & 0x30) >> 4;
+        break;
+    case 4:
+        data = (frames / FRAMES_TO_MINUTES) & 0x0f;
+        break;
+    case 5:
+        data = ((frames / FRAMES_TO_MINUTES) & 0x30) >> 4;
+        break;
+    case 6:
+        data = (frames / FRAMES_TO_HOURS) & 0x0f;
+        break;
+    case 7:
+        data = (((frames / FRAMES_TO_HOURS) & 0x10) >> 4) | FRAMERATE_30FPS;
+        break;
+    default:
+        break;
+    }
+    unsigned char msg[2];
+    msg[0] = 0xf1;
+    msg[1] = (qf << 4) | data;
+    Pm_WriteSysEx(pmMIDIStream, 0, msg);
+    // msg = (msg << 8) | 0xf1;
+    // Pm_WriteShort(pmMIDIStream, 0, msg);
 }

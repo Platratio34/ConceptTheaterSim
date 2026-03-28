@@ -33,9 +33,15 @@ public:
 
     UFUNCTION(BlueprintCallable)
     void sendFullFrame(int framerate, int hour, int minute, int second, int frame);
+    
+    UFUNCTION(BlueprintCallable)
+    void sendFullFrameByFrames(int frames);
 
     UFUNCTION(BlueprintCallable)
     void sendQuarterFrame(int qf, int framerate, int hour, int minute, int second, int frame);
+
+    UFUNCTION(BlueprintCallable)
+    void sendQuarterFrameByFrames(int qf, int frames);
 
     UFUNCTION(BlueprintCallable)
     FString getDeviceName() { return deviceName; }
