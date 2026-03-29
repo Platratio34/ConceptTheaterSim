@@ -32,7 +32,7 @@ public:
     UFUNCTION(BlueprintCallable)
     void clearChanged(int universe);
 
-    UPROPERTY(VisibleInstanceOnly, Category="DMX")
+    UPROPERTY(EditInstanceOnly, Category="DMX")
     TArray<int> activeUniverses;
 
     UFUNCTION(BlueprintCallable)

@@ -80,7 +80,7 @@ protected:
     UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category="Network")
     int subnetMask = 0xffff0000;
 
-    UPROPERTY()
+    UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category="Network")
     TArray<int> multicast;
 
     UPROPERTY(EditInstanceOnly, BlueprintReadWrite, Category="Network")

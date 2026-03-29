@@ -15,8 +15,9 @@ class CONCEPTTHEATERSIM_API UNetworkUtils : public UBlueprintFunctionLibrary
 	GENERATED_BODY()
 
 public:
-    UFUNCTION(BlueprintCallable)
-    int IPToNumber(uint8 o1, uint8 o2, uint8 o3, uint8 o4);
+    UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Network Util")
+    static int IPToNumber(uint8 o1, uint8 o2, uint8 o3, uint8 o4);
 
-    
+    UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Network Util")
+    static FString NumberToIPV4(int address);
 };
