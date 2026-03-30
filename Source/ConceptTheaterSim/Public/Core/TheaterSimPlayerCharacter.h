@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "TheaterSimCore.h"
+
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 
@@ -12,7 +14,6 @@
 #include "Cables/CCable.h"
 
 #include "Core/CInteractionComponent.h"
-#include "Core/TheaterSimPlayerController.h"
 
 #include "Networking/WirelessNetworkCard.h"
 
@@ -21,7 +22,7 @@
 
 #include "TheaterSimPlayerCharacter.generated.h"
 
-UCLASS()
+UCLASS(BlueprintType)
 class CONCEPTTHEATERSIM_API ATheaterSimPlayerCharacter : public ACharacter
 {
 	GENERATED_BODY()
@@ -38,28 +39,63 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
     void setCable(ACCable *cable);
 
+    UFUNCTION(BlueprintCallable)
     ATheaterSimPlayerController *getPlayerController();
 
+    UFUNCTION(BlueprintCallable)
+    void setFlashlight(bool on);
+    UFUNCTION(BlueprintCallable)
+    void toggleFlashlight();
+
+    UFUNCTION(BlueprintCallable)
+    void setCrouched(bool crouched);
+
+    UFUNCTION(BlueprintCallable)
+    bool getCrouched() {
+        return isCrouching;
+    }
+
+    UFUNCTION()
+    void setInteractionSource(bool mouse);
+
+    UFUNCTION()
+    void cameraInput(FVector2D move);
+
+    UFUNCTION()
+    void movementInput(FVector2D move);
+
+    UFUNCTION()
+    void onJump(bool ongoing);
+
+    UFUNCTION()
+    void onInteract();
+
+    UFUNCTION()
+    void onInteractScroll(float scroll);
+
+    UFUNCTION()
+    void endInteract();
+
+    UFUNCTION()
+    void toggleZoom();
+
+    UFUNCTION()
+    void setZoom(bool zoomed);
+
+    UFUNCTION(BlueprintCallable)
+    void emTp();
+
 protected:
+
     void updateInteractionWidget();
 
     void updateZoom(float deltaTime);
 
     void updateLadderState(bool newState, AActor *ladder);
 
-    void onInteract();
-
-    void endInteract();
-
-    void freeCursor(bool newFree);
-
     // Components
-
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Components")
     UCameraComponent *playerCamera;
 
@@ -73,6 +109,8 @@ protected:
     UWirelessNetworkCard *wirelessNetworkCard;
 
     // Interaction
+    bool interactionMouse = false;
+
     UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category="Interaction")
     UCInteractionComponent *interactable = nullptr;
 
@@ -105,29 +143,6 @@ protected:
     UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category="Camera")
     float fov = fovOut;
 
-    UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category="Camera")
-    bool cursorFree = false;
-
-    UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category="Camera")
-    AActor *fixedCamera = nullptr; // FixedCamera
-
-    UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category="Camera")
-    bool isSelfCam = true;
-
-    UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category="Camera")
-    FVector returnPos;
-
-    // Other
-    UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category="Default")
-    bool locked = false;
-
-    UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category="Default")
-    bool flashlightOn = true;
-
-    // HUD
-    UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category="Default")
-    UObject *hud = nullptr; // MainHUD
-
     // Ladders
     UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category="Ladder")
     bool onLadder = false;
@@ -138,75 +153,13 @@ protected:
     UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category="Ladder")
     float ladderMovement = 0.0;
     
-    // Input
-    UPROPERTY(EditDefaultsOnly, Category="Input")
-    UInputAction *moveCameraAction;
-    UFUNCTION()
-    void onCameraMoveInput(const FInputActionInstance &value);
-
-    UPROPERTY(EditDefaultsOnly, Category="Input")
-    UInputAction *moveAction;
-    UFUNCTION()
-    void onMoveInput(const FInputActionInstance &value);
+    // Other
+    UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category="Default")
+    bool flashlightOn = true;
     
-    UPROPERTY(EditDefaultsOnly, Category="Input")
-    UInputAction *jumpAction;
-    UFUNCTION()
-    void onJumpInputStarted(const FInputActionInstance &value);
-    UFUNCTION()
-    void onJumpInputOngoing(const FInputActionInstance &value);
-    UFUNCTION()
-    void onJumpInputCompleted(const FInputActionInstance &value);
+    UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category="Default")
+    bool isCrouching = false;
 
-    UPROPERTY(EditDefaultsOnly, Category="Input")
-    UInputAction *interactAction;
-    UFUNCTION()
-    void onInteractInputStart(const FInputActionInstance &value);
-    UFUNCTION()
-    void onInteractInputEnd(const FInputActionInstance &value);
-    
-    UPROPERTY(EditDefaultsOnly, Category="Input")
-    UInputAction *interactScrollAction;
-    UFUNCTION()
-    void onInteractScrollInput(const FInputActionInstance &value);
-
-    UPROPERTY(EditDefaultsOnly, Category="Input")
-    UInputAction *flashlightAction;
-    UFUNCTION()
-    void onFlashlightInput(const FInputActionInstance &value);
-
-    UPROPERTY(EditDefaultsOnly, Category="Input")
-    UInputAction *zoomAction;
-    UFUNCTION()
-    void onZoomInputStarted(const FInputActionInstance &value);
-    UFUNCTION()
-    void onZoomInputEnded(const FInputActionInstance &value);
-
-    UPROPERTY(EditDefaultsOnly, Category="Input")
-    UInputAction *freeLookAction;
-    UFUNCTION()
-    void onFreeLookInputStarted(const FInputActionInstance &value);
-    UFUNCTION()
-    void onFreeLookInputEnded(const FInputActionInstance &value);
-
-    UPROPERTY(EditDefaultsOnly, Category="Input")
-    UInputAction *emTpAction;
-    UFUNCTION()
-    void onEmTpInputStarted(const FInputActionInstance &value);
-    UFUNCTION()
-    void onEmTpInputTriggered(const FInputActionInstance &value);
-    UFUNCTION()
-    void onEmTpInputCanceled(const FInputActionInstance &value);
-
-    UPROPERTY(EditDefaultsOnly, Category="Input")
-    UInputAction *crouchAction;
-    UFUNCTION()
-    void onCrouchInputStarted(const FInputActionInstance &value);
-    UFUNCTION()
-    void onCrouchInputEnded(const FInputActionInstance &value);
-
-    UPROPERTY(EditDefaultsOnly, Category="Input")
-    UInputAction *viewModeAction;
-    UFUNCTION()
-    void onViewModeInput(const FInputActionInstance &value);
+    UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category="Default")
+    bool noClip = false;
 };

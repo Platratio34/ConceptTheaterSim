@@ -1,0 +1,11 @@
+// Copyright Peter Crall 2025
+
+#pragma once
+
+class CONCEPTTHEATERSIM_API ATheaterSimPlayerController;
+class CONCEPTTHEATERSIM_API ATheaterSimPlayerCharacter;
+class CONCEPTTHEATERSIM_API UCInteractionComponent;
+class CONCEPTTHEATERSIM_API UTheaterSimGameInstance;
+class CONCEPTTHEATERSIM_API ATheaterSimGameMode;
+class CONCEPTTHEATERSIM_API UTheaterSimSaveGame;
+class CONCEPTTHEATERSIM_API UTheaterSimUserSettings;
