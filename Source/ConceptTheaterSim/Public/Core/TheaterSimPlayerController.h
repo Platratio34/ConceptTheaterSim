@@ -26,9 +26,15 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-protected:
+    UFUNCTION(BlueprintCallable)
+    void clearObjectInteractionMode();
 
-    void updateZoom(float deltaTime);
+    UFUNCTION(BlueprintCallable)
+    ATheaterSimMainHUD* getMainHUD() {
+        return hud;
+    }
+
+protected:
 
     void freeCursor(bool newFree);
 
@@ -84,6 +90,8 @@ protected:
     void onCrouchInputStarted(const FInputActionInstance &value);
     UFUNCTION()
     void onCrouchInputEnded(const FInputActionInstance &value);
+    UFUNCTION()
+    void onCrouchInputTriggered(const FInputActionInstance &value);
 
     UPROPERTY(EditDefaultsOnly, Category="Input - Interaction")
     UInputAction *interactAction;
@@ -96,6 +104,11 @@ protected:
     UInputAction *interactScrollAction;
     UFUNCTION()
     void onInteractScrollInput(const FInputActionInstance &value);
+    
+    UPROPERTY(EditDefaultsOnly, Category="Input - Interaction")
+    UInputAction *interactObjectMode;
+    UFUNCTION()
+    void onInteractObjectMode(const FInputActionInstance &value);
 
     UPROPERTY(EditDefaultsOnly, Category="Input - Tools")
     UInputAction *flashlightAction;
@@ -110,6 +123,11 @@ protected:
     void onEmTpInputTriggered(const FInputActionInstance &value);
     UFUNCTION()
     void onEmTpInputCanceled(const FInputActionInstance &value);
+
+    UPROPERTY(EditDefaultsOnly, Category="Input - Debug")
+    UInputAction *noClipAction;
+    UFUNCTION()
+    void onNoClipInputTriggered(const FInputActionInstance &value);
 
     // Camera
     UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category="Camera")
@@ -127,6 +145,9 @@ protected:
     // Other
     UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category="Default")
     bool locked = false;
+
+    UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category="Default")
+    UCInteractionComponent *objectInteractionTarget = nullptr;
 
     // HUD
     UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category="Default")

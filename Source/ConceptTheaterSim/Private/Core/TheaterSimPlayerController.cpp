@@ -6,14 +6,15 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 
-void ATheaterSimPlayerController::BeginPlay()
-{
+void ATheaterSimPlayerController::BeginPlay() {
     Super::BeginPlay();
 
-    if(UEnhancedInputLocalPlayerSubsystem* inputSubsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
-    {
+    if(UEnhancedInputLocalPlayerSubsystem* inputSubsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer())) {
         inputSubsystem->AddMappingContext(defaultMappingContext, 0);
     }
+
+    hud = Cast<ATheaterSimMainHUD>(GetHUD());
+    // find fixed cameras?
 }
 
 void ATheaterSimPlayerController::SetupInputComponent() {
@@ -31,6 +32,8 @@ void ATheaterSimPlayerController::SetupInputComponent() {
         eI->BindAction(interactAction, ETriggerEvent::Completed, this, &ATheaterSimPlayerController::onInteractInputEnd);
         eI->BindAction(interactAction, ETriggerEvent::Canceled, this, &ATheaterSimPlayerController::onInteractInputEnd);
 
+        eI->BindAction(interactObjectMode, ETriggerEvent::Triggered, this, &ATheaterSimPlayerController::onInteractObjectMode);
+
         eI->BindAction(interactScrollAction, ETriggerEvent::Triggered, this, &ATheaterSimPlayerController::onInteractScrollInput);
         
         eI->BindAction(flashlightAction, ETriggerEvent::Triggered, this, &ATheaterSimPlayerController::onFlashlightInput);
@@ -47,7 +50,10 @@ void ATheaterSimPlayerController::SetupInputComponent() {
         eI->BindAction(emTpAction, ETriggerEvent::Triggered, this, &ATheaterSimPlayerController::onEmTpInputTriggered);
         eI->BindAction(emTpAction, ETriggerEvent::Canceled, this, &ATheaterSimPlayerController::onEmTpInputCanceled);
         
-        eI->BindAction(crouchAction, ETriggerEvent::Triggered, this, &ATheaterSimPlayerController::onCrouchInputStarted);
+        eI->BindAction(noClipAction, ETriggerEvent::Triggered, this, &ATheaterSimPlayerController::onNoClipInputTriggered);
+        
+        eI->BindAction(crouchAction, ETriggerEvent::Triggered, this, &ATheaterSimPlayerController::onCrouchInputTriggered);
+        eI->BindAction(crouchAction, ETriggerEvent::Started, this, &ATheaterSimPlayerController::onCrouchInputStarted);
         eI->BindAction(crouchAction, ETriggerEvent::Completed, this, &ATheaterSimPlayerController::onCrouchInputEnded);
         eI->BindAction(crouchAction, ETriggerEvent::Canceled, this, &ATheaterSimPlayerController::onCrouchInputEnded);
         
@@ -63,8 +69,7 @@ void ATheaterSimPlayerController::Tick(float deltaTime) {
     }
 }
 
-ATheaterSimPlayerCharacter *ATheaterSimPlayerController::getCharacter()
-{
+ATheaterSimPlayerCharacter *ATheaterSimPlayerController::getCharacter() {
     if(pc != nullptr)
         return pc;
     if(ACharacter* character = GetCharacter())
@@ -75,8 +80,7 @@ ATheaterSimPlayerCharacter *ATheaterSimPlayerController::getCharacter()
     return nullptr;
 }
 
-void ATheaterSimPlayerController::freeCursor(bool newFree)
-{
+void ATheaterSimPlayerController::freeCursor(bool newFree) {
     if(cursorFree == newFree)
         return;
     cursorFree = newFree;
@@ -101,148 +105,164 @@ void ATheaterSimPlayerController::freeCursor(bool newFree)
     }
 }
 
-void ATheaterSimPlayerController::onCameraMoveInput(const FInputActionInstance &value)
-{
+void ATheaterSimPlayerController::onCameraMoveInput(const FInputActionInstance &value) {
     if(locked || (pc == nullptr) || cursorFree)
         return;
     pc->cameraInput(value.GetValue().Get<FVector2D>());
 }
 
-void ATheaterSimPlayerController::onMoveInput(const FInputActionInstance &value)
-{
+void ATheaterSimPlayerController::onMoveInput(const FInputActionInstance &value) {
     if(locked || (pc == nullptr))
         return;
     FVector2D move = value.GetValue().Get<FVector2D>();
     pc->movementInput(value.GetValue().Get<FVector2D>());
 }
 
-void ATheaterSimPlayerController::onJumpInputStarted(const FInputActionInstance &value)
-{
+void ATheaterSimPlayerController::onJumpInputStarted(const FInputActionInstance &value) {
     if(locked || (pc == nullptr))
         return;
     pc->onJump(false);
 }
 
-void ATheaterSimPlayerController::onJumpInputOngoing(const FInputActionInstance &value)
-{
+void ATheaterSimPlayerController::onJumpInputOngoing(const FInputActionInstance &value) {
     if(locked || (pc == nullptr))
         return;
     pc->onJump(true);
 }
 
-void ATheaterSimPlayerController::onJumpInputCompleted(const FInputActionInstance &value)
-{
+void ATheaterSimPlayerController::onJumpInputCompleted(const FInputActionInstance &value) {
     if(locked || (pc == nullptr))
         return;
     pc->StopJumping();
 }
 
-void ATheaterSimPlayerController::onInteractInputStart(const FInputActionInstance &value)
-{
+void ATheaterSimPlayerController::onInteractInputStart(const FInputActionInstance &value) {
     if(locked || (pc == nullptr))
         return;
     pc->onInteract();
 }
 
-void ATheaterSimPlayerController::onInteractInputEnd(const FInputActionInstance &value)
-{
+void ATheaterSimPlayerController::onInteractInputEnd(const FInputActionInstance &value) {
     if(pc == nullptr)
         return;
     pc->endInteract();
 }
 
-void ATheaterSimPlayerController::onInteractScrollInput(const FInputActionInstance &value)
-{
+void ATheaterSimPlayerController::onInteractScrollInput(const FInputActionInstance &value) {
     if(locked || (pc == nullptr))
         return;
     pc->onInteractScroll(value.GetValue().Get<float>());
 }
 
-void ATheaterSimPlayerController::onFlashlightInput(const FInputActionInstance &value)
-{
+void ATheaterSimPlayerController::onInteractObjectMode(const FInputActionInstance &value) {
+    if(locked || (pc == nullptr))
+        return;
+    objectInteractionTarget = pc->onInteractObjectMode();
+    if(objectInteractionTarget == nullptr)
+        return;
+    objectInteractionTarget->setObjectMode(true);
+    locked = true;
+    freeCursor(true);
+    FInputModeUIOnly inputMode;
+    // inputMode.SetWidgetToFocus(hud->getWidget());
+    inputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+    SetInputMode(inputMode);
+}
+
+void ATheaterSimPlayerController::clearObjectInteractionMode() {
+    if(objectInteractionTarget == nullptr)
+        return;
+    objectInteractionTarget = nullptr;
+    locked = false;
+    freeCursor(false);
+}
+
+void ATheaterSimPlayerController::onFlashlightInput(const FInputActionInstance &value) {
     if(locked || (pc == nullptr))
         return;
     pc->toggleFlashlight();
 }
 
-void ATheaterSimPlayerController::onZoomInputStarted(const FInputActionInstance &value)
-{
+void ATheaterSimPlayerController::onZoomInputStarted(const FInputActionInstance &value) {
     if(locked || (pc == nullptr))
         return;
     pc->toggleZoom();
 }
 
-void ATheaterSimPlayerController::onZoomInputEnded(const FInputActionInstance &value)
-{
+void ATheaterSimPlayerController::onZoomInputEnded(const FInputActionInstance &value) {
     if(locked || (pc == nullptr))
         return;
-    if(value.GetElapsedTime() > 0.5)
+    if(value.GetElapsedTime() > 0.25)
         pc->setZoom(false);
 }
 
-void ATheaterSimPlayerController::onFreeLookInputStarted(const FInputActionInstance &value)
-{
+void ATheaterSimPlayerController::onFreeLookInputStarted(const FInputActionInstance &value) {
     if(locked || (pc == nullptr))
         return;
     freeCursor(!cursorFree);
 }
 
-void ATheaterSimPlayerController::onFreeLookInputEnded(const FInputActionInstance &value)
-{
+void ATheaterSimPlayerController::onFreeLookInputEnded(const FInputActionInstance &value) {
     if(locked || (pc == nullptr) || value.GetElapsedTime() < 0.5)
         return;
     freeCursor(false);
 }
 
-void ATheaterSimPlayerController::onEmTpInputStarted(const FInputActionInstance &value)
-{
+void ATheaterSimPlayerController::onEmTpInputStarted(const FInputActionInstance &value) {
     if(locked || (pc == nullptr))
         return;
     hud->setEmTpWarning(true);
 }
 
-void ATheaterSimPlayerController::onEmTpInputTriggered(const FInputActionInstance &value)
-{
+void ATheaterSimPlayerController::onEmTpInputTriggered(const FInputActionInstance &value) {
     if(locked || (pc == nullptr))
         return;
     hud->setEmTpWarning(false);
     pc->emTp();
 }
 
-void ATheaterSimPlayerController::onEmTpInputCanceled(const FInputActionInstance &value)
-{
+void ATheaterSimPlayerController::onEmTpInputCanceled(const FInputActionInstance &value) {
     if(locked || (pc == nullptr))
         return;
     hud->setEmTpWarning(false);
 }
 
-void ATheaterSimPlayerController::onCrouchInputStarted(const FInputActionInstance &value)
-{
+
+void ATheaterSimPlayerController::onNoClipInputTriggered(const FInputActionInstance &value) {
+    if(locked || (pc == nullptr))
+        return;
+    pc->toggleNoClip();
+}
+
+void ATheaterSimPlayerController::onCrouchInputTriggered(const FInputActionInstance &value) {
+    if(locked || (pc == nullptr))
+        return;
+    pc->onCrouch();
+}
+
+void ATheaterSimPlayerController::onCrouchInputStarted(const FInputActionInstance &value) {
     if(locked || (pc == nullptr))
         return;
     pc->setCrouched(!pc->getCrouched());
 }
 
-void ATheaterSimPlayerController::onCrouchInputEnded(const FInputActionInstance &value)
-{
+void ATheaterSimPlayerController::onCrouchInputEnded(const FInputActionInstance &value) {
     if(locked || (pc == nullptr))
         return;
     if(value.GetElapsedTime() > 0.25)
         pc->setCrouched(false);
 }
 
-void ATheaterSimPlayerController::onViewModeInput(const FInputActionInstance &value)
-{
+void ATheaterSimPlayerController::onViewModeInput(const FInputActionInstance &value) {
+    if(objectInteractionTarget != nullptr)
+        return;
     if(!fixedCamera)
         return;
-    if(isSelfCam)
-    {
+    if(isSelfCam) {
         SetViewTargetWithBlend(fixedCamera, 0, EViewTargetBlendFunction::VTBlend_Linear, 0, false);
         returnPos = pc->GetActorLocation();
         pc->SetActorLocation(FVector(0, 0, -1117.6), false, nullptr, ETeleportType::TeleportPhysics);
-    }
-    else
-    {
+    } else {
         SetViewTargetWithBlend(this, 0, EViewTargetBlendFunction::VTBlend_Linear, 0, false);
         pc->SetActorLocation(returnPos, false, nullptr, ETeleportType::TeleportPhysics);
     }

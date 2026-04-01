@@ -8,6 +8,8 @@
 #include "GameFramework/PlayerStart.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "UI/InteractionWidgetBase.h"
+#include "Engine/Engine.h"
 
 // Sets default values
 ATheaterSimPlayerCharacter::ATheaterSimPlayerCharacter()
@@ -136,16 +138,10 @@ void ATheaterSimPlayerCharacter::setCable(ACCable *cable)
     cable->putInInventory(this);
 }
 
-void ATheaterSimPlayerCharacter::updateInteractionWidget()
-{
-    if(interactable)
-    {
-        // interactionWidget->setInteraction(interactable->getName(interactionTarget), interactable->getAction(interactionTarget))
-    }
-    else
-    {
-        // interactionWidget->clearInteraction();
-    }
+void ATheaterSimPlayerCharacter::updateInteractionWidget() {
+    UInteractionWidgetBase *iw = getPlayerController()->getMainHUD()->interactionWidget;
+    iw->mouseMode = interactionMouse;
+    iw->updateInteractable(interactable, interactionTarget);
 }
 
 void ATheaterSimPlayerCharacter::updateZoom(float deltaTime) {
@@ -169,40 +165,31 @@ void ATheaterSimPlayerCharacter::updateZoom(float deltaTime) {
     playerCamera->SetFieldOfView(fov);
 }
 
-void ATheaterSimPlayerCharacter::updateLadderState(bool newState, AActor *ladder)
-{
+void ATheaterSimPlayerCharacter::updateLadderState(bool newState, AActor *ladder) {
     bool stateChanged = false;
-    if(newState)
-    {
+    if(newState) {
         ladders.Add(ladder);
-        if(!onLadder)
-        {
+        if(!onLadder) {
             onLadder = true;
             stateChanged = true;
         }
-    }
-    else
-    {
+    } else {
         ladders.Remove(ladder);
-        if(ladders.IsEmpty() && onLadder)
-        {
+        if(ladders.IsEmpty() && onLadder) {
             onLadder = false;
             stateChanged = true;
         }
     }
-    if(stateChanged)
-    {
+    if(stateChanged) {
         UCharacterMovementComponent* mc = GetCharacterMovement();
         if(onLadder)
-        {
             mc->StopMovementImmediately();
-        }
-        mc->SetMovementMode(onLadder ? EMovementMode::MOVE_Flying : EMovementMode::MOVE_Walking);
+        if(!noClip)
+            mc->SetMovementMode(onLadder ? EMovementMode::MOVE_Flying : EMovementMode::MOVE_Walking);
     }
 }
 
-void ATheaterSimPlayerCharacter::onInteract()
-{
+void ATheaterSimPlayerCharacter::onInteract() {
     widgetInteraction->PressPointerKey(EKeys::LeftMouseButton);
     if(interactable)
     {
@@ -211,6 +198,13 @@ void ATheaterSimPlayerCharacter::onInteract()
     }
     // otherwise cable?
 }
+
+UCInteractionComponent *ATheaterSimPlayerCharacter::onInteractObjectMode() {
+    if(!interactable || !interactable->supportsObjectMode)
+        return nullptr;
+    return interactable;
+}
+
 void ATheaterSimPlayerCharacter::onInteractScroll(float scroll) {
     widgetInteraction->ScrollWheel(scroll);
     if(interactable != nullptr)
@@ -287,9 +281,7 @@ void ATheaterSimPlayerCharacter::setZoom(bool zoomed) {
 }
 
 void ATheaterSimPlayerCharacter::setCrouched(bool crouched) {
-    if(noClip)
-        return;
-    if(crouched == isCrouching)
+    if(noClip || crouched == isCrouching)
         return;
     isCrouching = crouched;
     if(isCrouching) {
@@ -301,6 +293,11 @@ void ATheaterSimPlayerCharacter::setCrouched(bool crouched) {
         playerCamera->SetRelativeLocation(FVector(2.54, 0, 36.04), false, nullptr, ETeleportType::None);
     }
 }
+void ATheaterSimPlayerCharacter::onCrouch() {
+    if(!noClip)
+        return;
+    AddMovementInput(GetActorUpVector(), -1, true);
+}
 
 void ATheaterSimPlayerCharacter::emTp() {
     TArray<AActor *> foundActors;
@@ -311,4 +308,24 @@ void ATheaterSimPlayerCharacter::emTp() {
         return;
     }
     SetActorLocation(foundActors[0]->GetActorLocation(), false, nullptr, ETeleportType::TeleportPhysics);
+}
+
+void ATheaterSimPlayerCharacter::toggleNoClip() {
+    noClip = !noClip;
+    UCharacterMovementComponent* mc = GetCharacterMovement();
+    UCapsuleComponent *capsule = GetCapsuleComponent();
+    if(noClip) {
+        mc->StopMovementImmediately();
+        mc->SetMovementMode(EMovementMode::MOVE_Flying);
+        if(GEngine)
+            GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, FString::Printf(TEXT("NoClip Active")));
+        capsule->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldStatic, ECollisionResponse::ECR_Overlap);
+        capsule->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldDynamic, ECollisionResponse::ECR_Overlap);
+    } else {
+        mc->SetMovementMode(EMovementMode::MOVE_Walking);
+        if(GEngine)
+            GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, FString::Printf(TEXT("NoClip Inactive")));
+        capsule->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldStatic, ECollisionResponse::ECR_Block);
+        capsule->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldDynamic, ECollisionResponse::ECR_Block);
+    }
 }

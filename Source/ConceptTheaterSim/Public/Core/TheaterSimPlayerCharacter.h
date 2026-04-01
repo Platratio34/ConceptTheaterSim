@@ -53,6 +53,9 @@ public:
     void setCrouched(bool crouched);
 
     UFUNCTION(BlueprintCallable)
+    void onCrouch();
+
+    UFUNCTION(BlueprintCallable)
     bool getCrouched() {
         return isCrouching;
     }
@@ -73,6 +76,9 @@ public:
     void onInteract();
 
     UFUNCTION()
+    UCInteractionComponent *onInteractObjectMode();
+
+    UFUNCTION()
     void onInteractScroll(float scroll);
 
     UFUNCTION()
@@ -86,6 +92,9 @@ public:
 
     UFUNCTION(BlueprintCallable)
     void emTp();
+
+    UFUNCTION(BlueprintCallable)
+    void toggleNoClip();
 
 protected:
 

@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/HUD.h"
+#include "UI/InteractionWidgetBase.h"
+#include "CPerson.h"
 #include "TheaterSimMainHUD.generated.h"
 
 UCLASS(BlueprintType)
@@ -21,6 +23,21 @@ public:
         minimapVisible = visible;
     }
 
+    UFUNCTION(BlueprintImplementableEvent)
+    void setLoading(bool loading, const FText& showName);
+    
+    UFUNCTION(BlueprintImplementableEvent)
+    void clearLoading();
+
+    UFUNCTION(BlueprintImplementableEvent)
+    void openPersonMenu(ACPerson *person);
+
+    UPROPERTY(BlueprintReadWrite)
+    UInteractionWidgetBase *interactionWidget;
+
+    UFUNCTION(BlueprintNativeEvent)
+    UUserWidget* getWidget();
+
 protected:
 
     UPROPERTY(BlueprintReadOnly, VisibleInstanceOnly)
@@ -28,4 +45,8 @@ protected:
 
     UPROPERTY(BlueprintReadOnly, VisibleInstanceOnly)
     bool minimapVisible = true;
+
+    UUserWidget* getWidget_Implementation() {
+        return nullptr;
+    }
 };
