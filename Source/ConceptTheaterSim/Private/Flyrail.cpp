@@ -309,6 +309,8 @@ void AFlyrailRedirectBlock::setup(TArray<UStaticMeshComponent*>& loftBlocks) {
     int numLoftBlocks = loftBlocks.Num();
     for (int i = 0; i < blockLines.Num(); i++) {
         UStaticMeshComponent *comp = blockLines[i];
+        if(!IsValid(comp))
+            continue;
         if (i > numLoftBlocks) {
             comp->SetVisibility(false);
             continue;
@@ -317,6 +319,8 @@ void AFlyrailRedirectBlock::setup(TArray<UStaticMeshComponent*>& loftBlocks) {
     }
     for (int i = 0; i < outLines.Num(); i++) {
         USplineMeshComponent *comp = outLines[i];
+        if(!IsValid(comp))
+            continue;
         if (i > numLoftBlocks) {
             comp->SetVisibility(false);
             continue;

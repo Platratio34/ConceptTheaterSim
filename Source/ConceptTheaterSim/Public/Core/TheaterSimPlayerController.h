@@ -65,7 +65,7 @@ protected:
     UFUNCTION()
     void onFreeLookInputEnded(const FInputActionInstance &value);
 
-    UPROPERTY(EditDefaultsOnly, Category="Input - Canera")
+    UPROPERTY(EditDefaultsOnly, Category="Input - Camera")
     UInputAction *viewModeAction;
     UFUNCTION()
     void onViewModeInput(const FInputActionInstance &value);
