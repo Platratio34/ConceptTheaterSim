@@ -22,30 +22,42 @@ void ALightingPosition::OnConstruction(const FTransform& Transform)
     // Clear any previous persistent debug lines for this actor in the editor
     FlushPersistentDebugLines(GetWorld());
 
-    float step = byAngle ? 5 : 12;
-
-    if(minPosition < 0 && maxPosition > 0)
-        drawDebugBox(getHangLocation(0), getHangRotation(0, 0));
-
-    float start = minPosition;
-    if(start < 0)
-        start = 0;
-    start = start + (step - FMath::Fmod(start, step));
-    for (float p = start; p < maxPosition; p += step)
-    {
-        drawDebugBox(getHangLocation(p), getHangRotation(p, 0));
+    if(positions.Num() == 0) {
+        FLightingPositionConfig p0;
+        p0.minPosition = minPosition;
+        p0.maxPosition = maxPosition;
+        p0.radius = radius;
+        p0.byAngle = byAngle;
+        positions.Add(p0);
     }
-    drawDebugBox(getHangLocation(maxPosition), getHangRotation(maxPosition, 0));
 
-    start = maxPosition;
-    if(start > -step)
-        start = -step;
-    start = start - FMath::Fmod(start, step);
-    for (float p = start; p > minPosition; p -= step)
-    {
-        drawDebugBox(getHangLocation(p), getHangRotation(p, 0));
+
+    for (int index = 0; index < positions.Num(); index++) {
+        FLightingPositionConfig &pc = positions[index];
+        float step = pc.byAngle ? 5 : 12;
+        if (pc.minPosition < 0 && pc.maxPosition > 0)
+            drawDebugBox(getHangLocation(index, 0), getHangRotation(index, 0, 0));
+
+        float start = pc.minPosition;
+        if(start < 0)
+            start = 0;
+        start = start + (step - FMath::Fmod(start, step));
+        for (float p = start; p < pc.maxPosition; p += step)
+        {
+            drawDebugBox(getHangLocation(index, p), getHangRotation(index, p, 0));
+        }
+        drawDebugBox(getHangLocation(index, pc.maxPosition), getHangRotation(index, pc.maxPosition, 0));
+
+        start = pc.maxPosition;
+        if(start > -step)
+            start = -step;
+        start = start - FMath::Fmod(start, step);
+        for (float p = start; p > pc.minPosition; p -= step)
+        {
+            drawDebugBox(getHangLocation(index, p), getHangRotation(index, p, 0));
+        }
+        drawDebugBox(getHangLocation(index, pc.minPosition), getHangRotation(index, pc.minPosition, 0));
     }
-    drawDebugBox(getHangLocation(minPosition), getHangRotation(minPosition, 0));
 }
 
 void ALightingPosition::drawDebugBox(FVector pos, FQuat rot)
@@ -77,30 +89,43 @@ void ALightingPosition::Tick(float DeltaTime)
 
 }
 
-FVector ALightingPosition::getHangLocation(float position)
+FVector ALightingPosition::getHangLocation(int index, float position)
 {
-    if(radius != 0)
+    if(positions.Num() == 0)
+        return GetActorTransform().TransformPosition(FVector(position * 2.54, 0, 0));
+    if(index < 0 || index >= positions.Num())
+        index = 0;
+    FLightingPositionConfig &pc = positions[index];
+    if(pc.radius != 0)
     {
         // float theta = position / (3.141562653 * 2 * radius);
-        float theta = byAngle ? (position / 180 * 3.141592653) : (position / radius);
+        float theta = pc.byAngle ? (position / 180 * 3.141592653) : (position / pc.radius);
         float x = FMath::Cos(theta);
         float y = FMath::Sin(theta);
         FVector pos = /*GetActorLocation();
-        pos += */FVector(y * radius * 2.54, -(1-x) * radius * 2.54, 0);
-        return GetActorTransform().TransformPosition(pos);
+        pos += */FVector(y * pc.radius * 2.54, -(1-x) * pc.radius * 2.54, 0);
+        return GetActorTransform().TransformPosition(pos + (pc.offset*2.54));
     }
-    return GetActorTransform().TransformPosition(FVector(position * 2.54, 0, 0));
+    return GetActorTransform().TransformPosition(FVector(position * 2.54, 0, 0) + (pc.offset*2.54));
 }
 
-FQuat ALightingPosition::getHangRotation(float position, float roll)
+FQuat ALightingPosition::getHangRotation(int index, float position, float roll)
 {
+    if(positions.Num() == 0) {
+        FRotator r = GetActorRotation();
+        r.Roll = roll;
+        return r.Quaternion();
+    }
+    if(index < 0 || index >= positions.Num())
+        index = 0;
+    FLightingPositionConfig &pc = positions[index];
     FRotator r = GetActorRotation();
-    if(radius != 0)
+    if(pc.radius != 0)
     {
-        if(byAngle) {
+        if(pc.byAngle) {
             r += FRotator(roll, -position, 0);
         } else {
-            r += FRotator(roll, -(position / (3.141592653 * 2 * radius)) * 360, 0);
+            r += FRotator(roll, -(position / (3.141592653 * 2 * pc.radius)) * 360, 0);
         }
     } else {
         r.Roll = roll;

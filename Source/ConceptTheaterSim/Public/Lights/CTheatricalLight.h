@@ -148,6 +148,9 @@ public:
     TSoftObjectPtr<ALightingPosition> positionActor = nullptr;
 
     UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category="Default")
+    int positionIndex = 0;
+
+    UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category="Default")
     float positionDistance = 0;
 
     UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category="Default")

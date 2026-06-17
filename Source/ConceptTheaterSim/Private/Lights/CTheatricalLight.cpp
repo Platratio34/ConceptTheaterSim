@@ -107,9 +107,9 @@ void ACTheatricalLight::OnConstruction(const FTransform &Transform)
     onLightUpdate();
 
     if(positionActor != nullptr) {
-        FVector p = positionActor->getHangLocation(positionDistance);
+        FVector p = positionActor->getHangLocation(positionIndex, positionDistance);
         SetActorLocation(p);
-        SetActorRotation(positionActor->getHangRotation(positionDistance, positionRoll));
+        SetActorRotation(positionActor->getHangRotation(positionIndex, positionDistance, positionRoll));
     }
 }
 
@@ -119,9 +119,9 @@ void ACTheatricalLight::BeginPlay()
 	Super::BeginPlay();
     
     if(positionActor != nullptr) {
-        FVector p = positionActor->getHangLocation(positionDistance);
+        FVector p = positionActor->getHangLocation(positionIndex, positionDistance);
         SetActorLocation(p);
-        SetActorRotation(positionActor->getHangRotation(positionDistance, positionRoll));
+        SetActorRotation(positionActor->getHangRotation(positionIndex, positionDistance, positionRoll));
         root->AttachToComponent(positionActor->GetRootComponent(), FAttachmentTransformRules::KeepWorldTransform);
     }
     else if(parentActor != nullptr)
