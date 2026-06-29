@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "Components/SplineMeshComponent.h"
 #include "GameFramework/Character.h"
+#include "Engine/EngineTypes.h"
 #include "CCable.generated.h"
 
 class CONCEPTTHEATERSIM_API UCCableConnector;
@@ -59,6 +60,9 @@ public:
     UPROPERTY(EditInstanceOnly, BlueprintReadWrite, Category="Cable")
     FName endPortID;
 
+    UPROPERTY(EditInstanceOnly, BlueprintReadWrite, Category="Cable")
+    TArray<AActor*> redirectPoints;
+
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Debug")
     FLinearColor debugColor = FLinearColor(1.0, 1.0, 0.0, 1.0);
 
@@ -89,14 +93,20 @@ public:
     UFUNCTION(BlueprintCallable)
     virtual void onDisconnect(bool start);
 
-    UFUNCTION(BlueprintCallable, BlueprintPure)
+    UFUNCTION(BlueprintPure)
     bool isFullyConnected();
 
-    UFUNCTION(BlueprintCallable)
-    virtual void updateCable();
+    UFUNCTION()
+    virtual void updateCable(UCCableConnector *startPort, UCCableConnector *endPort, bool withDebug);
+    
+    UFUNCTION(BlueprintCallable, CallInEditor, Category="Cable")
+    virtual void redrawCable();
 
     UFUNCTION(BlueprintCallable)
     virtual bool isValidConnection(UCCableConnector *connector, bool start);
+
+    UFUNCTION(CallInEditor, Category="Cable")
+    void swapEnds();
 
 protected:
 
@@ -114,6 +124,9 @@ protected:
     
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Components")
     USplineMeshComponent *spline;
+    
+    UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category="Components")
+    TArray<USplineMeshComponent*> splines;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Components")
     UArrowComponent *arrow;
@@ -123,4 +136,5 @@ protected:
 
 private:
     
+    USplineMeshComponent* getSpline(int i, FAttachmentTransformRules &transformRules);
 };

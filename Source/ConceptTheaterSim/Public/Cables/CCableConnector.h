@@ -26,21 +26,22 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default", meta = (ExposeOnSpawn = true))
     bool input;
     
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default")
     FText name;
     
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default", meta = (ExposeOnSpawn = true))
     FName id;
 
     UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category="Default")
     ACCable *cable = nullptr;
     
-    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Components")
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Components", meta = (ExposeOnSpawn = true))
     UPrimitiveComponent *connector = nullptr;
 
+    UFUNCTION(BlueprintPure, Category="Cable")
     bool isConnected()
     {
         return cable != nullptr;

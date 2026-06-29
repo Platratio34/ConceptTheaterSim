@@ -38,7 +38,7 @@ public:
 
     virtual void onDisconnect(ACCable* cable) override;
 
-    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default")
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default", meta = (ExposeOnSpawn = true))
     UCDMXCableConnector *through = nullptr;
     
     UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, AdvancedDisplay, Category="Default")
@@ -47,10 +47,10 @@ public:
     UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, AdvancedDisplay, Category="Default")
     UCDMXCableConnector *other = nullptr;
 
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="DMX")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="DMX", meta = (ExposeOnSpawn = true))
     bool isSource = false;
 
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="DMX")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="DMX", meta = (ExposeOnSpawn = true))
     bool isReceiver = true;
 
     UFUNCTION(BlueprintCallable)

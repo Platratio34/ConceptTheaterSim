@@ -47,6 +47,9 @@ public:
         }
         for(FColorParameter p : parameters)
         {
+            if(!light->hasParameter(p.parameterId)) {
+                continue;
+            }
             double v = light->getParameterNormalized(p.parameterId);
             if(subtractive)
             {

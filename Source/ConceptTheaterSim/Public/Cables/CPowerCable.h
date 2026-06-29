@@ -17,13 +17,13 @@ public:
     
 
 protected:
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Power")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Power")
     FName startType;
 
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Power")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Power")
     FName endType;
 
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Power")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Power")
     double maxAmps = 20;
 
 public:	

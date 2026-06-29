@@ -153,8 +153,11 @@ public:
     UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category="Default")
     float positionDistance = 0;
 
-    UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category="Default")
+    UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category="Default", AdvancedDisplay)
     float positionRoll = 0;
+    
+    UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category="Default")
+    FRotator positionRotation;
     
     UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Image")
     UTexture2D* gobo = nullptr;

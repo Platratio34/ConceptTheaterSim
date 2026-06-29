@@ -41,13 +41,13 @@ public:
 
     virtual void onDisconnect(ACCable* cable) override;
 
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Power")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Power", meta = (ExposeOnSpawn = true))
     FName connectorType;
 
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Power")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Power", meta = (ExposeOnSpawn = true))
     bool isSource = false;
 
-    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default")
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default", meta = (ExposeOnSpawn = true))
     UCPowerCableConnector *through = nullptr;
     
     UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, AdvancedDisplay, Category="Default")
@@ -74,10 +74,10 @@ public:
     UPROPERTY(BlueprintAssignable, VisibleAnywhere, Category="Power")
     FOnPowerChange onPowerChange;
 
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Power")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Power", meta = (ExposeOnSpawn = true))
     ACBreaker *breaker;
 
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Power")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Power", meta = (ExposeOnSpawn = true))
     FName breakerCircuit;
 
     UFUNCTION(BlueprintCallable)

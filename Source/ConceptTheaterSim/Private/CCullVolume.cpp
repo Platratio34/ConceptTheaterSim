@@ -2,6 +2,7 @@
 
 #include "CCullVolume.h"
 #include "GameFramework/Pawn.h"
+#include "GameFramework/Character.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
@@ -69,7 +70,7 @@ void ACCullVolume::Tick(float DeltaTime)
         collider->GetOverlappingActors(overlappingActors);
         for(AActor* actor : overlappingActors)
         {
-            if(Cast<APawn>(actor))
+            if(Cast<ACharacter>(actor))
             {
                 pawnInBox = true;
                 break;
@@ -119,14 +120,14 @@ void ACCullVolume::Tick(float DeltaTime)
 
 void ACCullVolume::onBeginBoxOverlap(UPrimitiveComponent *OverlappedComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult)
 {
-    if(!Cast<APawn>(OtherActor))
+    if(!Cast<ACharacter>(OtherActor))
         return;
     pawnInBox = true;
 }
 
 void ACCullVolume::onBoxOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-    if(!Cast<APawn>(OtherActor))
+    if(!Cast<ACharacter>(OtherActor))
         return;
     if(!pawnInBox)
         return;
@@ -135,7 +136,7 @@ void ACCullVolume::onBoxOverlapEnd(UPrimitiveComponent* OverlappedComponent, AAc
 
     for(AActor* actor : overlappingActors)
     {
-        if(Cast<APawn>(actor))
+        if(Cast<ACharacter>(actor))
             return;
     }
     pawnInBox = false;
